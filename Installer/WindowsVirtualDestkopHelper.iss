@@ -134,7 +134,7 @@ DisableProgramGroupPage=yes
 LicenseFile=C:\Users\dankrusi\Code\WindowsVirtualDesktopHelper\LICENSE
 ;InfoBeforeFile=C:\Users\dankrusi\Code\WindowsVirtualDesktopHelper\EULA
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
-PrivilegesRequired=admin
+PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputBaseFilename=Windows Virtual Desktop Helper Setup
 Compression=lzma
@@ -160,7 +160,7 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon     
 ; NOTE: this causes issues with windows defender? 
 ; NOTE: should this be userstartup instead? 
-Name: "{commonstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: autostart    
+Name: "{userstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: autostart    
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

@@ -12,7 +12,7 @@ namespace WindowsVirtualDesktopHelper {
     public partial class SwitchNotificationForm : Form {
 
         public string LabelText;
-        public int DisplayTimeMS = 1000;
+        public int DisplayTimeMS = 2000;
 
         public SwitchNotificationForm() {
             InitializeComponent();

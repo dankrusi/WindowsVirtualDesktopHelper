@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -83,6 +84,11 @@ namespace WindowsVirtualDesktopHelper {
                 form.LabelText = "Virtual Desktop Helper";
                 form.Show();
             }));
+        }
+
+        public void OpenURL(string url) {
+            url = url.Replace("&", "^&");
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
 
     }
