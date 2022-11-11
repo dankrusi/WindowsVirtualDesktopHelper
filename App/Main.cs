@@ -9,9 +9,9 @@ namespace WindowsVirtualDesktopHelper {
 
         [STAThread]
         public static void Main(string[] args) {
-            Console.WriteLine("asdf");
+            var app = new App();
             Application.EnableVisualStyles();
-            Application.Run(new Form()); // or whatever
+            Application.Run(app.SettingsForm);
         }
     }
 }
