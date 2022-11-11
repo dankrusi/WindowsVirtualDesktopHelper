@@ -11,6 +11,7 @@ Windows comes builtin with virtual desktops, however some important features are
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
 fix some of these missing features.
 
+Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop number
 
 ## Features
 
