@@ -2,9 +2,9 @@
 
 Simple and lightweight app to help with Virtual Desktops for Windows 10 and Windows 11.
 
-![Screenshot](Images/WindowsVirtualDeskopHelper Screenshot.png)
+![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v1.0 Setup](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Setup.v1.0.exe)
+[Download v1.0 Setup](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Setup.v1.0.exe) | 
 [Download v1.0 Executable](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Executable.v1.0.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
