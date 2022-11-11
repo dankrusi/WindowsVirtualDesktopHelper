@@ -2,6 +2,11 @@
 
 Simple and lightweight app to help with Virtual Desktops for Windows 10 and Windows 11.
 
+![Screenshot](Images/WindowsVirtualDeskopHelper Screenshot.png)
+
+[Download v1.0 Setup](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Setup.v1.0.exe)
+[Download v1.0 Executable](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Executable.v1.0.zip)
+
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
 fix some of these missing features.
@@ -25,7 +30,7 @@ Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.5 or higher 
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download Windows Virtual Desktop Helper Setup v1.0.exe]()
+[Download WindowsVirtualDesktopHelper Setup v1.0.exe](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Setup.v1.0.exe)
 
 Windows Defender Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender due to its installation option for installing to autostart. Typically, after enough users download, install, and report
@@ -36,7 +41,7 @@ the software as okay/safe, this malware warning will go away.
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 If you would like it to start with your computer, [add a shortcut to it to your autostart folder](https://support.microsoft.com/en-us/windows/add-an-app-to-run-automatically-at-startup-in-windows-10-150da165-dcd9-7230-517b-cf3c295d89dd).
 
-[Download WindowsVirtualDesktopHelper Executable v1.0.zip]()
+[Download WindowsVirtualDesktopHelper Executable v1.0.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Executable.v1.0.zip)
 
 
 ## Special Thanks
@@ -73,4 +78,3 @@ the software as okay/safe, this malware warning will go away. With USD 70 donati
 ### Why is the app based on the older .NET 4.5?
 
 The idea is to make the app as easy and lightweight to run as possible. Most systems have some version of .NET installed, thus we use a low version to cover as many users as possible. 
-Ideally the app would be coded in C++ Win32, but 
