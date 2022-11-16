@@ -22,8 +22,9 @@ namespace WindowsVirtualDesktopHelper {
             App.Instance = this;
 
             // Load the implementation
-            const int win11MinBuild = 22000;
-            if (Environment.OSVersion.Version.Build >= win11MinBuild) {
+            //const int win11MinBuild = 22000;
+            //if (Environment.OSVersion.Version.Build >= win11MinBuild) { // note this method requires a app manifest declaring win11 support otherwise a 'lie' is returned
+            if (IsWindows11()) {
                 this.VDAPI = new VirtualDesktopIndicator.Native.VirtualDesktop.Implementation.VirtualDesktopWin11();
             } else {
                 this.VDAPI = new VirtualDesktopIndicator.Native.VirtualDesktop.Implementation.VirtualDesktopWin10();
@@ -35,6 +36,16 @@ namespace WindowsVirtualDesktopHelper {
             this.SettingsForm = new SettingsForm();
 
 
+        }
+
+        public static bool IsWindows11() {
+            // via https://stackoverflow.com/questions/69038560/detect-windows-11-with-net-framework-or-windows-api
+            var reg = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+
+            var currentBuildStr = (string)reg.GetValue("CurrentBuild");
+            var currentBuild = int.Parse(currentBuildStr);
+
+            return currentBuild >= 22000;
         }
 
         public void Exit() {
