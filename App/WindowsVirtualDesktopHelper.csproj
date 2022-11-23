@@ -23,9 +23,14 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <SupportUrl>https://github.com/dankrusi/WindowsVirtualDesktopHelper</SupportUrl>
+    <ErrorReportUrl>https://github.com/dankrusi/WindowsVirtualDesktopHelper</ErrorReportUrl>
+    <ProductName>Windows Virtual Desktop Helper</ProductName>
+    <PublisherName>Dan Krusi</PublisherName>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>1.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
