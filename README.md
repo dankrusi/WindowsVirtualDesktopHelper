@@ -4,14 +4,18 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v1.0 Setup](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Setup.v1.0.exe) | 
-[Download v1.0 Executable](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Executable.v1.0.zip)
+[Download v1.1 Setup (.exe)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.1/WindowsVirtualDesktopHelper.Setup.v1.1.exe) | 
+[Download v1.1 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.1/WindowsVirtualDesktopHelper.Executable.v1.1.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
 fix some of these missing features.
 
 Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop number
+
+Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
+Defender or other anti-virus applications due to its installation option for installing to autostart. Typically, after enough users download, install, and report
+the software as okay/safe, this malware warning will go away. If you prefer to avoid some of these issues, use the Zip version of the executable instead.
 
 ## Features
 
@@ -25,24 +29,24 @@ Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop numbe
 
 ### Requirements
 
-Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.5 or higher in order to run.
+Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.5 or higher in order to run. Most likely you already have this installed, otherwise you can get it from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download/dotnet-framework)
 
 ### Setup
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v1.0.exe](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Setup.v1.0.exe)
+[Download WindowsVirtualDesktopHelper Setup v1.1.exe](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.1/WindowsVirtualDesktopHelper.Setup.v1.1.exe)
 
-Windows Defender Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
-Defender due to its installation option for installing to autostart. Typically, after enough users download, install, and report
-the software as okay/safe, this malware warning will go away.
+Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
+Defender or other anti-virus applications due to its installation option for installing to autostart. Typically, after enough users download, install, and report
+the software as okay/safe, this malware warning will go away. If you prefer to avoid some of these issues, use the Zip version of the executable instead.
 
 ### Executable
 
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 If you would like it to start with your computer, [add a shortcut to it to your autostart folder](https://support.microsoft.com/en-us/windows/add-an-app-to-run-automatically-at-startup-in-windows-10-150da165-dcd9-7230-517b-cf3c295d89dd).
 
-[Download WindowsVirtualDesktopHelper Executable v1.0.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.0/WindowsVirtualDesktopHelper.Executable.v1.0.zip)
+[Download WindowsVirtualDesktopHelper Executable v1.1.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.1/WindowsVirtualDesktopHelper.Executable.v1.1.zip)
 
 
 ## Special Thanks
