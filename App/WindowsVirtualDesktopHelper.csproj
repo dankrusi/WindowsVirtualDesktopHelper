@@ -170,5 +170,9 @@
   <ItemGroup>
     <None Include="Resources\circled-plus-256.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\chevron-left-256.ico" />
+    <Content Include="Resources\chevron-right-256.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

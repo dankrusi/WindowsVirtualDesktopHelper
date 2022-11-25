@@ -20,25 +20,25 @@ namespace WindowsVirtualDesktopHelper {
         public void UpdateIconForVDDisplayNumber(uint number) {
             number++;
             if(number == 1) {
-                this.notifyIcon1.Icon = Icons.circled_1_256;
+                this.notifyIconNumber.Icon = Icons.circled_1_256;
             } else if (number == 2) {
-                this.notifyIcon1.Icon = Icons.circled_2_256;
+                this.notifyIconNumber.Icon = Icons.circled_2_256;
             } else if (number == 3) {
-                this.notifyIcon1.Icon = Icons.circled_3_256;
+                this.notifyIconNumber.Icon = Icons.circled_3_256;
             } else if (number == 4) {
-                this.notifyIcon1.Icon = Icons.circled_4_256;
+                this.notifyIconNumber.Icon = Icons.circled_4_256;
             } else if (number == 5) {
-                this.notifyIcon1.Icon = Icons.circled_5_256;
+                this.notifyIconNumber.Icon = Icons.circled_5_256;
             } else if (number == 6) {
-                this.notifyIcon1.Icon = Icons.circled_6_256;
+                this.notifyIconNumber.Icon = Icons.circled_6_256;
             } else if (number == 7) {
-                this.notifyIcon1.Icon = Icons.circled_7_256;
+                this.notifyIconNumber.Icon = Icons.circled_7_256;
             } else if (number == 8) {
-                this.notifyIcon1.Icon = Icons.circled_8_256;
+                this.notifyIconNumber.Icon = Icons.circled_8_256;
             } else if (number == 9) {
-                this.notifyIcon1.Icon = Icons.circled_9_256;
+                this.notifyIconNumber.Icon = Icons.circled_9_256;
             } else {
-                this.notifyIcon1.Icon = Icons.circled_plus_256;
+                this.notifyIconNumber.Icon = Icons.circled_plus_256;
             }
         }
 
@@ -49,13 +49,43 @@ namespace WindowsVirtualDesktopHelper {
 
         private void SettingsForm_Shown(object sender, EventArgs e) {
             UpdateIconForVDDisplayNumber(App.Instance.CurrentVDDisplayNumber);
-            this.notifyIcon1.Visible = true;
+            this.notifyIconNumber.Visible = true;
             this.Hide();
         }
 
         private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e) {
             if (e.ClickedItem.Tag.ToString() == "exit") App.Instance.Exit();
+            else if (e.ClickedItem.Tag.ToString() == "settings") this.Show();
             else if (e.ClickedItem.Tag.ToString() == "about") App.Instance.ShowAbout();
+        }
+
+        private void notifyIconPrev_Click(object sender, EventArgs e) {
+            App.Instance.VDAPI.SwitchBackward();
+        }
+
+        private void notifyIconNext_Click(object sender, EventArgs e) {
+            App.Instance.VDAPI.SwitchForward();
+        }
+
+        private void checkBoxShowPrevNextIcons_CheckedChanged(object sender, EventArgs e) {
+            if(checkBoxShowPrevNextIcons.Checked) {
+                notifyIconPrev.Visible = true;
+                notifyIconNext.Visible = true;
+            } else {
+                notifyIconPrev.Visible = false;
+                notifyIconNext.Visible = false;
+            }
+        }
+
+        private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) {
+            
+        }
+
+        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e) {
+            if (e.CloseReason == CloseReason.UserClosing) {
+                e.Cancel = true;
+                Hide();
+            }
         }
     }
 }
