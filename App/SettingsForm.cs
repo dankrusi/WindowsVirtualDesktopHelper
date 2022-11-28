@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -11,10 +12,65 @@ using System.Windows.Forms;
 namespace WindowsVirtualDesktopHelper {
     public partial class SettingsForm : Form {
 
-
+        private bool IsLoading;
 
         public SettingsForm() {
+            IsLoading = true;
+
+            // Init UI
             InitializeComponent();
+            LoadSettingsIntoUI();
+
+            // Apply some settings
+            if (checkBoxShowPrevNextIcons.Checked) {
+                notifyIconPrev.Visible = true;
+                notifyIconNext.Visible = true;
+            } else {
+                notifyIconPrev.Visible = false;
+                notifyIconNext.Visible = false;
+            }
+
+            //TODO: how to sync the startup setting - best would be to see if the reg key is actually there
+
+            IsLoading = false;
+        }
+
+        private void LoadSettingsIntoUI() {
+            this.checkBoxShowPrevNextIcons.CheckState = GetBool("ShowPrevNextIcons", false) ? CheckState.Checked: CheckState.Unchecked;
+            this.checkBoxStartupWithWindows.CheckState = GetBool("StartupWithWindows", false) ? CheckState.Checked : CheckState.Unchecked;
+
+            
+        }
+        private void SaveSettingsFromUI() {
+            SetBool("ShowPrevNextIcons", this.checkBoxShowPrevNextIcons.Checked);
+            SetBool("StartupWithWindows", this.checkBoxStartupWithWindows.Checked);
+        }
+
+        static bool GetBool(string key, bool defaultValue) {
+            try {
+                var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                var settings = config.AppSettings.Settings;
+                if (settings[key] == null || settings[key].Value == null) return defaultValue;
+                return bool.Parse(settings[key].Value);
+            } catch (Exception e) {
+                Console.WriteLine("Error reading app settings: "+e.Message);
+                return defaultValue;
+            }
+        }
+
+        static void SetBool(string key, bool value) {
+            try {
+                var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                var settings = config.AppSettings.Settings;
+                if(settings[key] == null) {
+                    settings.Add(key, value.ToString().ToLower());
+                } else {
+                    settings[key].Value = value.ToString().ToLower();
+                }
+                config.Save(ConfigurationSaveMode.Modified);
+            } catch (Exception e) {
+                Console.WriteLine("Error saving app settings: " + e.Message);
+            }
         }
 
         public void UpdateIconForVDDisplayNumber(uint number) {
@@ -68,6 +124,8 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         private void checkBoxShowPrevNextIcons_CheckedChanged(object sender, EventArgs e) {
+            if (IsLoading) return;
+            
             if(checkBoxShowPrevNextIcons.Checked) {
                 notifyIconPrev.Visible = true;
                 notifyIconNext.Visible = true;
@@ -75,6 +133,7 @@ namespace WindowsVirtualDesktopHelper {
                 notifyIconPrev.Visible = false;
                 notifyIconNext.Visible = false;
             }
+            SaveSettingsFromUI();
         }
 
         private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) {
@@ -86,6 +145,17 @@ namespace WindowsVirtualDesktopHelper {
                 e.Cancel = true;
                 Hide();
             }
+        }
+
+        private void checkBoxStartupWithWindows_CheckedChanged(object sender, EventArgs e) {
+            if (IsLoading) return;
+
+            if (checkBoxStartupWithWindows.Checked) {
+                App.Instance.EnableStartupWithWindows();
+            } else {
+                App.Instance.DisableStartupWithWindows();
+            }
+            SaveSettingsFromUI();
         }
     }
 }

@@ -29,14 +29,14 @@ namespace WindowsVirtualDesktopHelper {
             this.notifyIconNumber = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIconPrev = new System.Windows.Forms.NotifyIcon(this.components);
             this.notifyIconNext = new System.Windows.Forms.NotifyIcon(this.components);
             this.checkBoxShowPrevNextIcons = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.toolStripMenuItemSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.checkBoxStartupWithWindows = new System.Windows.Forms.CheckBox();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -62,14 +62,21 @@ namespace WindowsVirtualDesktopHelper {
             // toolStripMenuItemAbout
             // 
             this.toolStripMenuItemAbout.Name = "toolStripMenuItemAbout";
-            this.toolStripMenuItemAbout.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemAbout.Size = new System.Drawing.Size(116, 22);
             this.toolStripMenuItemAbout.Tag = "about";
             this.toolStripMenuItemAbout.Text = "About";
+            // 
+            // toolStripMenuItemSettings
+            // 
+            this.toolStripMenuItemSettings.Name = "toolStripMenuItemSettings";
+            this.toolStripMenuItemSettings.Size = new System.Drawing.Size(116, 22);
+            this.toolStripMenuItemSettings.Tag = "settings";
+            this.toolStripMenuItemSettings.Text = "Settings";
             // 
             // toolStripMenuItemExit
             // 
             this.toolStripMenuItemExit.Name = "toolStripMenuItemExit";
-            this.toolStripMenuItemExit.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItemExit.Size = new System.Drawing.Size(116, 22);
             this.toolStripMenuItemExit.Tag = "exit";
             this.toolStripMenuItemExit.Text = "Exit";
             // 
@@ -103,50 +110,43 @@ namespace WindowsVirtualDesktopHelper {
             this.groupBox1.Controls.Add(this.checkBoxShowPrevNextIcons);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(279, 91);
+            this.groupBox1.Size = new System.Drawing.Size(392, 91);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Features";
             // 
-            // toolStripMenuItemSettings
-            // 
-            this.toolStripMenuItemSettings.Name = "toolStripMenuItemSettings";
-            this.toolStripMenuItemSettings.Size = new System.Drawing.Size(180, 22);
-            this.toolStripMenuItemSettings.Tag = "settings";
-            this.toolStripMenuItemSettings.Text = "Settings";
-            // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.checkBox1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 124);
+            this.groupBox2.Controls.Add(this.checkBoxStartupWithWindows);
+            this.groupBox2.Location = new System.Drawing.Point(12, 109);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(279, 91);
+            this.groupBox2.Size = new System.Drawing.Size(392, 106);
             this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Settings";
             // 
-            // checkBox1
+            // checkBoxStartupWithWindows
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Enabled = false;
-            this.checkBox1.Location = new System.Drawing.Point(15, 19);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(129, 17);
-            this.checkBox1.TabIndex = 1;
-            this.checkBox1.Text = "Startup with Windows";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBoxStartupWithWindows.AutoSize = true;
+            this.checkBoxStartupWithWindows.Location = new System.Drawing.Point(15, 19);
+            this.checkBoxStartupWithWindows.Name = "checkBoxStartupWithWindows";
+            this.checkBoxStartupWithWindows.Size = new System.Drawing.Size(129, 17);
+            this.checkBoxStartupWithWindows.TabIndex = 1;
+            this.checkBoxStartupWithWindows.Text = "Startup with Windows";
+            this.checkBoxStartupWithWindows.UseVisualStyleBackColor = true;
+            this.checkBoxStartupWithWindows.CheckedChanged += new System.EventHandler(this.checkBoxStartupWithWindows_CheckedChanged);
             // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(304, 230);
+            this.ClientSize = new System.Drawing.Size(416, 230);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SettingsForm";
-            this.Text = "SettingsForm";
+            this.Text = "Settings";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SettingsForm_FormClosed);
             this.Load += new System.EventHandler(this.SettingsForm_Load);
@@ -172,6 +172,6 @@ namespace WindowsVirtualDesktopHelper {
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSettings;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox checkBoxStartupWithWindows;
     }
 }
