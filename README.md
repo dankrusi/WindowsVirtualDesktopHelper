@@ -4,8 +4,8 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v1.2 Setup (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.2/WindowsVirtualDesktopHelper.Setup.v1.2.zip) | 
-[Download v1.2 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.2/WindowsVirtualDesktopHelper.Executable.v1.2.zip)
+[Download v1.3 Setup (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.3/WindowsVirtualDesktopHelper.Setup.v1.3.zip) | 
+[Download v1.3 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.3/WindowsVirtualDesktopHelper.Executable.v1.3.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
@@ -21,6 +21,8 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 
 * Show desktop number in notification area
 * Show desktop name when switching desktops
+* Option to show prev/next desktop by clicking icons in notification area
+* Option to autostart with Windows
 * Simple and lightweight
 * Free
 
@@ -29,13 +31,13 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 
 ### Requirements
 
-Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.5 or higher in order to run. Most likely you already have this installed, otherwise you can get it from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download/dotnet-framework)
+Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7 or higher in order to run. Most likely you already have this installed, otherwise you can get it from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download/dotnet-framework)
 
 ### Setup
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v1.2.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.2/WindowsVirtualDesktopHelper.Setup.v1.2.zip)
+[Download WindowsVirtualDesktopHelper Setup v1.3.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.3/WindowsVirtualDesktopHelper.Setup.v1.3.zip)
 
 Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
@@ -46,7 +48,7 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 If you would like it to start with your computer, [add a shortcut to it to your autostart folder](https://support.microsoft.com/en-us/windows/add-an-app-to-run-automatically-at-startup-in-windows-10-150da165-dcd9-7230-517b-cf3c295d89dd).
 
-[Download WindowsVirtualDesktopHelper Executable v1.2.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.2/WindowsVirtualDesktopHelper.Executable.v1.2.zip)
+[Download WindowsVirtualDesktopHelper Executable v1.3.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.3/WindowsVirtualDesktopHelper.Executable.v1.3.zip)
 
 
 ## Special Thanks
@@ -80,6 +82,6 @@ Currently Windows Virtual Desktop Helper is not code-signed, and thus may be rep
 Currently Windows Virtual Desktop Helper is not code-signed, and due to its installation option for installing to autostart, may be flagged as malware. Typically, after enough users download, install, and report
 the software as okay/safe, this malware warning will go away. With USD 70 donations per year, the app will be signed.
 
-### Why is the app based on the older .NET 4.5?
+### Why is the app based on the older .NET 4.7?
 
 The idea is to make the app as easy and lightweight to run as possible. Most systems have some version of .NET installed, thus we use a low version to cover as many users as possible. 
