@@ -9,9 +9,18 @@ namespace WindowsVirtualDesktopHelper {
 
         [STAThread]
         public static void Main(string[] args) {
-            var app = new App();
-            Application.EnableVisualStyles();
-            Application.Run(app.SettingsForm);
+            try {
+                var app = new App();
+                Application.EnableVisualStyles();
+                Application.Run(app.SettingsForm);
+            }catch(Exception e) {
+                // Global error handler
+                Console.Error.WriteLine(e);
+                var form = new ErrorForm();
+                form.UpdateUIForError(e);
+                //form.Show();
+                Application.Run(form);
+            }
         }
     }
 }
