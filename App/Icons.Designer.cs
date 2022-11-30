@@ -63,9 +63,9 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_1_256 {
+        internal static System.Drawing.Icon chevron_left_256_black {
             get {
-                object obj = ResourceManager.GetObject("circled-1-256", resourceCulture);
+                object obj = ResourceManager.GetObject("chevron-left-256-black", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_2_256 {
+        internal static System.Drawing.Icon chevron_left_256_white {
             get {
-                object obj = ResourceManager.GetObject("circled-2-256", resourceCulture);
+                object obj = ResourceManager.GetObject("chevron-left-256-white", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_3_256 {
+        internal static System.Drawing.Icon chevron_right_256_black {
             get {
-                object obj = ResourceManager.GetObject("circled-3-256", resourceCulture);
+                object obj = ResourceManager.GetObject("chevron-right-256-black", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_4_256 {
+        internal static System.Drawing.Icon chevron_right_256_white {
             get {
-                object obj = ResourceManager.GetObject("circled-4-256", resourceCulture);
+                object obj = ResourceManager.GetObject("chevron-right-256-white", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -103,9 +103,9 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_5_256 {
+        internal static System.Drawing.Icon number_1_256_black {
             get {
-                object obj = ResourceManager.GetObject("circled-5-256", resourceCulture);
+                object obj = ResourceManager.GetObject("number-1-256-black", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -113,9 +113,9 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_6_256 {
+        internal static System.Drawing.Icon number_1_256_white {
             get {
-                object obj = ResourceManager.GetObject("circled-6-256", resourceCulture);
+                object obj = ResourceManager.GetObject("number-1-256-white", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -123,9 +123,9 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_7_256 {
+        internal static System.Drawing.Icon number_2_256_black {
             get {
-                object obj = ResourceManager.GetObject("circled-7-256", resourceCulture);
+                object obj = ResourceManager.GetObject("number-2-256-black", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -133,9 +133,9 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_8_256 {
+        internal static System.Drawing.Icon number_2_256_white {
             get {
-                object obj = ResourceManager.GetObject("circled-8-256", resourceCulture);
+                object obj = ResourceManager.GetObject("number-2-256-white", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -143,9 +143,9 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_9_256 {
+        internal static System.Drawing.Icon number_3_256_black {
             get {
-                object obj = ResourceManager.GetObject("circled-9-256", resourceCulture);
+                object obj = ResourceManager.GetObject("number-3-256-black", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -153,9 +153,149 @@ namespace WindowsVirtualDesktopHelper {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon circled_plus_256 {
+        internal static System.Drawing.Icon number_3_256_white {
             get {
-                object obj = ResourceManager.GetObject("circled-plus-256", resourceCulture);
+                object obj = ResourceManager.GetObject("number-3-256-white", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_4_256_black {
+            get {
+                object obj = ResourceManager.GetObject("number-4-256-black", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_4_256_white {
+            get {
+                object obj = ResourceManager.GetObject("number-4-256-white", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_5_256_black {
+            get {
+                object obj = ResourceManager.GetObject("number-5-256-black", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_5_256_white {
+            get {
+                object obj = ResourceManager.GetObject("number-5-256-white", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_6_256_black {
+            get {
+                object obj = ResourceManager.GetObject("number-6-256-black", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_6_256_white {
+            get {
+                object obj = ResourceManager.GetObject("number-6-256-white", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_7_256_black {
+            get {
+                object obj = ResourceManager.GetObject("number-7-256-black", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_7_256_white {
+            get {
+                object obj = ResourceManager.GetObject("number-7-256-white", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_8_256_black {
+            get {
+                object obj = ResourceManager.GetObject("number-8-256-black", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_8_256_white {
+            get {
+                object obj = ResourceManager.GetObject("number-8-256-white", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_9_256_black {
+            get {
+                object obj = ResourceManager.GetObject("number-9-256-black", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_9_256_white {
+            get {
+                object obj = ResourceManager.GetObject("number-9-256-white", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_plus_256_black {
+            get {
+                object obj = ResourceManager.GetObject("number-plus-256-black", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon number_plus_256_white {
+            get {
+                object obj = ResourceManager.GetObject("number-plus-256-white", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

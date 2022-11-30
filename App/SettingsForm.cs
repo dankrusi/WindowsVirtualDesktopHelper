@@ -21,6 +21,16 @@ namespace WindowsVirtualDesktopHelper {
             InitializeComponent();
             LoadSettingsIntoUI();
 
+            if(App.Instance.IsDarkThemeMode()) {
+                // Dark mode - icons should be white
+                notifyIconPrev.Icon = Icons.chevron_left_256_white;
+                notifyIconNext.Icon = Icons.chevron_right_256_white;
+            } else {
+                // Light mode - icons should be black
+                notifyIconPrev.Icon = Icons.chevron_left_256_black;
+                notifyIconNext.Icon = Icons.chevron_right_256_black;
+            }
+
             // Apply some settings
             if (checkBoxShowPrevNextIcons.Checked) {
                 notifyIconPrev.Visible = true;
@@ -75,26 +85,52 @@ namespace WindowsVirtualDesktopHelper {
 
         public void UpdateIconForVDDisplayNumber(uint number) {
             number++;
-            if(number == 1) {
-                this.notifyIconNumber.Icon = Icons.circled_1_256;
-            } else if (number == 2) {
-                this.notifyIconNumber.Icon = Icons.circled_2_256;
-            } else if (number == 3) {
-                this.notifyIconNumber.Icon = Icons.circled_3_256;
-            } else if (number == 4) {
-                this.notifyIconNumber.Icon = Icons.circled_4_256;
-            } else if (number == 5) {
-                this.notifyIconNumber.Icon = Icons.circled_5_256;
-            } else if (number == 6) {
-                this.notifyIconNumber.Icon = Icons.circled_6_256;
-            } else if (number == 7) {
-                this.notifyIconNumber.Icon = Icons.circled_7_256;
-            } else if (number == 8) {
-                this.notifyIconNumber.Icon = Icons.circled_8_256;
-            } else if (number == 9) {
-                this.notifyIconNumber.Icon = Icons.circled_9_256;
+            if (App.Instance.IsDarkThemeMode()) {
+                // White icon
+                if (number == 1) {
+                    this.notifyIconNumber.Icon = Icons.number_1_256_white;
+                } else if (number == 2) {
+                    this.notifyIconNumber.Icon = Icons.number_2_256_white;
+                } else if (number == 3) {
+                    this.notifyIconNumber.Icon = Icons.number_3_256_white;
+                } else if (number == 4) {
+                    this.notifyIconNumber.Icon = Icons.number_4_256_white;
+                } else if (number == 5) {
+                    this.notifyIconNumber.Icon = Icons.number_5_256_white;
+                } else if (number == 6) {
+                    this.notifyIconNumber.Icon = Icons.number_6_256_white;
+                } else if (number == 7) {
+                    this.notifyIconNumber.Icon = Icons.number_7_256_white;
+                } else if (number == 8) {
+                    this.notifyIconNumber.Icon = Icons.number_8_256_white;
+                } else if (number == 9) {
+                    this.notifyIconNumber.Icon = Icons.number_9_256_white;
+                } else {
+                    this.notifyIconNumber.Icon = Icons.number_plus_256_white;
+                }
             } else {
-                this.notifyIconNumber.Icon = Icons.circled_plus_256;
+                // Black icon
+                if (number == 1) {
+                    this.notifyIconNumber.Icon = Icons.number_1_256_black;
+                } else if (number == 2) {
+                    this.notifyIconNumber.Icon = Icons.number_2_256_black;
+                } else if (number == 3) {
+                    this.notifyIconNumber.Icon = Icons.number_3_256_black;
+                } else if (number == 4) {
+                    this.notifyIconNumber.Icon = Icons.number_4_256_black;
+                } else if (number == 5) {
+                    this.notifyIconNumber.Icon = Icons.number_5_256_black;
+                } else if (number == 6) {
+                    this.notifyIconNumber.Icon = Icons.number_6_256_black;
+                } else if (number == 7) {
+                    this.notifyIconNumber.Icon = Icons.number_7_256_black;
+                } else if (number == 8) {
+                    this.notifyIconNumber.Icon = Icons.number_8_256_black;
+                } else if (number == 9) {
+                    this.notifyIconNumber.Icon = Icons.number_9_256_black;
+                } else {
+                    this.notifyIconNumber.Icon = Icons.number_plus_256_black;
+                }
             }
         }
 
@@ -144,6 +180,11 @@ namespace WindowsVirtualDesktopHelper {
             if (e.CloseReason == CloseReason.UserClosing) {
                 e.Cancel = true;
                 Hide();
+            } else if (e.CloseReason == CloseReason.ApplicationExitCall || e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.TaskManagerClosing) {
+                // Remove all notif icons
+                notifyIconNumber.Visible = false;
+                notifyIconPrev.Visible = false;
+                notifyIconNext.Visible = false;
             }
         }
 

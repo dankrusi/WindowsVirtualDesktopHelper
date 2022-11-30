@@ -63,6 +63,26 @@ Do you like Windows Virtual Desktop Helper?
 [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6)
 
 
+## Compatibility
+
+Currently this app is compatible with Windows 10 and Windows 11. Microsoft is constantly changing their API for the Virtual Desktops, so it appears not all builds of Windows are fully working yet.
+
+The following builds have been confirmed as working:
+
+* Windows 10
+  - 21H2 19044.2251
+* Windows 11
+  - 21H2 22000.1219
+  - 21H2 22000.1281
+  
+The following builds have been cofnirmed as NOT working:
+
+* Windows 11
+  - 22H2 22621 
+  
+If you know of a working version or non-working version, please report it.
+
+
 ## Roadmap
 
 While the goal of this app is to remain simple and lightweight, there are some features that will still be added:
@@ -72,6 +92,14 @@ While the goal of this app is to remain simple and lightweight, there are some f
 
 
 ## Frequently Asked Questions
+
+### Where is the icon showing the screen number?
+
+Windows automatically organizes the notification area icons, and places new ones in the icons menu under the ^ chevron. You can drag the screen number into the main icon area from there to have it always showing.
+
+### Where are the prev/next screen icons in the wrong order?
+
+Windows automatically organizes and orders the notification area icons. You can drag prev/next screen icons to organize them accordingly.
 
 ### Why is this app is being reported by Windows Defender as untrusted?
 

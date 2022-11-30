@@ -181,6 +181,19 @@ namespace WindowsVirtualDesktopHelper {
             }
         }
 
+        public bool IsDarkThemeMode() {
+            // https://learn.microsoft.com/en-us/answers/questions/715081/how-to-detect-windows-dark-mode.html
+            try {
+                Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", true);
+                var ret = key.GetValue("SystemUsesLightTheme");
+                var retNumber = (int)ret; // 1 == light
+                if (retNumber == 1) return false;
+                else return true;
+            } catch (Exception e) {
+                throw new Exception("IsDarkThemeMode: could not get dark/light theme setting: " + e.Message);
+            }
+        }
+
         public void DisableStartupWithWindows() {
             // https://stackoverflow.com/questions/674628/how-do-i-set-a-program-to-launch-at-startup
             try {
