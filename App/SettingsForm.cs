@@ -144,6 +144,11 @@ namespace WindowsVirtualDesktopHelper {
             if (e.CloseReason == CloseReason.UserClosing) {
                 e.Cancel = true;
                 Hide();
+            } else if (e.CloseReason == CloseReason.ApplicationExitCall || e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.TaskManagerClosing) {
+                // Remove all notif icons
+                notifyIconNumber.Visible = false;
+                notifyIconPrev.Visible = false;
+                notifyIconNext.Visible = false;
             }
         }
 
