@@ -27,8 +27,8 @@
     <ErrorReportUrl>https://github.com/dankrusi/WindowsVirtualDesktopHelper</ErrorReportUrl>
     <ProductName>Windows Virtual Desktop Helper</ProductName>
     <PublisherName>Dan Krusi</PublisherName>
-    <ApplicationRevision>3</ApplicationRevision>
-    <ApplicationVersion>1.3.0.%2a</ApplicationVersion>
+    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationVersion>1.4.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -106,7 +106,8 @@
       <DependentUpon>SwitchNotificationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ThirdParty\zgdump\windows-virtualdesktopindicator\src\VirtualDesktop\Implementation\VirtualDesktopWin10.cs" />
-    <Compile Include="ThirdParty\zgdump\windows-virtualdesktopindicator\src\VirtualDesktop\Implementation\VirtualDesktopWin11.cs" />
+    <Compile Include="ThirdParty\zgdump\windows-virtualdesktopindicator\src\VirtualDesktop\Implementation\VirtualDesktopWin11_22H2.cs" />
+    <Compile Include="ThirdParty\zgdump\windows-virtualdesktopindicator\src\VirtualDesktop\Implementation\VirtualDesktopWin11_21H2.cs" />
     <Compile Include="ThirdParty\zgdump\windows-virtualdesktopindicator\src\VirtualDesktop\IVirtualDesktopManager.cs" />
   </ItemGroup>
   <ItemGroup>

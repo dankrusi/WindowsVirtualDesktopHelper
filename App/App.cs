@@ -16,6 +16,8 @@ namespace WindowsVirtualDesktopHelper {
         public uint CurrentVDDisplayNumber = 0;
         public SettingsForm SettingsForm;
 
+        public static string DetectedVDImplementation = null;
+
         public static App Instance;
 
         public App() {
@@ -23,8 +25,6 @@ namespace WindowsVirtualDesktopHelper {
             App.Instance = this;
 
             // Load the implementation
-            //const int win11MinBuild = 22000;
-            //if (Environment.OSVersion.Version.Build >= win11MinBuild) { // note this method requires a app manifest declaring win11 support otherwise a 'lie' is returned
             try {
                 this.LoadVDAPI();
                 this.LoadVDDisplayInfo();
@@ -38,21 +38,34 @@ namespace WindowsVirtualDesktopHelper {
 
 
         public void LoadVDAPI() {
-            bool isWindows11 = true;
+            // We need to load the correct API for correct windows version...
+            // See https://www.anoopcnair.com/windows-11-version-numbers-build-numbers-major/ for versions
+            int currentBuild = 0;
             try {
-                isWindows11 = IsWindows11();
+                currentBuild = GetWindowsBuildVersion();
             } catch(Exception e) {
                 throw new Exception("LoadVDAPI: could not determine Windows version: " + e.Message, e);
             }
-            if (isWindows11) {
-                Console.WriteLine("Detected Windows 11");
+            Console.WriteLine("Windows Build Version: " + currentBuild);
+            if (currentBuild >= 22621) {
+                App.DetectedVDImplementation = "VirtualDesktopWin11_22H2";
+                Console.WriteLine("Detected Windows 11 22H2");
                 try {
-                    this.VDAPI = new VirtualDesktopIndicator.Native.VirtualDesktop.Implementation.VirtualDesktopWin11();
+                    this.VDAPI = new VirtualDesktopIndicator.Native.VirtualDesktop.Implementation.VirtualDesktopWin11_22H2();
                 } catch (Exception e) {
-                    throw new Exception("LoadVDAPI: could not load VirtualDesktop API implementation VirtualDesktopWin11: " + e.Message, e);
+                    throw new Exception("LoadVDAPI: could not load VirtualDesktop API implementation VirtualDesktopWin11_22H2: " + e.Message, e);
+                }
+            } else if (currentBuild >= 22000) {
+                App.DetectedVDImplementation = "VirtualDesktopWin11_21H2";
+                Console.WriteLine("Detected Windows 11 21H1");
+                try {
+                    this.VDAPI = new VirtualDesktopIndicator.Native.VirtualDesktop.Implementation.VirtualDesktopWin11_21H2();
+                } catch (Exception e) {
+                    throw new Exception("LoadVDAPI: could not load VirtualDesktop API implementation VirtualDesktopWin11_21H2: " + e.Message, e);
                 }
             } else {
                 Console.WriteLine("Detected Windows 10");
+                App.DetectedVDImplementation = "VirtualDesktopWin10";
                 try {
                     this.VDAPI = new VirtualDesktopIndicator.Native.VirtualDesktop.Implementation.VirtualDesktopWin10();
                 } catch (Exception e) {
@@ -93,13 +106,15 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         public static bool IsWindows11() {
+            return GetWindowsBuildVersion() >= 22000;
+        }
+
+        public static int GetWindowsBuildVersion() {
             // via https://stackoverflow.com/questions/69038560/detect-windows-11-with-net-framework-or-windows-api
             var reg = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
-
             var currentBuildStr = (string)reg.GetValue("CurrentBuild");
             var currentBuild = int.Parse(currentBuildStr);
-            Console.WriteLine("Windows Build Version: "+currentBuildStr);
-            return currentBuild >= 22000;
+            return currentBuild;
         }
 
         public void Exit() {

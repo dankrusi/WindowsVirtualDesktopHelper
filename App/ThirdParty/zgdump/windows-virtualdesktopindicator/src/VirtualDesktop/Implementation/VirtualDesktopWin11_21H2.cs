@@ -3,7 +3,17 @@ using System.Runtime.InteropServices;
 
 namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
 
-    internal class VirtualDesktopWin11 : IVirtualDesktopManager {
+
+    internal class VirtualDesktopWin11_21H2 : IVirtualDesktopManager {
+
+        const string GUID_CLSID_ImmersiveShell = "C2F03A33-21F5-47FA-B4BB-156362A2F239";
+        const string GUID_CLSID_VirtualDesktopManagerInternal = "C5E0CDCA-7B6E-41B2-9FC4-D93975CC467B";
+        const string GUID_IApplicationView = "372E1D3B-38D3-42E4-A15B-8AB2B178F513";
+        const string GUID_IVirtualDesktop = "536D3495-B208-4CC9-AE26-DE8111275BF8";
+        const string GUID_IVirtualDesktopManagerInternal = "B2F925B9-5A0F-4D2E-9F4D-2B1507593C10";
+        const string GUID_IObjectArray = "92CA9DCD-5622-4BBA-A805-5E9F541BD8C9";
+        const string GUID_IServiceProvider10 = "6D5140C1-7436-11CE-8034-00AA006009FA";
+
         #region API
 
         public uint Current() {
@@ -53,10 +63,8 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
         #region COM Guids
 
         internal static class Guids {
-            public static readonly Guid CLSID_ImmersiveShell = new Guid("C2F03A33-21F5-47FA-B4BB-156362A2F239");
-
-            public static readonly Guid CLSID_VirtualDesktopManagerInternal =
-                new Guid("C5E0CDCA-7B6E-41B2-9FC4-D93975CC467B");
+            public static readonly Guid CLSID_ImmersiveShell = new Guid(GUID_CLSID_ImmersiveShell);
+            public static readonly Guid CLSID_VirtualDesktopManagerInternal = new Guid(GUID_CLSID_VirtualDesktopManagerInternal);
         }
 
         #endregion
@@ -93,7 +101,7 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
 
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIInspectable)]
-        [Guid("372E1D3B-38D3-42E4-A15B-8AB2B178F513")]
+        [Guid(GUID_IApplicationView)]
         internal interface IApplicationView {
             int SetFocus();
             int SwitchTo();
@@ -154,7 +162,7 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
 
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        [Guid("536D3495-B208-4CC9-AE26-DE8111275BF8")]
+        [Guid(GUID_IVirtualDesktop)]
         internal interface IVirtualDesktop {
             bool IsViewVisible(IApplicationView view);
             Guid GetId();
@@ -169,7 +177,7 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
 
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        [Guid("B2F925B9-5A0F-4D2E-9F4D-2B1507593C10")]
+        [Guid(GUID_IVirtualDesktopManagerInternal)]
         internal interface IVirtualDesktopManagerInternal {
             int GetCount(IntPtr hWnd);
             void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);
@@ -196,7 +204,7 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
 
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        [Guid("92CA9DCD-5622-4BBA-A805-5E9F541BD8C9")]
+        [Guid(GUID_IObjectArray)]
         internal interface IObjectArray {
             void GetCount(out int count);
             void GetAt(int index, ref Guid iid, [MarshalAs(UnmanagedType.Interface)] out object obj);
@@ -204,7 +212,7 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
 
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        [Guid("6D5140C1-7436-11CE-8034-00AA006009FA")]
+        [Guid(GUID_IServiceProvider10)]
         internal interface IServiceProvider10 {
             [return: MarshalAs(UnmanagedType.IUnknown)]
             object QueryService(ref Guid service, ref Guid riid);

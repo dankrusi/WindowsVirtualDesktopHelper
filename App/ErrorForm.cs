@@ -22,6 +22,7 @@ namespace WindowsVirtualDesktopHelper {
             if (e.InnerException != null) this.textBoxDetails.Text += "\r\n\r\n" + e.InnerException.Message;
             if (e.InnerException != null && e.InnerException.StackTrace != null) this.textBoxDetails.Text += "\r\n" + e.InnerException.StackTrace.ToString();
             this.textBoxDetails.Text += "\r\n\r\n" + "Windows Build: "+GetWinBuildVersion();
+            this.textBoxDetails.Text += "\r\n" + "Virtual Desktop Implementation: "+App.DetectedVDImplementation;
         }
 
         private string GetWinBuildVersion() {
