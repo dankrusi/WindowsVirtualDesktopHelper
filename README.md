@@ -4,8 +4,8 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v1.3 Setup (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.3/WindowsVirtualDesktopHelper.Setup.v1.3.zip) | 
-[Download v1.3 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.3/WindowsVirtualDesktopHelper.Executable.v1.3.zip)
+[Download v1.4 Setup (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.4/WindowsVirtualDesktopHelper.Setup.v1.4.zip) | 
+[Download v1.4 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.4/WindowsVirtualDesktopHelper.Executable.v1.4.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
@@ -37,7 +37,7 @@ Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7 or higher 
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v1.3.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.3/WindowsVirtualDesktopHelper.Setup.v1.3.zip)
+[Download WindowsVirtualDesktopHelper Setup v1.4.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.4/WindowsVirtualDesktopHelper.Setup.v1.4.zip)
 
 Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
@@ -48,7 +48,7 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 If you would like it to start with your computer, [add a shortcut to it to your autostart folder](https://support.microsoft.com/en-us/windows/add-an-app-to-run-automatically-at-startup-in-windows-10-150da165-dcd9-7230-517b-cf3c295d89dd).
 
-[Download WindowsVirtualDesktopHelper Executable v1.3.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.3/WindowsVirtualDesktopHelper.Executable.v1.3.zip)
+[Download WindowsVirtualDesktopHelper Executable v1.4.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.4/WindowsVirtualDesktopHelper.Executable.v1.4.zip)
 
 
 ## Special Thanks
@@ -70,15 +70,20 @@ Currently this app is compatible with Windows 10 and Windows 11. Microsoft is co
 The following builds have been confirmed as working:
 
 * Windows 10
-  - 21H2 19044.2251
+  - 21H2 19044 (19044.2251)
 * Windows 11
-  - 21H2 22000.1219
-  - 21H2 22000.1281
+  - 21H2 22000 (22000.1219, 22000.1281)
+  - 21H2 22621
   
 The following builds have been cofnirmed as NOT working:
 
-* Windows 11
-  - 22H2 22621 
+* na
+  
+The following versions are not supported:
+
+* Windows 7
+* Windows 8
+* Windows Server
   
 If you know of a working version or non-working version, please report it.
 
