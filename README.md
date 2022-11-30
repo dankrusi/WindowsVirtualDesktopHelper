@@ -73,6 +73,7 @@ The following builds have been confirmed as working:
   - 21H2 19044.2251
 * Windows 11
   - 21H2 22000.1219
+  - 21H2 22000.1281
   
 The following builds have been cofnirmed as NOT working:
 
