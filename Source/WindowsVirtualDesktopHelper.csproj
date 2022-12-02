@@ -27,7 +27,7 @@
     <ErrorReportUrl>https://github.com/dankrusi/WindowsVirtualDesktopHelper</ErrorReportUrl>
     <ProductName>Windows Virtual Desktop Helper</ProductName>
     <PublisherName>Dan Krusi</PublisherName>
-    <ApplicationRevision>6</ApplicationRevision>
+    <ApplicationRevision>7</ApplicationRevision>
     <ApplicationVersion>1.5.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
