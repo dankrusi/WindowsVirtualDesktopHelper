@@ -18,16 +18,28 @@ namespace WindowsVirtualDesktopHelper {
             InitializeComponent();
         }
 
+        // Preven from from being focusable
+        // Via https://stackoverflow.com/questions/2423234/make-a-form-not-focusable-in-c-sharp
+        private const int WS_EX_NOACTIVATE = 0x08000000;
+        protected override CreateParams CreateParams {
+            get {
+                var createParams = base.CreateParams;
+
+                createParams.ExStyle |= WS_EX_NOACTIVATE;
+                return createParams;
+            }
+        }
+
         private void SwitchNotificationForm_Shown(object sender, EventArgs e) {
-            this.timer1.Interval = this.DisplayTimeMS;
-            this.timer1.Start();
+            this.timerClose.Interval = this.DisplayTimeMS;
+            this.timerClose.Start();
         }
 
         private void SwitchNotificationForm_Load(object sender, EventArgs e) {
             this.label1.Text = LabelText;
         }
 
-        private void timer1_Tick(object sender, EventArgs e) {
+        private void timerClose_Tick(object sender, EventArgs e) {
             this.Close();
         }
     }
