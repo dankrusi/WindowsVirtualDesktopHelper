@@ -10,8 +10,9 @@ namespace WindowsVirtualDesktopHelper {
         [STAThread]
         public static void Main(string[] args) {
             try {
-                var app = new App();
                 Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                var app = new App();
                 Application.Run(app.SettingsForm);
             }catch(Exception e) {
                 // Global error handler
