@@ -1,10 +1,14 @@
-﻿using System;
+﻿// Original Implemation: windows-virtualdesktopindicator by zgdump (https://github.com/zgdump/windows-virtualdesktopindicator)
+// Contributors: Dan Krusi (https://github.com/dankrusi), MScholtes (https://github.com/MScholtes), Flaflo (https://github.com/Flaflo)
+// License: MIT License (https://github.com/zgdump/windows-virtualdesktopindicator/blob/main/LICENSE)
+
+using System;
 using System.Runtime.InteropServices;
 
-namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
+namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
 
-    internal class VirtualDesktopWin11_21H2 : IVirtualDesktopManager {
+    internal class VirtualDesktopWin11_22H2 : IVirtualDesktopManager {
 
         const string GUID_CLSID_ImmersiveShell = "C2F03A33-21F5-47FA-B4BB-156362A2F239";
         const string GUID_CLSID_VirtualDesktopManagerInternal = "C5E0CDCA-7B6E-41B2-9FC4-D93975CC467B";
@@ -110,10 +114,7 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
             int GetMonitor(out IntPtr /* IImmersiveMonitor */ immersiveMonitor);
             int GetVisibility(out int visibility);
             int SetCloak(APPLICATION_VIEW_CLOAK_TYPE cloakType, int unknown);
-
-            int GetPosition(ref Guid guid /* GUID for IApplicationViewPosition */,
-                out IntPtr /* IApplicationViewPosition** */ position);
-
+            int GetPosition(ref Guid guid /* GUID for IApplicationViewPosition */, out IntPtr /* IApplicationViewPosition** */ position);
             int SetPosition(ref IntPtr /* IApplicationViewPosition* */ position);
             int InsertAfterWindow(IntPtr hwnd);
             int GetExtendedFramePosition(out Rect rect);
@@ -167,10 +168,8 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
             bool IsViewVisible(IApplicationView view);
             Guid GetId();
             IntPtr Unknown1();
-
             [return: MarshalAs(UnmanagedType.HString)]
             string GetName();
-
             [return: MarshalAs(UnmanagedType.HString)]
             string GetWallpaperPath();
         }
@@ -179,27 +178,26 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         [Guid(GUID_IVirtualDesktopManagerInternal)]
         internal interface IVirtualDesktopManagerInternal {
-            int GetCount(IntPtr hWnd);
+            int GetCount(IntPtr hWndOrMon);
             void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);
             bool CanViewMoveDesktops(IApplicationView view);
-            IVirtualDesktop GetCurrentDesktop(IntPtr hWnd);
-            void GetDesktops(IntPtr hWnd, out IObjectArray desktops);
-
+            IVirtualDesktop GetCurrentDesktop(IntPtr hWndOrMon);
+            IObjectArray GetAllCurrentDesktops();
+            void GetDesktops(IntPtr hWndOrMon, out IObjectArray desktops);
             [PreserveSig]
             int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
-
-            void SwitchDesktop(IntPtr hWnd, IVirtualDesktop desktop);
-            IVirtualDesktop CreateDesktop(IntPtr hWnd);
-            void MoveDesktop(IVirtualDesktop desktop, IntPtr hWnd, int nIndex);
+            void SwitchDesktop(IntPtr hWndOrMon, IVirtualDesktop desktop);
+            IVirtualDesktop CreateDesktop(IntPtr hWndOrMon);
+            void MoveDesktop(IVirtualDesktop desktop, IntPtr hWndOrMon, int nIndex);
             void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
             IVirtualDesktop FindDesktop(ref Guid desktopid);
-            void Unknown1(IVirtualDesktop desktop, out IntPtr unknown1, out IntPtr unknown2);
-            void SetName(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string name);
-            void SetWallpaperPath(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string path);
-            void SetAllWallpaperPaths([MarshalAs(UnmanagedType.HString)] string path);
-            void Unknown2(IApplicationView pView0, IApplicationView pView1);
-            int Unknown3();
-            void RemoveAll(bool remove);
+            void GetDesktopSwitchIncludeExcludeViews(IVirtualDesktop desktop, out IObjectArray unknown1, out IObjectArray unknown2);
+            void SetDesktopName(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string name);
+            void SetDesktopWallpaper(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string path);
+            void UpdateWallpaperPathForAllDesktops([MarshalAs(UnmanagedType.HString)] string path);
+            void CopyDesktopState(IApplicationView pView0, IApplicationView pView1);
+            int GetDesktopIsPerMonitor();
+            void SetDesktopIsPerMonitor(bool state);
         }
 
         [ComImport]
@@ -226,11 +224,8 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
             internal static IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
 
             static DesktopManager() {
-                var shell = (IServiceProvider10)Activator.CreateInstance(
-                    Type.GetTypeFromCLSID(Guids.CLSID_ImmersiveShell));
-                VirtualDesktopManagerInternal =
-                    (IVirtualDesktopManagerInternal)shell.QueryService(Guids.CLSID_VirtualDesktopManagerInternal,
-                        typeof(IVirtualDesktopManagerInternal).GUID);
+                var shell = (IServiceProvider10)Activator.CreateInstance(Type.GetTypeFromCLSID(Guids.CLSID_ImmersiveShell));
+                VirtualDesktopManagerInternal = (IVirtualDesktopManagerInternal)shell.QueryService(Guids.CLSID_VirtualDesktopManagerInternal, typeof(IVirtualDesktopManagerInternal).GUID);
             }
 
             internal static int GetDesktopIndex(IVirtualDesktop desktop) {
@@ -246,7 +241,6 @@ namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
                         break;
                     }
                 }
-
                 Marshal.ReleaseComObject(desktops);
                 return index;
             }

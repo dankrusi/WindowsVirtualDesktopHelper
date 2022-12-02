@@ -28,7 +28,7 @@
     <ProductName>Windows Virtual Desktop Helper</ProductName>
     <PublisherName>Dan Krusi</PublisherName>
     <ApplicationRevision>6</ApplicationRevision>
-    <ApplicationVersion>1.4.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.5.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -72,43 +72,43 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AboutForm.cs">
+    <Compile Include="Forms\AboutForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutForm.Designer.cs">
+    <Compile Include="Forms\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="App.cs" />
+    <Compile Include="App\App.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="ErrorForm.cs">
+    <Compile Include="Forms\ErrorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ErrorForm.Designer.cs">
+    <Compile Include="Forms\ErrorForm.Designer.cs">
       <DependentUpon>ErrorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Icons.Designer.cs">
+    <Compile Include="Main.cs" />
+    <Compile Include="App\Settings.cs" />
+    <Compile Include="Forms\SettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsForm.Designer.cs">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SwitchNotificationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SwitchNotificationForm.Designer.cs">
+      <DependentUpon>SwitchNotificationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Icons.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Icons.resx</DependentUpon>
     </Compile>
-    <Compile Include="Main.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="SettingsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SettingsForm.Designer.cs">
-      <DependentUpon>SettingsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SwitchNotificationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SwitchNotificationForm.Designer.cs">
-      <DependentUpon>SwitchNotificationForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ThirdParty\zgdump\windows-virtualdesktopindicator\src\VirtualDesktop\Implementation\VirtualDesktopWin10.cs" />
-    <Compile Include="ThirdParty\zgdump\windows-virtualdesktopindicator\src\VirtualDesktop\Implementation\VirtualDesktopWin11_22H2.cs" />
-    <Compile Include="ThirdParty\zgdump\windows-virtualdesktopindicator\src\VirtualDesktop\Implementation\VirtualDesktopWin11_21H2.cs" />
-    <Compile Include="ThirdParty\zgdump\windows-virtualdesktopindicator\src\VirtualDesktop\IVirtualDesktopManager.cs" />
+    <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin10.cs" />
+    <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_22H2.cs" />
+    <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_21H2.cs" />
+    <Compile Include="VirtualDesktopAPI\IVirtualDesktopManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -134,21 +134,21 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AboutForm.resx">
+    <EmbeddedResource Include="Forms\AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ErrorForm.resx">
+    <EmbeddedResource Include="Forms\ErrorForm.resx">
       <DependentUpon>ErrorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Icons.resx">
+    <EmbeddedResource Include="Resources\Icons.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Icons.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Icons.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="SettingsForm.resx">
+    <EmbeddedResource Include="Forms\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SwitchNotificationForm.resx">
+    <EmbeddedResource Include="Forms\SwitchNotificationForm.resx">
       <DependentUpon>SwitchNotificationForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
@@ -222,5 +222,6 @@
     <Content Include="Resources\number-plus-256-black.png" />
     <Content Include="Resources\number-plus-256-white.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

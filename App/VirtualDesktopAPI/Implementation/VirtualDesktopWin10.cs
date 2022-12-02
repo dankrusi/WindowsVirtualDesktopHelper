@@ -1,7 +1,11 @@
-﻿using System;
+﻿// Original Implemation: windows-virtualdesktopindicator by zgdump (https://github.com/zgdump/windows-virtualdesktopindicator)
+// Contributors: Dan Krusi (https://github.com/dankrusi), MScholtes (https://github.com/MScholtes), Flaflo (https://github.com/Flaflo)
+// License: MIT License (https://github.com/zgdump/windows-virtualdesktopindicator/blob/main/LICENSE)
+
+using System;
 using System.Runtime.InteropServices;
 
-namespace VirtualDesktopIndicator.Native.VirtualDesktop.Implementation {
+namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
     internal class VirtualDesktopWin10 : IVirtualDesktopManager {
         #region API

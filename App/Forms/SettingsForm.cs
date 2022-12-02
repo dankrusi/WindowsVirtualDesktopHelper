@@ -21,14 +21,14 @@ namespace WindowsVirtualDesktopHelper {
             InitializeComponent();
             LoadSettingsIntoUI();
 
-            if(App.Instance.IsDarkThemeMode()) {
+            if(!App.Instance.IsSystemLightThemeModeEnabled()) {
                 // Dark mode - icons should be white
-                notifyIconPrev.Icon = Icons.chevron_left_256_white;
-                notifyIconNext.Icon = Icons.chevron_right_256_white;
+                notifyIconPrev.Icon = Resources.Icons.chevron_left_256_white;
+                notifyIconNext.Icon = Resources.Icons.chevron_right_256_white;
             } else {
                 // Light mode - icons should be black
-                notifyIconPrev.Icon = Icons.chevron_left_256_black;
-                notifyIconNext.Icon = Icons.chevron_right_256_black;
+                notifyIconPrev.Icon = Resources.Icons.chevron_left_256_black;
+                notifyIconNext.Icon = Resources.Icons.chevron_right_256_black;
             }
 
             // Apply some settings
@@ -112,51 +112,51 @@ namespace WindowsVirtualDesktopHelper {
 
         public void UpdateIconForVDDisplayNumber(uint number) {
             number++;
-            if (App.Instance.IsDarkThemeMode()) {
+            if (!App.Instance.IsSystemLightThemeModeEnabled()) {
                 // White icon
                 if (number == 1) {
-                    this.notifyIconNumber.Icon = Icons.number_1_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_1_256_white;
                 } else if (number == 2) {
-                    this.notifyIconNumber.Icon = Icons.number_2_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_2_256_white;
                 } else if (number == 3) {
-                    this.notifyIconNumber.Icon = Icons.number_3_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_3_256_white;
                 } else if (number == 4) {
-                    this.notifyIconNumber.Icon = Icons.number_4_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_4_256_white;
                 } else if (number == 5) {
-                    this.notifyIconNumber.Icon = Icons.number_5_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_5_256_white;
                 } else if (number == 6) {
-                    this.notifyIconNumber.Icon = Icons.number_6_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_6_256_white;
                 } else if (number == 7) {
-                    this.notifyIconNumber.Icon = Icons.number_7_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_7_256_white;
                 } else if (number == 8) {
-                    this.notifyIconNumber.Icon = Icons.number_8_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_8_256_white;
                 } else if (number == 9) {
-                    this.notifyIconNumber.Icon = Icons.number_9_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_9_256_white;
                 } else {
-                    this.notifyIconNumber.Icon = Icons.number_plus_256_white;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_plus_256_white;
                 }
             } else {
                 // Black icon
                 if (number == 1) {
-                    this.notifyIconNumber.Icon = Icons.number_1_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_1_256_black;
                 } else if (number == 2) {
-                    this.notifyIconNumber.Icon = Icons.number_2_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_2_256_black;
                 } else if (number == 3) {
-                    this.notifyIconNumber.Icon = Icons.number_3_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_3_256_black;
                 } else if (number == 4) {
-                    this.notifyIconNumber.Icon = Icons.number_4_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_4_256_black;
                 } else if (number == 5) {
-                    this.notifyIconNumber.Icon = Icons.number_5_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_5_256_black;
                 } else if (number == 6) {
-                    this.notifyIconNumber.Icon = Icons.number_6_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_6_256_black;
                 } else if (number == 7) {
-                    this.notifyIconNumber.Icon = Icons.number_7_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_7_256_black;
                 } else if (number == 8) {
-                    this.notifyIconNumber.Icon = Icons.number_8_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_8_256_black;
                 } else if (number == 9) {
-                    this.notifyIconNumber.Icon = Icons.number_9_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_9_256_black;
                 } else {
-                    this.notifyIconNumber.Icon = Icons.number_plus_256_black;
+                    this.notifyIconNumber.Icon = Resources.Icons.number_plus_256_black;
                 }
             }
         }

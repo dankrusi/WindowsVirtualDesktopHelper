@@ -8,10 +8,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using WindowsVirtualDesktopHelper.VirtualDesktopAPI;
+
 namespace WindowsVirtualDesktopHelper {
     class App {
 
-        public VirtualDesktopIndicator.Native.VirtualDesktop.IVirtualDesktopManager VDAPI = null;
+        public IVirtualDesktopManager VDAPI = null;
         public string CurrentVDDisplayName = null;
         public uint CurrentVDDisplayNumber = 0;
         public SettingsForm SettingsForm;
@@ -51,7 +53,7 @@ namespace WindowsVirtualDesktopHelper {
                 App.DetectedVDImplementation = "VirtualDesktopWin11_22H2";
                 Console.WriteLine("Detected Windows 11 22H2");
                 try {
-                    this.VDAPI = new VirtualDesktopIndicator.Native.VirtualDesktop.Implementation.VirtualDesktopWin11_22H2();
+                    this.VDAPI = new VirtualDesktopAPI.Implementation.VirtualDesktopWin11_22H2();
                 } catch (Exception e) {
                     throw new Exception("LoadVDAPI: could not load VirtualDesktop API implementation VirtualDesktopWin11_22H2: " + e.Message, e);
                 }
@@ -59,7 +61,7 @@ namespace WindowsVirtualDesktopHelper {
                 App.DetectedVDImplementation = "VirtualDesktopWin11_21H2";
                 Console.WriteLine("Detected Windows 11 21H1");
                 try {
-                    this.VDAPI = new VirtualDesktopIndicator.Native.VirtualDesktop.Implementation.VirtualDesktopWin11_21H2();
+                    this.VDAPI = new VirtualDesktopAPI.Implementation.VirtualDesktopWin11_21H2();
                 } catch (Exception e) {
                     throw new Exception("LoadVDAPI: could not load VirtualDesktop API implementation VirtualDesktopWin11_21H2: " + e.Message, e);
                 }
@@ -67,7 +69,7 @@ namespace WindowsVirtualDesktopHelper {
                 Console.WriteLine("Detected Windows 10");
                 App.DetectedVDImplementation = "VirtualDesktopWin10";
                 try {
-                    this.VDAPI = new VirtualDesktopIndicator.Native.VirtualDesktop.Implementation.VirtualDesktopWin10();
+                    this.VDAPI = new VirtualDesktopAPI.Implementation.VirtualDesktopWin10();
                 } catch (Exception e) {
                     throw new Exception("LoadVDAPI: could not load VirtualDesktop API implementation VirtualDesktopWin10: " + e.Message, e);
                 }
@@ -185,14 +187,14 @@ namespace WindowsVirtualDesktopHelper {
             }
         }
 
-        public bool IsDarkThemeMode() {
+        public bool IsSystemLightThemeModeEnabled() {
             // https://learn.microsoft.com/en-us/answers/questions/715081/how-to-detect-windows-dark-mode.html
             try {
                 Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", true);
                 var ret = key.GetValue("SystemUsesLightTheme");
                 var retNumber = (int)ret; // 1 == light
-                if (retNumber == 1) return false;
-                else return true;
+                if (retNumber == 1) return true;
+                else return false;
             } catch (Exception e) {
                 throw new Exception("IsDarkThemeMode: could not get dark/light theme setting: " + e.Message);
             }

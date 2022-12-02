@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,7 +23,16 @@ namespace WindowsVirtualDesktopHelper {
             if (e.InnerException != null) this.textBoxDetails.Text += "\r\n\r\n" + e.InnerException.Message;
             if (e.InnerException != null && e.InnerException.StackTrace != null) this.textBoxDetails.Text += "\r\n" + e.InnerException.StackTrace.ToString();
             this.textBoxDetails.Text += "\r\n\r\n" + "Windows Build: "+GetWinBuildVersion();
+            this.textBoxDetails.Text += "\r\n" + "Windows Virtual Desktop Helper Version: "+GetAppBuildVersion();
             this.textBoxDetails.Text += "\r\n" + "Virtual Desktop Implementation: "+App.DetectedVDImplementation;
+        }
+
+        private string GetAppBuildVersion() {
+            try {
+                return Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            } catch (Exception e) {
+                return "Error getting build version: " + e.Message;
+            }
         }
 
         private string GetWinBuildVersion() {
