@@ -27,6 +27,7 @@ namespace WindowsVirtualDesktopHelper {
             this.components = new System.ComponentModel.Container();
             this.timerClose = new System.Windows.Forms.Timer(this.components);
             this.label1 = new System.Windows.Forms.Label();
+            this.timerAnimate = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // timerClose
@@ -46,6 +47,11 @@ namespace WindowsVirtualDesktopHelper {
             this.label1.Size = new System.Drawing.Size(496, 183);
             this.label1.TabIndex = 0;
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // timerAnimate
+            // 
+            this.timerAnimate.Interval = 16;
+            this.timerAnimate.Tick += new System.EventHandler(this.timerAnimate_Tick);
             // 
             // SwitchNotificationForm
             // 
@@ -76,5 +82,6 @@ namespace WindowsVirtualDesktopHelper {
 
         private System.Windows.Forms.Timer timerClose;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Timer timerAnimate;
     }
 }

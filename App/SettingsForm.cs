@@ -45,15 +45,42 @@ namespace WindowsVirtualDesktopHelper {
             IsLoading = false;
         }
 
-        private void LoadSettingsIntoUI() {
-            this.checkBoxShowPrevNextIcons.CheckState = GetBool("ShowPrevNextIcons", false) ? CheckState.Checked: CheckState.Unchecked;
-            this.checkBoxStartupWithWindows.CheckState = GetBool("StartupWithWindows", false) ? CheckState.Checked : CheckState.Unchecked;
+        public bool ShowOverlay() {
+            return this.checkBoxShowOverlay.Checked;
+        }
+        public bool OverlayAnimate() {
+            return this.checkBoxOverlayAnimate.Checked;
+        }
+        public bool OverlayTranslucent() {
+            return this.checkBoxOverlayTranslucent.Checked;
+        }
+        public int OverlayDurationMS() {
+            if (this.radioButtonOverlayLongDuration.Checked == true) return 3000;
+            else if (this.radioButtonOverlayMediumDuration.Checked == true) return 2000;
+            else if (this.radioButtonOverlayShortDuration.Checked == true) return 1000;
+            else return 2000;
+        }
 
-            
+        private void LoadSettingsIntoUI() {
+            this.checkBoxShowPrevNextIcons.Checked = GetBool("ShowPrevNextIcons", false);
+            this.checkBoxStartupWithWindows.Checked = GetBool("StartupWithWindows", false);
+            this.checkBoxShowOverlay.Checked = GetBool("ShowOverlay", true);
+            this.checkBoxOverlayAnimate.Checked = GetBool("OverlayAnimate", true);
+            this.checkBoxOverlayTranslucent.Checked = GetBool("OverlayTranslucent", true);
+            this.radioButtonOverlayLongDuration.Checked = GetBool("OverlayLongDuration", false);
+            this.radioButtonOverlayMediumDuration.Checked = GetBool("OverlayMediumDuration", true);
+            this.radioButtonOverlayShortDuration.Checked = GetBool("OverlayShortDuration", false);
+            checkBoxShowOverlay_CheckedChanged(this, null);
         }
         private void SaveSettingsFromUI() {
             SetBool("ShowPrevNextIcons", this.checkBoxShowPrevNextIcons.Checked);
             SetBool("StartupWithWindows", this.checkBoxStartupWithWindows.Checked);
+            SetBool("ShowOverlay", this.checkBoxShowOverlay.Checked);
+            SetBool("OverlayAnimate", this.checkBoxOverlayAnimate.Checked);
+            SetBool("OverlayTranslucent", this.checkBoxOverlayTranslucent.Checked);
+            SetBool("OverlayLongDuration", this.radioButtonOverlayLongDuration.Checked);
+            SetBool("OverlayMediumDuration", this.radioButtonOverlayMediumDuration.Checked);
+            SetBool("OverlayShortDuration", this.radioButtonOverlayShortDuration.Checked);
         }
 
         static bool GetBool(string key, bool defaultValue) {
@@ -169,7 +196,6 @@ namespace WindowsVirtualDesktopHelper {
                 notifyIconPrev.Visible = false;
                 notifyIconNext.Visible = false;
             }
-            SaveSettingsFromUI();
         }
 
         private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) {
@@ -179,6 +205,7 @@ namespace WindowsVirtualDesktopHelper {
         private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e) {
             if (e.CloseReason == CloseReason.UserClosing) {
                 e.Cancel = true;
+                SaveSettingsFromUI();
                 Hide();
             } else if (e.CloseReason == CloseReason.ApplicationExitCall || e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.TaskManagerClosing) {
                 // Remove all notif icons
@@ -196,7 +223,22 @@ namespace WindowsVirtualDesktopHelper {
             } else {
                 App.Instance.DisableStartupWithWindows();
             }
-            SaveSettingsFromUI();
+        }
+
+        private void checkBoxShowOverlay_CheckedChanged(object sender, EventArgs e) {
+            radioButtonOverlayShortDuration.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonOverlayMediumDuration.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonOverlayLongDuration.Enabled = checkBoxShowOverlay.Checked;
+            checkBoxOverlayAnimate.Enabled = checkBoxShowOverlay.Checked;
+            checkBoxOverlayTranslucent.Enabled = checkBoxShowOverlay.Checked;
+        }
+
+        private void notifyIconPrev_DoubleClick(object sender, EventArgs e) {
+            //TODO: got to first desktop
+        }
+
+        private void notifyIconNext_DoubleClick(object sender, EventArgs e) {
+            //TODO: go to last desktop
         }
     }
 }

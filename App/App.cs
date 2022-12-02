@@ -142,12 +142,14 @@ namespace WindowsVirtualDesktopHelper {
 
         public void VDSwitched() {
             this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentVDDisplayNumber);
-            this.SettingsForm.Invoke((Action)(() =>
-            {
-                var form = new SwitchNotificationForm();
-                form.LabelText = this.CurrentVDDisplayName;
-                form.Show();
-            }));
+            if (this.SettingsForm.ShowOverlay()) {
+                this.SettingsForm.Invoke((Action)(() => {
+                    var form = new SwitchNotificationForm();
+                    form.LabelText = this.CurrentVDDisplayName;
+                    form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
+                    form.Show();
+                }));
+            }
         }
 
         public void ShowAbout() {
@@ -158,12 +160,14 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         public void ShowSplash() {
-            this.SettingsForm.Invoke((Action)(() => {
-                var form = new SwitchNotificationForm();
-                form.DisplayTimeMS = 2000;
-                form.LabelText = "Virtual Desktop Helper";
-                form.Show();
-            }));
+            if (this.SettingsForm.ShowOverlay()) {
+                this.SettingsForm.Invoke((Action)(() => {
+                    var form = new SwitchNotificationForm();
+                    form.DisplayTimeMS = 2000;
+                    form.LabelText = "Virtual Desktop Helper";
+                    form.Show();
+                }));
+            }
         }
 
         public void OpenURL(string url) {
