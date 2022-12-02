@@ -4,8 +4,8 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v1.4 Setup (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.4/WindowsVirtualDesktopHelper.Setup.v1.4.zip) | 
-[Download v1.4 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.4/WindowsVirtualDesktopHelper.Executable.v1.4.zip)
+[Download v1.5 Setup (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.5/WindowsVirtualDesktopHelper.Setup.v1.5.zip) | 
+[Download v1.5 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.5/WindowsVirtualDesktopHelper.Executable.v1.5.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
@@ -13,19 +13,21 @@ fix some of these missing features.
 
 Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop number
 
-Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
-Defender or other anti-virus applications due to its installation option for installing to autostart. Typically, after enough users download, install, and report
-the software as okay/safe, this malware warning will go away. If you prefer to avoid some of these issues, use the Zip version of the executable instead.
+Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as untrusted by Windows
+Defender or other anti-virus applications. Typically, after enough users download, install, and report
+the software as okay/safe, this warning will go away.
 
 ## Features
 
 * Show desktop number in notification area
 * Show desktop name when switching desktops
-* Option to show prev/next desktop by clicking icons in notification area
-* Option to autostart with Windows
+* Show prev/next desktop by clicking icons in notification area
+* Autostart with Windows
 * Simple and lightweight
+* Configurable
 * Free
 
+![Settings](Images/WindowsVirtualDeskopHelper%20Settings.png)
 
 ## Installation
 
@@ -37,7 +39,7 @@ Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7 or higher 
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v1.4.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.4/WindowsVirtualDesktopHelper.Setup.v1.4.zip)
+[Download WindowsVirtualDesktopHelper Setup v1.5.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.5/WindowsVirtualDesktopHelper.Setup.v1.5.zip)
 
 Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
@@ -48,7 +50,7 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 If you would like it to start with your computer, [add a shortcut to it to your autostart folder](https://support.microsoft.com/en-us/windows/add-an-app-to-run-automatically-at-startup-in-windows-10-150da165-dcd9-7230-517b-cf3c295d89dd).
 
-[Download WindowsVirtualDesktopHelper Executable v1.4.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.4/WindowsVirtualDesktopHelper.Executable.v1.4.zip)
+[Download WindowsVirtualDesktopHelper Executable v1.5.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.5/WindowsVirtualDesktopHelper.Executable.v1.5.zip)
 
 
 ## Special Thanks
@@ -92,7 +94,7 @@ If you know of a working version or non-working version, please report it.
 
 While the goal of this app is to remain simple and lightweight, there are some features that will still be added:
 
-* Settings: allow some basic settings
+* Settings: more configuration options
 * Console-Mode: allow a console-mode which can be used by scripts
 
 
@@ -102,7 +104,7 @@ While the goal of this app is to remain simple and lightweight, there are some f
 
 Windows automatically organizes the notification area icons, and places new ones in the icons menu under the ^ chevron. You can drag the screen number into the main icon area from there to have it always showing.
 
-### Where are the prev/next screen icons in the wrong order?
+### Why are the prev/next screen icons in the wrong order?
 
 Windows automatically organizes and orders the notification area icons. You can drag prev/next screen icons to organize them accordingly.
 
