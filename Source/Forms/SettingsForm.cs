@@ -67,9 +67,9 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxShowOverlay.Checked = GetBool("ShowOverlay", true);
             this.checkBoxOverlayAnimate.Checked = GetBool("OverlayAnimate", true);
             this.checkBoxOverlayTranslucent.Checked = GetBool("OverlayTranslucent", true);
-            this.radioButtonOverlayLongDuration.Checked = GetBool("OverlayLongDuration", false);
-            this.radioButtonOverlayMediumDuration.Checked = GetBool("OverlayMediumDuration", true);
-            this.radioButtonOverlayShortDuration.Checked = GetBool("OverlayShortDuration", false);
+            this.radioButtonOverlayLongDuration.Checked = GetString("OverlayDuration","medium") == "long";
+            this.radioButtonOverlayMediumDuration.Checked = GetString("OverlayDuration", "medium") == "medium";
+            this.radioButtonOverlayShortDuration.Checked = GetString("OverlayDuration", "medium") == "short";
             checkBoxShowOverlay_CheckedChanged(this, null);
         }
         private void SaveSettingsFromUI() {
@@ -78,17 +78,41 @@ namespace WindowsVirtualDesktopHelper {
             SetBool("ShowOverlay", this.checkBoxShowOverlay.Checked);
             SetBool("OverlayAnimate", this.checkBoxOverlayAnimate.Checked);
             SetBool("OverlayTranslucent", this.checkBoxOverlayTranslucent.Checked);
-            SetBool("OverlayLongDuration", this.radioButtonOverlayLongDuration.Checked);
-            SetBool("OverlayMediumDuration", this.radioButtonOverlayMediumDuration.Checked);
-            SetBool("OverlayShortDuration", this.radioButtonOverlayShortDuration.Checked);
+            if (this.radioButtonOverlayLongDuration.Checked) SetString("OverlayDuration", "long");
+            if (this.radioButtonOverlayMediumDuration.Checked) SetString("OverlayDuration", "medium");
+            if (this.radioButtonOverlayShortDuration.Checked) SetString("OverlayDuration", "short");
         }
 
-        static bool GetBool(string key, bool defaultValue) {
+        static string GetString(string key, string defaultValue) {
             try {
                 var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
                 var settings = config.AppSettings.Settings;
                 if (settings[key] == null || settings[key].Value == null) return defaultValue;
-                return bool.Parse(settings[key].Value);
+                return settings[key].Value;
+            } catch (Exception e) {
+                Console.WriteLine("Error reading app settings: " + e.Message);
+                return defaultValue;
+            }
+        }
+
+        static void SetString(string key, string value) {
+            try {
+                var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                var settings = config.AppSettings.Settings;
+                if (settings[key] == null) {
+                    settings.Add(key, value);
+                } else {
+                    settings[key].Value = value;
+                }
+                config.Save(ConfigurationSaveMode.Modified);
+            } catch (Exception e) {
+                Console.WriteLine("Error saving app settings: " + e.Message);
+            }
+        }
+
+        static bool GetBool(string key, bool defaultValue) {
+            try {
+                return bool.Parse(GetString(key,defaultValue.ToString().ToLower()));
             } catch (Exception e) {
                 Console.WriteLine("Error reading app settings: "+e.Message);
                 return defaultValue;
@@ -96,18 +120,7 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         static void SetBool(string key, bool value) {
-            try {
-                var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                var settings = config.AppSettings.Settings;
-                if(settings[key] == null) {
-                    settings.Add(key, value.ToString().ToLower());
-                } else {
-                    settings[key].Value = value.ToString().ToLower();
-                }
-                config.Save(ConfigurationSaveMode.Modified);
-            } catch (Exception e) {
-                Console.WriteLine("Error saving app settings: " + e.Message);
-            }
+            SetString(key, value.ToString().ToLower());
         }
 
         public void UpdateIconForVDDisplayNumber(uint number) {
