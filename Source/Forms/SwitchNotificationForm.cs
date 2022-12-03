@@ -12,6 +12,7 @@ namespace WindowsVirtualDesktopHelper {
     public partial class SwitchNotificationForm : Form {
 
         public string LabelText;
+        public string Position = "middlecenter";
         public int DisplayTimeMS = 2000;
         public bool FadeIn = false;
         public bool Translucent = true;
@@ -28,9 +29,36 @@ namespace WindowsVirtualDesktopHelper {
 
             this.FadeIn = App.Instance.SettingsForm.OverlayAnimate();
             this.Translucent = App.Instance.SettingsForm.OverlayTranslucent();
+            this.Position = App.Instance.SettingsForm.OverlayPosition();
 
             // Set theme
             //TODO
+
+            // Set position
+            var positionOffset = 40;
+            this.StartPosition = FormStartPosition.Manual;
+            var screen = Screen.FromControl(this);
+            var screenW = screen.WorkingArea.Width;
+            var screenH = screen.WorkingArea.Height;
+            if (this.Position == "topleft") {
+                this.Location = new Point(positionOffset, positionOffset);
+            } else if (this.Position == "topcenter") {
+                this.Location = new Point(screenW/2 - this.Width/2, positionOffset);
+            } else if (this.Position == "topright") {
+                this.Location = new Point(screenW - this.Width - positionOffset, positionOffset);
+            } else if (this.Position == "middleleft") {
+                this.Location = new Point(positionOffset, screenH/2-this.Height/2);
+            } else if (this.Position == "middlecenter") {
+                this.Location = new Point(screenW / 2 - this.Width / 2, screenH / 2 - this.Height / 2);
+            } else if (this.Position == "middleright") {
+                this.Location = new Point(screenW - this.Width - positionOffset, screenH / 2 - this.Height / 2);
+            } else if (this.Position == "bottomleft") {
+                this.Location = new Point(positionOffset, screenH - this.Height - positionOffset);
+            } else if (this.Position == "bottomcenter") {
+                this.Location = new Point(screenW / 2 - this.Width / 2, screenH - this.Height - positionOffset);
+            } else if (this.Position == "bottomright") {
+                this.Location = new Point(screenW - this.Width - positionOffset, screenH - this.Height - positionOffset);
+            }
 
             // Send signal to close all others
             SwitchNotificationForm.WillShowNotificationFormEvent?.Invoke(this, EventArgs.Empty);

@@ -60,6 +60,21 @@ namespace WindowsVirtualDesktopHelper {
             else if (this.radioButtonOverlayShortDuration.Checked == true) return 1000;
             else return 2000;
         }
+        public string OverlayPosition() {
+            if (this.radioButtonOverlayLongDuration.Checked) return "long";
+            else if (this.radioButtonOverlayMediumDuration.Checked) return "medium";
+            else if (this.radioButtonOverlayShortDuration.Checked) return "short";
+            else if (this.radioButtonPositionTopLeft.Checked) return "topleft";
+            else if (this.radioButtonPositionTopCenter.Checked) return "topcenter";
+            else if (this.radioButtonPositionTopRight.Checked) return "topright";
+            else if (this.radioButtonPositionMiddleLeft.Checked) return "middleleft";
+            else if (this.radioButtonPositionMiddleCenter.Checked) return "middlecenter";
+            else if (this.radioButtonPositionMiddleRight.Checked) return "middleright";
+            else if (this.radioButtonPositionBottomLeft.Checked) return "bottomleft";
+            else if (this.radioButtonPositionBottomCenter.Checked) return "bottomcenter";
+            else if (this.radioButtonPositionBottomRight.Checked) return "bottomright";
+            else return "middlecenter";
+        }
 
         private void LoadSettingsIntoUI() {
             this.checkBoxShowPrevNextIcons.Checked = GetBool("ShowPrevNextIcons", false);
@@ -70,6 +85,15 @@ namespace WindowsVirtualDesktopHelper {
             this.radioButtonOverlayLongDuration.Checked = GetString("OverlayDuration","medium") == "long";
             this.radioButtonOverlayMediumDuration.Checked = GetString("OverlayDuration", "medium") == "medium";
             this.radioButtonOverlayShortDuration.Checked = GetString("OverlayDuration", "medium") == "short";
+            this.radioButtonPositionTopLeft.Checked = GetString("OverlayPosition", "middlecenter") == "topleft";
+            this.radioButtonPositionTopCenter.Checked = GetString("OverlayPosition", "middlecenter") == "topcenter";
+            this.radioButtonPositionTopRight.Checked = GetString("OverlayPosition", "middlecenter") == "topright";
+            this.radioButtonPositionMiddleLeft.Checked = GetString("OverlayPosition", "middlecenter") == "middleleft";
+            this.radioButtonPositionMiddleCenter.Checked = GetString("OverlayPosition", "middlecenter") == "middlecenter";
+            this.radioButtonPositionMiddleRight.Checked = GetString("OverlayPosition", "middlecenter") == "middleright";
+            this.radioButtonPositionBottomLeft.Checked = GetString("OverlayPosition", "middlecenter") == "bottomleft";
+            this.radioButtonPositionBottomCenter.Checked = GetString("OverlayPosition", "middlecenter") == "bottomcenter";
+            this.radioButtonPositionBottomRight.Checked = GetString("OverlayPosition", "middlecenter") == "bottomright";
             checkBoxShowOverlay_CheckedChanged(this, null);
         }
         private void SaveSettingsFromUI() {
@@ -81,6 +105,15 @@ namespace WindowsVirtualDesktopHelper {
             if (this.radioButtonOverlayLongDuration.Checked) SetString("OverlayDuration", "long");
             if (this.radioButtonOverlayMediumDuration.Checked) SetString("OverlayDuration", "medium");
             if (this.radioButtonOverlayShortDuration.Checked) SetString("OverlayDuration", "short");
+            if (this.radioButtonPositionTopLeft.Checked) SetString("OverlayPosition", "topleft");
+            if (this.radioButtonPositionTopCenter.Checked) SetString("OverlayPosition", "topcenter");
+            if (this.radioButtonPositionTopRight.Checked) SetString("OverlayPosition", "topright");
+            if (this.radioButtonPositionMiddleLeft.Checked) SetString("OverlayPosition", "middleleft");
+            if (this.radioButtonPositionMiddleCenter.Checked) SetString("OverlayPosition", "middlecenter");
+            if (this.radioButtonPositionMiddleRight.Checked) SetString("OverlayPosition", "middleright");
+            if (this.radioButtonPositionBottomLeft.Checked) SetString("OverlayPosition", "bottomleft");
+            if (this.radioButtonPositionBottomCenter.Checked) SetString("OverlayPosition", "bottomcenter");
+            if (this.radioButtonPositionBottomRight.Checked) SetString("OverlayPosition", "bottomright");
         }
 
         static string GetString(string key, string defaultValue) {
@@ -244,6 +277,16 @@ namespace WindowsVirtualDesktopHelper {
             radioButtonOverlayLongDuration.Enabled = checkBoxShowOverlay.Checked;
             checkBoxOverlayAnimate.Enabled = checkBoxShowOverlay.Checked;
             checkBoxOverlayTranslucent.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonPositionTopLeft.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonPositionTopCenter.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonPositionTopRight.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonPositionMiddleLeft.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonPositionMiddleCenter.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonPositionMiddleRight.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonPositionBottomLeft.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonPositionBottomCenter.Enabled = checkBoxShowOverlay.Checked;
+            radioButtonPositionBottomRight.Enabled = checkBoxShowOverlay.Checked;
+
         }
 
         private void notifyIconPrev_DoubleClick(object sender, EventArgs e) {
