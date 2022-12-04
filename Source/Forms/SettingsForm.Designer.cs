@@ -37,25 +37,29 @@ namespace WindowsVirtualDesktopHelper {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.checkBoxOverlayTranslucent = new System.Windows.Forms.CheckBox();
             this.checkBoxOverlayAnimate = new System.Windows.Forms.CheckBox();
-            this.radioButtonOverlayLongDuration = new System.Windows.Forms.RadioButton();
-            this.radioButtonOverlayMediumDuration = new System.Windows.Forms.RadioButton();
-            this.radioButtonOverlayShortDuration = new System.Windows.Forms.RadioButton();
             this.checkBoxShowOverlay = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.checkBoxStartupWithWindows = new System.Windows.Forms.CheckBox();
-            this.radioButtonPositionTopLeft = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
-            this.radioButtonPositionTopCenter = new System.Windows.Forms.RadioButton();
-            this.radioButtonPositionTopRight = new System.Windows.Forms.RadioButton();
-            this.radioButtonPositionMiddleRight = new System.Windows.Forms.RadioButton();
-            this.radioButtonPositionMiddleCenter = new System.Windows.Forms.RadioButton();
-            this.radioButtonPositionMiddleLeft = new System.Windows.Forms.RadioButton();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.radioButtonPositionBottomRight = new System.Windows.Forms.RadioButton();
             this.radioButtonPositionBottomCenter = new System.Windows.Forms.RadioButton();
             this.radioButtonPositionBottomLeft = new System.Windows.Forms.RadioButton();
+            this.radioButtonPositionMiddleRight = new System.Windows.Forms.RadioButton();
+            this.radioButtonPositionMiddleCenter = new System.Windows.Forms.RadioButton();
+            this.radioButtonPositionMiddleLeft = new System.Windows.Forms.RadioButton();
+            this.radioButtonPositionTopRight = new System.Windows.Forms.RadioButton();
+            this.radioButtonPositionTopCenter = new System.Windows.Forms.RadioButton();
+            this.radioButtonPositionTopLeft = new System.Windows.Forms.RadioButton();
+            this.radioButtonOverlayLongDuration = new System.Windows.Forms.RadioButton();
+            this.radioButtonOverlayMediumDuration = new System.Windows.Forms.RadioButton();
+            this.radioButtonOverlayShortDuration = new System.Windows.Forms.RadioButton();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // notifyIconNumber
@@ -123,21 +127,11 @@ namespace WindowsVirtualDesktopHelper {
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.radioButtonPositionBottomRight);
-            this.groupBox1.Controls.Add(this.radioButtonPositionBottomCenter);
-            this.groupBox1.Controls.Add(this.radioButtonPositionBottomLeft);
-            this.groupBox1.Controls.Add(this.radioButtonPositionMiddleRight);
-            this.groupBox1.Controls.Add(this.radioButtonPositionMiddleCenter);
-            this.groupBox1.Controls.Add(this.radioButtonPositionMiddleLeft);
-            this.groupBox1.Controls.Add(this.radioButtonPositionTopRight);
-            this.groupBox1.Controls.Add(this.radioButtonPositionTopCenter);
+            this.groupBox1.Controls.Add(this.panel2);
+            this.groupBox1.Controls.Add(this.panel1);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.radioButtonPositionTopLeft);
             this.groupBox1.Controls.Add(this.checkBoxOverlayTranslucent);
             this.groupBox1.Controls.Add(this.checkBoxOverlayAnimate);
-            this.groupBox1.Controls.Add(this.radioButtonOverlayLongDuration);
-            this.groupBox1.Controls.Add(this.radioButtonOverlayMediumDuration);
-            this.groupBox1.Controls.Add(this.radioButtonOverlayShortDuration);
             this.groupBox1.Controls.Add(this.checkBoxShowOverlay);
             this.groupBox1.Controls.Add(this.checkBoxShowPrevNextIcons);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
@@ -166,39 +160,6 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxOverlayAnimate.TabIndex = 6;
             this.checkBoxOverlayAnimate.Text = "Animate In/Out";
             this.checkBoxOverlayAnimate.UseVisualStyleBackColor = true;
-            // 
-            // radioButtonOverlayLongDuration
-            // 
-            this.radioButtonOverlayLongDuration.AutoSize = true;
-            this.radioButtonOverlayLongDuration.Location = new System.Drawing.Point(253, 65);
-            this.radioButtonOverlayLongDuration.Name = "radioButtonOverlayLongDuration";
-            this.radioButtonOverlayLongDuration.Size = new System.Drawing.Size(92, 17);
-            this.radioButtonOverlayLongDuration.TabIndex = 5;
-            this.radioButtonOverlayLongDuration.TabStop = true;
-            this.radioButtonOverlayLongDuration.Text = "Long Duration";
-            this.radioButtonOverlayLongDuration.UseVisualStyleBackColor = true;
-            // 
-            // radioButtonOverlayMediumDuration
-            // 
-            this.radioButtonOverlayMediumDuration.AutoSize = true;
-            this.radioButtonOverlayMediumDuration.Location = new System.Drawing.Point(142, 65);
-            this.radioButtonOverlayMediumDuration.Name = "radioButtonOverlayMediumDuration";
-            this.radioButtonOverlayMediumDuration.Size = new System.Drawing.Size(105, 17);
-            this.radioButtonOverlayMediumDuration.TabIndex = 4;
-            this.radioButtonOverlayMediumDuration.TabStop = true;
-            this.radioButtonOverlayMediumDuration.Text = "Medium Duration";
-            this.radioButtonOverlayMediumDuration.UseVisualStyleBackColor = true;
-            // 
-            // radioButtonOverlayShortDuration
-            // 
-            this.radioButtonOverlayShortDuration.AutoSize = true;
-            this.radioButtonOverlayShortDuration.Location = new System.Drawing.Point(43, 65);
-            this.radioButtonOverlayShortDuration.Name = "radioButtonOverlayShortDuration";
-            this.radioButtonOverlayShortDuration.Size = new System.Drawing.Size(93, 17);
-            this.radioButtonOverlayShortDuration.TabIndex = 3;
-            this.radioButtonOverlayShortDuration.TabStop = true;
-            this.radioButtonOverlayShortDuration.Text = "Short Duration";
-            this.radioButtonOverlayShortDuration.UseVisualStyleBackColor = true;
             // 
             // checkBoxShowOverlay
             // 
@@ -232,16 +193,6 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxStartupWithWindows.UseVisualStyleBackColor = true;
             this.checkBoxStartupWithWindows.CheckedChanged += new System.EventHandler(this.checkBoxStartupWithWindows_CheckedChanged);
             // 
-            // radioButtonPositionTopLeft
-            // 
-            this.radioButtonPositionTopLeft.AutoSize = true;
-            this.radioButtonPositionTopLeft.Location = new System.Drawing.Point(90, 135);
-            this.radioButtonPositionTopLeft.Name = "radioButtonPositionTopLeft";
-            this.radioButtonPositionTopLeft.Size = new System.Drawing.Size(14, 13);
-            this.radioButtonPositionTopLeft.TabIndex = 8;
-            this.radioButtonPositionTopLeft.TabStop = true;
-            this.radioButtonPositionTopLeft.UseVisualStyleBackColor = true;
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -251,85 +202,154 @@ namespace WindowsVirtualDesktopHelper {
             this.label1.TabIndex = 9;
             this.label1.Text = "Position:";
             // 
-            // radioButtonPositionTopCenter
+            // panel1
             // 
-            this.radioButtonPositionTopCenter.AutoSize = true;
-            this.radioButtonPositionTopCenter.Location = new System.Drawing.Point(110, 135);
-            this.radioButtonPositionTopCenter.Name = "radioButtonPositionTopCenter";
-            this.radioButtonPositionTopCenter.Size = new System.Drawing.Size(14, 13);
-            this.radioButtonPositionTopCenter.TabIndex = 10;
-            this.radioButtonPositionTopCenter.TabStop = true;
-            this.radioButtonPositionTopCenter.UseVisualStyleBackColor = true;
+            this.panel1.Controls.Add(this.radioButtonPositionBottomRight);
+            this.panel1.Controls.Add(this.radioButtonPositionBottomCenter);
+            this.panel1.Controls.Add(this.radioButtonPositionBottomLeft);
+            this.panel1.Controls.Add(this.radioButtonPositionMiddleRight);
+            this.panel1.Controls.Add(this.radioButtonPositionMiddleCenter);
+            this.panel1.Controls.Add(this.radioButtonPositionMiddleLeft);
+            this.panel1.Controls.Add(this.radioButtonPositionTopRight);
+            this.panel1.Controls.Add(this.radioButtonPositionTopCenter);
+            this.panel1.Controls.Add(this.radioButtonPositionTopLeft);
+            this.panel1.Location = new System.Drawing.Point(87, 133);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(62, 59);
+            this.panel1.TabIndex = 18;
             // 
-            // radioButtonPositionTopRight
+            // panel2
             // 
-            this.radioButtonPositionTopRight.AutoSize = true;
-            this.radioButtonPositionTopRight.Location = new System.Drawing.Point(130, 135);
-            this.radioButtonPositionTopRight.Name = "radioButtonPositionTopRight";
-            this.radioButtonPositionTopRight.Size = new System.Drawing.Size(14, 13);
-            this.radioButtonPositionTopRight.TabIndex = 11;
-            this.radioButtonPositionTopRight.TabStop = true;
-            this.radioButtonPositionTopRight.UseVisualStyleBackColor = true;
-            // 
-            // radioButtonPositionMiddleRight
-            // 
-            this.radioButtonPositionMiddleRight.AutoSize = true;
-            this.radioButtonPositionMiddleRight.Location = new System.Drawing.Point(130, 154);
-            this.radioButtonPositionMiddleRight.Name = "radioButtonPositionMiddleRight";
-            this.radioButtonPositionMiddleRight.Size = new System.Drawing.Size(14, 13);
-            this.radioButtonPositionMiddleRight.TabIndex = 14;
-            this.radioButtonPositionMiddleRight.TabStop = true;
-            this.radioButtonPositionMiddleRight.UseVisualStyleBackColor = true;
-            // 
-            // radioButtonPositionMiddleCenter
-            // 
-            this.radioButtonPositionMiddleCenter.AutoSize = true;
-            this.radioButtonPositionMiddleCenter.Location = new System.Drawing.Point(110, 154);
-            this.radioButtonPositionMiddleCenter.Name = "radioButtonPositionMiddleCenter";
-            this.radioButtonPositionMiddleCenter.Size = new System.Drawing.Size(14, 13);
-            this.radioButtonPositionMiddleCenter.TabIndex = 13;
-            this.radioButtonPositionMiddleCenter.TabStop = true;
-            this.radioButtonPositionMiddleCenter.UseVisualStyleBackColor = true;
-            // 
-            // radioButtonPositionMiddleLeft
-            // 
-            this.radioButtonPositionMiddleLeft.AutoSize = true;
-            this.radioButtonPositionMiddleLeft.Location = new System.Drawing.Point(90, 154);
-            this.radioButtonPositionMiddleLeft.Name = "radioButtonPositionMiddleLeft";
-            this.radioButtonPositionMiddleLeft.Size = new System.Drawing.Size(14, 13);
-            this.radioButtonPositionMiddleLeft.TabIndex = 12;
-            this.radioButtonPositionMiddleLeft.TabStop = true;
-            this.radioButtonPositionMiddleLeft.UseVisualStyleBackColor = true;
+            this.panel2.Controls.Add(this.radioButtonOverlayLongDuration);
+            this.panel2.Controls.Add(this.radioButtonOverlayMediumDuration);
+            this.panel2.Controls.Add(this.radioButtonOverlayShortDuration);
+            this.panel2.Location = new System.Drawing.Point(40, 62);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(334, 25);
+            this.panel2.TabIndex = 19;
             // 
             // radioButtonPositionBottomRight
             // 
             this.radioButtonPositionBottomRight.AutoSize = true;
-            this.radioButtonPositionBottomRight.Location = new System.Drawing.Point(130, 173);
+            this.radioButtonPositionBottomRight.Location = new System.Drawing.Point(43, 41);
             this.radioButtonPositionBottomRight.Name = "radioButtonPositionBottomRight";
             this.radioButtonPositionBottomRight.Size = new System.Drawing.Size(14, 13);
-            this.radioButtonPositionBottomRight.TabIndex = 17;
+            this.radioButtonPositionBottomRight.TabIndex = 26;
             this.radioButtonPositionBottomRight.TabStop = true;
             this.radioButtonPositionBottomRight.UseVisualStyleBackColor = true;
             // 
             // radioButtonPositionBottomCenter
             // 
             this.radioButtonPositionBottomCenter.AutoSize = true;
-            this.radioButtonPositionBottomCenter.Location = new System.Drawing.Point(110, 173);
+            this.radioButtonPositionBottomCenter.Location = new System.Drawing.Point(23, 41);
             this.radioButtonPositionBottomCenter.Name = "radioButtonPositionBottomCenter";
             this.radioButtonPositionBottomCenter.Size = new System.Drawing.Size(14, 13);
-            this.radioButtonPositionBottomCenter.TabIndex = 16;
+            this.radioButtonPositionBottomCenter.TabIndex = 25;
             this.radioButtonPositionBottomCenter.TabStop = true;
             this.radioButtonPositionBottomCenter.UseVisualStyleBackColor = true;
             // 
             // radioButtonPositionBottomLeft
             // 
             this.radioButtonPositionBottomLeft.AutoSize = true;
-            this.radioButtonPositionBottomLeft.Location = new System.Drawing.Point(90, 173);
+            this.radioButtonPositionBottomLeft.Location = new System.Drawing.Point(3, 41);
             this.radioButtonPositionBottomLeft.Name = "radioButtonPositionBottomLeft";
             this.radioButtonPositionBottomLeft.Size = new System.Drawing.Size(14, 13);
-            this.radioButtonPositionBottomLeft.TabIndex = 15;
+            this.radioButtonPositionBottomLeft.TabIndex = 24;
             this.radioButtonPositionBottomLeft.TabStop = true;
             this.radioButtonPositionBottomLeft.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonPositionMiddleRight
+            // 
+            this.radioButtonPositionMiddleRight.AutoSize = true;
+            this.radioButtonPositionMiddleRight.Location = new System.Drawing.Point(43, 22);
+            this.radioButtonPositionMiddleRight.Name = "radioButtonPositionMiddleRight";
+            this.radioButtonPositionMiddleRight.Size = new System.Drawing.Size(14, 13);
+            this.radioButtonPositionMiddleRight.TabIndex = 23;
+            this.radioButtonPositionMiddleRight.TabStop = true;
+            this.radioButtonPositionMiddleRight.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonPositionMiddleCenter
+            // 
+            this.radioButtonPositionMiddleCenter.AutoSize = true;
+            this.radioButtonPositionMiddleCenter.Location = new System.Drawing.Point(23, 22);
+            this.radioButtonPositionMiddleCenter.Name = "radioButtonPositionMiddleCenter";
+            this.radioButtonPositionMiddleCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioButtonPositionMiddleCenter.TabIndex = 22;
+            this.radioButtonPositionMiddleCenter.TabStop = true;
+            this.radioButtonPositionMiddleCenter.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonPositionMiddleLeft
+            // 
+            this.radioButtonPositionMiddleLeft.AutoSize = true;
+            this.radioButtonPositionMiddleLeft.Location = new System.Drawing.Point(3, 22);
+            this.radioButtonPositionMiddleLeft.Name = "radioButtonPositionMiddleLeft";
+            this.radioButtonPositionMiddleLeft.Size = new System.Drawing.Size(14, 13);
+            this.radioButtonPositionMiddleLeft.TabIndex = 21;
+            this.radioButtonPositionMiddleLeft.TabStop = true;
+            this.radioButtonPositionMiddleLeft.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonPositionTopRight
+            // 
+            this.radioButtonPositionTopRight.AutoSize = true;
+            this.radioButtonPositionTopRight.Location = new System.Drawing.Point(43, 3);
+            this.radioButtonPositionTopRight.Name = "radioButtonPositionTopRight";
+            this.radioButtonPositionTopRight.Size = new System.Drawing.Size(14, 13);
+            this.radioButtonPositionTopRight.TabIndex = 20;
+            this.radioButtonPositionTopRight.TabStop = true;
+            this.radioButtonPositionTopRight.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonPositionTopCenter
+            // 
+            this.radioButtonPositionTopCenter.AutoSize = true;
+            this.radioButtonPositionTopCenter.Location = new System.Drawing.Point(23, 3);
+            this.radioButtonPositionTopCenter.Name = "radioButtonPositionTopCenter";
+            this.radioButtonPositionTopCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioButtonPositionTopCenter.TabIndex = 19;
+            this.radioButtonPositionTopCenter.TabStop = true;
+            this.radioButtonPositionTopCenter.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonPositionTopLeft
+            // 
+            this.radioButtonPositionTopLeft.AutoSize = true;
+            this.radioButtonPositionTopLeft.Location = new System.Drawing.Point(3, 3);
+            this.radioButtonPositionTopLeft.Name = "radioButtonPositionTopLeft";
+            this.radioButtonPositionTopLeft.Size = new System.Drawing.Size(14, 13);
+            this.radioButtonPositionTopLeft.TabIndex = 18;
+            this.radioButtonPositionTopLeft.TabStop = true;
+            this.radioButtonPositionTopLeft.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonOverlayLongDuration
+            // 
+            this.radioButtonOverlayLongDuration.AutoSize = true;
+            this.radioButtonOverlayLongDuration.Location = new System.Drawing.Point(213, 3);
+            this.radioButtonOverlayLongDuration.Name = "radioButtonOverlayLongDuration";
+            this.radioButtonOverlayLongDuration.Size = new System.Drawing.Size(92, 17);
+            this.radioButtonOverlayLongDuration.TabIndex = 8;
+            this.radioButtonOverlayLongDuration.TabStop = true;
+            this.radioButtonOverlayLongDuration.Text = "Long Duration";
+            this.radioButtonOverlayLongDuration.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonOverlayMediumDuration
+            // 
+            this.radioButtonOverlayMediumDuration.AutoSize = true;
+            this.radioButtonOverlayMediumDuration.Location = new System.Drawing.Point(102, 3);
+            this.radioButtonOverlayMediumDuration.Name = "radioButtonOverlayMediumDuration";
+            this.radioButtonOverlayMediumDuration.Size = new System.Drawing.Size(105, 17);
+            this.radioButtonOverlayMediumDuration.TabIndex = 7;
+            this.radioButtonOverlayMediumDuration.TabStop = true;
+            this.radioButtonOverlayMediumDuration.Text = "Medium Duration";
+            this.radioButtonOverlayMediumDuration.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonOverlayShortDuration
+            // 
+            this.radioButtonOverlayShortDuration.AutoSize = true;
+            this.radioButtonOverlayShortDuration.Location = new System.Drawing.Point(3, 3);
+            this.radioButtonOverlayShortDuration.Name = "radioButtonOverlayShortDuration";
+            this.radioButtonOverlayShortDuration.Size = new System.Drawing.Size(93, 17);
+            this.radioButtonOverlayShortDuration.TabIndex = 6;
+            this.radioButtonOverlayShortDuration.TabStop = true;
+            this.radioButtonOverlayShortDuration.Text = "Short Duration";
+            this.radioButtonOverlayShortDuration.UseVisualStyleBackColor = true;
             // 
             // SettingsForm
             // 
@@ -351,6 +371,10 @@ namespace WindowsVirtualDesktopHelper {
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -368,12 +392,15 @@ namespace WindowsVirtualDesktopHelper {
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSettings;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox checkBoxStartupWithWindows;
-        private System.Windows.Forms.RadioButton radioButtonOverlayLongDuration;
-        private System.Windows.Forms.RadioButton radioButtonOverlayMediumDuration;
-        private System.Windows.Forms.RadioButton radioButtonOverlayShortDuration;
         private System.Windows.Forms.CheckBox checkBoxShowOverlay;
         private System.Windows.Forms.CheckBox checkBoxOverlayTranslucent;
         private System.Windows.Forms.CheckBox checkBoxOverlayAnimate;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.RadioButton radioButtonOverlayLongDuration;
+        private System.Windows.Forms.RadioButton radioButtonOverlayMediumDuration;
+        private System.Windows.Forms.RadioButton radioButtonOverlayShortDuration;
+        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.RadioButton radioButtonPositionBottomRight;
         private System.Windows.Forms.RadioButton radioButtonPositionBottomCenter;
         private System.Windows.Forms.RadioButton radioButtonPositionBottomLeft;
@@ -382,7 +409,6 @@ namespace WindowsVirtualDesktopHelper {
         private System.Windows.Forms.RadioButton radioButtonPositionMiddleLeft;
         private System.Windows.Forms.RadioButton radioButtonPositionTopRight;
         private System.Windows.Forms.RadioButton radioButtonPositionTopCenter;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.RadioButton radioButtonPositionTopLeft;
     }
 }

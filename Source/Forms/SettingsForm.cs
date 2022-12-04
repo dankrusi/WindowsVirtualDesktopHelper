@@ -61,10 +61,7 @@ namespace WindowsVirtualDesktopHelper {
             else return 2000;
         }
         public string OverlayPosition() {
-            if (this.radioButtonOverlayLongDuration.Checked) return "long";
-            else if (this.radioButtonOverlayMediumDuration.Checked) return "medium";
-            else if (this.radioButtonOverlayShortDuration.Checked) return "short";
-            else if (this.radioButtonPositionTopLeft.Checked) return "topleft";
+            if (this.radioButtonPositionTopLeft.Checked) return "topleft";
             else if (this.radioButtonPositionTopCenter.Checked) return "topcenter";
             else if (this.radioButtonPositionTopRight.Checked) return "topright";
             else if (this.radioButtonPositionMiddleLeft.Checked) return "middleleft";
