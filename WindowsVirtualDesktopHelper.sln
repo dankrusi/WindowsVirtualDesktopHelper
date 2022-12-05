@@ -8,8 +8,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D5AC9C5-CA17-450A-B63E-66BFF5261906}"
 	ProjectSection(SolutionItems) = preProject
 		CHANGELOG.md = CHANGELOG.md
+		Scripts\create-version.sh = Scripts\create-version.sh
 		LICENSE.md = LICENSE.md
 		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{5D3D71E2-FB87-4D01-8013-520ED05EC6C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CCD7DB49-839B-4BD0-B28B-30B7F8A8F355}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\create-version.ps1 = Scripts\create-version.ps1
 	EndProjectSection
 EndProject
 Global
@@ -22,9 +30,15 @@ Global
 		{88BEA099-1D4B-4213-9197-1929FFB44901}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88BEA099-1D4B-4213-9197-1929FFB44901}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88BEA099-1D4B-4213-9197-1929FFB44901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D3D71E2-FB87-4D01-8013-520ED05EC6C4}.Debug|Any CPU.ActiveCfg = Debug
+		{5D3D71E2-FB87-4D01-8013-520ED05EC6C4}.Release|Any CPU.ActiveCfg = Release
+		{5D3D71E2-FB87-4D01-8013-520ED05EC6C4}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CCD7DB49-839B-4BD0-B28B-30B7F8A8F355} = {8D5AC9C5-CA17-450A-B63E-66BFF5261906}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4501F245-0997-4EFA-9053-549FD6135156}
