@@ -48,7 +48,6 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 ### Executable
 
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
-If you would like it to start with your computer, [add a shortcut to it to your autostart folder](https://support.microsoft.com/en-us/windows/add-an-app-to-run-automatically-at-startup-in-windows-10-150da165-dcd9-7230-517b-cf3c295d89dd).
 
 [Download WindowsVirtualDesktopHelper Executable v1.6.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.6/WindowsVirtualDesktopHelper.Executable.v1.6.zip)
 
