@@ -4,7 +4,7 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v1.6 Setup (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.6/WindowsVirtualDesktopHelper.Setup.v1.6.zip) | 
+[Download v1.6 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.6/WindowsVirtualDesktopHelper.Setup.v1.6.msi) | 
 [Download v1.6 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.6/WindowsVirtualDesktopHelper.Executable.v1.6.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
@@ -39,7 +39,7 @@ Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7 or higher 
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v1.6.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.6/WindowsVirtualDesktopHelper.Setup.v1.6.zip)
+[Download WindowsVirtualDesktopHelper Setup v1.6.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.6/WindowsVirtualDesktopHelper.Setup.v1.6.msi)
 
 Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
