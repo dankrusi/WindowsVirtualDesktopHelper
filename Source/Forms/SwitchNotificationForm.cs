@@ -82,13 +82,18 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         // Preven from from being focusable
-        // Via https://stackoverflow.com/questions/2423234/make-a-form-not-focusable-in-c-sharp
+        // via https://stackoverflow.com/questions/2423234/make-a-form-not-focusable-in-c-sharp
+        // via https://stackoverflow.com/questions/2798245/click-through-in-c-sharp-form
         private const int WS_EX_NOACTIVATE = 0x08000000;
+        private const int WS_EX_LAYERED = 0x80000;
+        private const int WS_EX_TRANSPARENT = 0x20;
         protected override CreateParams CreateParams {
             get {
                 var createParams = base.CreateParams;
 
                 createParams.ExStyle |= WS_EX_NOACTIVATE;
+                createParams.ExStyle |= WS_EX_LAYERED;
+                createParams.ExStyle |= WS_EX_TRANSPARENT;
                 return createParams;
             }
         }
