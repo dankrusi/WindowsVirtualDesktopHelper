@@ -3,7 +3,7 @@
 // License: MIT License (https://github.com/zgdump/windows-virtualdesktopindicator/blob/main/LICENSE)
 
 namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
-    internal interface IVirtualDesktopManager
+    public interface IVirtualDesktopManager
     {
         uint Current();
 

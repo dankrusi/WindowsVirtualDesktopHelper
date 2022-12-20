@@ -120,7 +120,7 @@ namespace WindowsVirtualDesktopHelper {
                 if (settings[key] == null || settings[key].Value == null) return defaultValue;
                 return settings[key].Value;
             } catch (Exception e) {
-                Console.WriteLine("Error reading app settings: " + e.Message);
+                Util.Logging.WriteLine("Error reading app settings: " + e.Message);
                 return defaultValue;
             }
         }
@@ -136,7 +136,7 @@ namespace WindowsVirtualDesktopHelper {
                 }
                 config.Save(ConfigurationSaveMode.Modified);
             } catch (Exception e) {
-                Console.WriteLine("Error saving app settings: " + e.Message);
+                Util.Logging.WriteLine("Error saving app settings: " + e.Message);
             }
         }
 
@@ -144,7 +144,7 @@ namespace WindowsVirtualDesktopHelper {
             try {
                 return bool.Parse(GetString(key,defaultValue.ToString().ToLower()));
             } catch (Exception e) {
-                Console.WriteLine("Error reading app settings: "+e.Message);
+                Util.Logging.WriteLine("Error reading app settings: "+e.Message);
                 return defaultValue;
             }
         }

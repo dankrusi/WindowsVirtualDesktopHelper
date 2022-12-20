@@ -40,40 +40,8 @@ namespace WindowsVirtualDesktopHelper {
 
 
         public void LoadVDAPI() {
-            // We need to load the correct API for correct windows version...
-            // See https://www.anoopcnair.com/windows-11-version-numbers-build-numbers-major/ for versions
-            int currentBuild = 0;
-            try {
-                currentBuild = GetWindowsBuildVersion();
-            } catch(Exception e) {
-                throw new Exception("LoadVDAPI: could not determine Windows version: " + e.Message, e);
-            }
-            Console.WriteLine("Windows Build Version: " + currentBuild);
-            if (currentBuild >= 22621) {
-                App.DetectedVDImplementation = "VirtualDesktopWin11_22H2";
-                Console.WriteLine("Detected Windows 11 22H2");
-                try {
-                    this.VDAPI = new VirtualDesktopAPI.Implementation.VirtualDesktopWin11_22H2();
-                } catch (Exception e) {
-                    throw new Exception("LoadVDAPI: could not load VirtualDesktop API implementation VirtualDesktopWin11_22H2: " + e.Message, e);
-                }
-            } else if (currentBuild >= 22000) {
-                App.DetectedVDImplementation = "VirtualDesktopWin11_21H2";
-                Console.WriteLine("Detected Windows 11 21H1");
-                try {
-                    this.VDAPI = new VirtualDesktopAPI.Implementation.VirtualDesktopWin11_21H2();
-                } catch (Exception e) {
-                    throw new Exception("LoadVDAPI: could not load VirtualDesktop API implementation VirtualDesktopWin11_21H2: " + e.Message, e);
-                }
-            } else {
-                Console.WriteLine("Detected Windows 10");
-                App.DetectedVDImplementation = "VirtualDesktopWin10";
-                try {
-                    this.VDAPI = new VirtualDesktopAPI.Implementation.VirtualDesktopWin10();
-                } catch (Exception e) {
-                    throw new Exception("LoadVDAPI: could not load VirtualDesktop API implementation VirtualDesktopWin10: " + e.Message, e);
-                }
-            }
+            App.DetectedVDImplementation = VirtualDesktopAPI.Loader.GetImplementationForOS();
+            this.VDAPI = VirtualDesktopAPI.Loader.LoadImplementationWithFallback(App.DetectedVDImplementation);
         }
 
         public void LoadVDDisplayInfo() {
@@ -107,17 +75,7 @@ namespace WindowsVirtualDesktopHelper {
             }
         }
 
-        public static bool IsWindows11() {
-            return GetWindowsBuildVersion() >= 22000;
-        }
-
-        public static int GetWindowsBuildVersion() {
-            // via https://stackoverflow.com/questions/69038560/detect-windows-11-with-net-framework-or-windows-api
-            var reg = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
-            var currentBuildStr = (string)reg.GetValue("CurrentBuild");
-            var currentBuild = int.Parse(currentBuildStr);
-            return currentBuild;
-        }
+        
 
         public void Exit() {
             Application.Exit();
@@ -133,7 +91,7 @@ namespace WindowsVirtualDesktopHelper {
             while (true) {
                 var newVDDisplayNumber = this.GetVDDisplayNumber(false); 
                 if (newVDDisplayNumber != this.CurrentVDDisplayNumber) {
-                    //Console.WriteLine("Switched to " + newVDDisplayName);
+                    //Util.Logging.WriteLine("Switched to " + newVDDisplayName);
                     this.CurrentVDDisplayName = this.GetVDDisplayName(false);
                     this.CurrentVDDisplayNumber = newVDDisplayNumber;
                     VDSwitched();
