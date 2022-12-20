@@ -33,7 +33,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\Setup.msi"
+        "OutputFilename" = "8:Debug\\WindowsVirtualDesktopHelper Setup.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -50,6 +50,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -74,6 +82,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -160,15 +176,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Windows Virtual Desktop Helper"
-        "ProductCode" = "8:{E6E8A3C1-11E2-46DB-9BD1-0D43141FF186}"
-        "PackageCode" = "8:{D5CEC053-C532-4E9A-A4FF-CF656347AA86}"
+        "ProductCode" = "8:{B2A09E22-630B-4961-BF4A-29C45F34CFDF}"
+        "PackageCode" = "8:{4306C236-09A2-4B84-B082-75ECB959041C}"
         "UpgradeCode" = "8:{E12EB062-7579-402D-9B7C-EF5AE3C7DCCF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.6.0"
+        "ProductVersion" = "8:1.7.0"
         "Manufacturer" = "8:Dan Krusi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/dankrusi/WindowsVirtualDesktopHelper"
@@ -696,7 +712,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_3426EA7DC1BB49F08DFAB47C820C7AC4"
             {
-            "SourcePath" = "8:..\\Source\\obj\\Release\\WindowsVirtualDesktopHelper.exe"
+            "SourcePath" = "8:..\\Source\\obj\\Debug\\WindowsVirtualDesktopHelper.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_9D371B01176B4DC683E623257154FCFC"
