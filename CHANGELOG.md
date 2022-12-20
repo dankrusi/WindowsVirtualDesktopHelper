@@ -1,3 +1,22 @@
+# v1.7
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
+
+## Changes
+* Notification display is click-through
+* Fallback system which tries all virtual desktop API implementations if the best guess fails
+
+## Fixes
+* Prevent crashes on failed desktop information updates
+
+
 # v1.6
 
 ## Features

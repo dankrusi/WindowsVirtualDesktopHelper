@@ -89,14 +89,19 @@ namespace WindowsVirtualDesktopHelper {
 
         private void _MonitorVDSwitch() {
             while (true) {
-                var newVDDisplayNumber = this.GetVDDisplayNumber(false); 
-                if (newVDDisplayNumber != this.CurrentVDDisplayNumber) {
-                    //Util.Logging.WriteLine("Switched to " + newVDDisplayName);
-                    this.CurrentVDDisplayName = this.GetVDDisplayName(false);
-                    this.CurrentVDDisplayNumber = newVDDisplayNumber;
-                    VDSwitched();
+                try {
+                    var newVDDisplayNumber = this.GetVDDisplayNumber(false);
+                    if (newVDDisplayNumber != this.CurrentVDDisplayNumber) {
+                        //Util.Logging.WriteLine("Switched to " + newVDDisplayName);
+                        this.CurrentVDDisplayName = this.GetVDDisplayName(false);
+                        this.CurrentVDDisplayNumber = newVDDisplayNumber;
+                        VDSwitched();
+                    }
+                    System.Threading.Thread.Sleep(100);
+                }catch(Exception e) {
+                    Util.Logging.WriteLine("App: Error: " + e.Message);
+                    System.Threading.Thread.Sleep(1000);
                 }
-                System.Threading.Thread.Sleep(100);
             }
         }
 
