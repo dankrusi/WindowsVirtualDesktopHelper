@@ -22,9 +22,16 @@ namespace WindowsVirtualDesktopHelper {
             if(e.StackTrace != null) this.textBoxDetails.Text += "\r\n" + e.StackTrace.ToString();
             if (e.InnerException != null) this.textBoxDetails.Text += "\r\n\r\n" + e.InnerException.Message;
             if (e.InnerException != null && e.InnerException.StackTrace != null) this.textBoxDetails.Text += "\r\n" + e.InnerException.StackTrace.ToString();
-            this.textBoxDetails.Text += "\r\n\r\n" + "Windows Build: "+GetWinBuildVersion();
+            this.textBoxDetails.Text += "\r\n";
+            this.textBoxDetails.Text += "\r\n" + "Windows Build: "+GetWindowsBuildVersion();
+            this.textBoxDetails.Text += "\r\n" + "Windows Release: "+GetWindowsReleaseId();
+            this.textBoxDetails.Text += "\r\n" + "Windows Product: "+GetWindowsProductName();
+            this.textBoxDetails.Text += "\r\n" + "Windows Version: "+GetWindowsDisplayVersion();
             this.textBoxDetails.Text += "\r\n" + "Windows Virtual Desktop Helper Version: "+GetAppBuildVersion();
             this.textBoxDetails.Text += "\r\n" + "Virtual Desktop Implementation: "+App.DetectedVDImplementation;
+            this.textBoxDetails.Text += "\r\n";
+            this.textBoxDetails.Text += "\r\n" + "Log:";
+            this.textBoxDetails.Text += "\r\n" + string.Join("\r\n", Util.Logging.GetLogHistory());
         }
 
         private string GetAppBuildVersion() {
@@ -35,13 +42,35 @@ namespace WindowsVirtualDesktopHelper {
             }
         }
 
-        private string GetWinBuildVersion() {
+        private string GetWindowsBuildVersion() {
             try {
-                var reg = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
-                var currentBuildStr = (string)reg.GetValue("CurrentBuild");
-                return currentBuildStr;
-            }catch(Exception e) {
-                return "Error getting build version: "+e.Message;
+                return Util.OS.GetWindowsBuildVersion().ToString();
+            } catch (Exception e) {
+                return "Error getting build version: " + e.Message;
+            }
+        }
+
+        private string GetWindowsProductName() {
+            try {
+                return Util.OS.GetWindowsProductName();
+            } catch (Exception e) {
+                return "Error getting build version: " + e.Message;
+            }
+        }
+
+        private string GetWindowsDisplayVersion() {
+            try {
+                return Util.OS.GetWindowsDisplayVersion();
+            } catch (Exception e) {
+                return "Error getting build version: " + e.Message;
+            }
+        }
+
+        private string GetWindowsReleaseId() {
+            try {
+                return Util.OS.GetWindowsReleaseId().ToString();
+            } catch (Exception e) {
+                return "Error getting build version: " + e.Message;
             }
         }
 
