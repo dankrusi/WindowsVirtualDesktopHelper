@@ -53,8 +53,9 @@ echo "================================================================"
 $EXE_PATH = "..\Source\bin\Release\WindowsVirtualDesktopHelper.exe"
 $LICENSE_PATH = "..\LICENSE.md"
 $README_PATH = "..\README.md"
+$CHANGELOG_PATH = "..\CHANGELOG.md"
 $EXE_DEST_PATH = $RELEASE_FOLDER + "\WindowsVirtualDesktopHelper Executable v"+$VERSION+".zip"
-Compress-Archive -Force -Path $EXE_PATH, $LICENSE_PATH, $README_PATH -DestinationPath $EXE_DEST_PATH
+Compress-Archive -Force -Path $EXE_PATH, $LICENSE_PATH, $README_PATH, $CHANGELOG_PATH -DestinationPath $EXE_DEST_PATH
 
 # Copy Setup
 echo "================================================================"
@@ -67,3 +68,7 @@ Copy-Item -Force -Path $SETUP_PATH -Destination $SETUP_DEST_PATH
 echo "================================================================"
 echo "= Done!"
 echo "================================================================"
+
+
+$null = Read-Host "Press enter to open release at GitHub..."
+Start-Process "https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/new"
