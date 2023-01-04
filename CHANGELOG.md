@@ -1,3 +1,21 @@
+# v1.8
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
+
+## Changes
+* Improved fallback attempts to other Windows APIs if initial guess doesn't work
+
+## Fixes
+* Support Windows 11 Insider builds 
+
+
 # v1.7
 
 ## Features

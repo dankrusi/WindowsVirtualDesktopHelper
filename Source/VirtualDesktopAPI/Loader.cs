@@ -22,7 +22,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
                 throw new Exception("LoadVDAPI: could not determine Windows version: " + e.Message, e);
             }
             Util.Logging.WriteLine("GetImplementationForOS: Windows Build Version: " + currentBuild);
-            if (currentBuild >= 25158 && currentBuild <= 25267) {
+            if (currentBuild >= 25158) {
                 Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 Insider due to build 25158-5267");
                 return VirtualDesktopWin11_Insider;
             } else if (currentBuild >= 22621) {
