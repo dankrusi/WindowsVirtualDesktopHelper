@@ -35,14 +35,13 @@ namespace WindowsVirtualDesktopHelper {
             this.notifyIconNext = new System.Windows.Forms.NotifyIcon(this.components);
             this.checkBoxShowPrevNextIcons = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.checkBoxOverlayTranslucent = new System.Windows.Forms.CheckBox();
-            this.checkBoxOverlayAnimate = new System.Windows.Forms.CheckBox();
-            this.checkBoxShowOverlay = new System.Windows.Forms.CheckBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.checkBoxStartupWithWindows = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.checkBoxClickDesktopNumberTaskView = new System.Windows.Forms.CheckBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.radioButtonOverlayMicroDuration = new System.Windows.Forms.RadioButton();
+            this.radioButtonOverlayLongDuration = new System.Windows.Forms.RadioButton();
+            this.radioButtonOverlayMediumDuration = new System.Windows.Forms.RadioButton();
+            this.radioButtonOverlayShortDuration = new System.Windows.Forms.RadioButton();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.radioButtonPositionBottomRight = new System.Windows.Forms.RadioButton();
             this.radioButtonPositionBottomCenter = new System.Windows.Forms.RadioButton();
             this.radioButtonPositionBottomLeft = new System.Windows.Forms.RadioButton();
@@ -52,14 +51,17 @@ namespace WindowsVirtualDesktopHelper {
             this.radioButtonPositionTopRight = new System.Windows.Forms.RadioButton();
             this.radioButtonPositionTopCenter = new System.Windows.Forms.RadioButton();
             this.radioButtonPositionTopLeft = new System.Windows.Forms.RadioButton();
-            this.radioButtonOverlayLongDuration = new System.Windows.Forms.RadioButton();
-            this.radioButtonOverlayMediumDuration = new System.Windows.Forms.RadioButton();
-            this.radioButtonOverlayShortDuration = new System.Windows.Forms.RadioButton();
+            this.label1 = new System.Windows.Forms.Label();
+            this.checkBoxOverlayTranslucent = new System.Windows.Forms.CheckBox();
+            this.checkBoxOverlayAnimate = new System.Windows.Forms.CheckBox();
+            this.checkBoxShowOverlay = new System.Windows.Forms.CheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.checkBoxStartupWithWindows = new System.Windows.Forms.CheckBox();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // notifyIconNumber
@@ -68,6 +70,8 @@ namespace WindowsVirtualDesktopHelper {
             this.notifyIconNumber.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIconNumber.Icon")));
             this.notifyIconNumber.Text = "Windows Virtual Desktop Helper";
             this.notifyIconNumber.Visible = true;
+            this.notifyIconNumber.Click += new System.EventHandler(this.notifyIconNumber_Click);
+            this.notifyIconNumber.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIconNumber_MouseClick);
             // 
             // contextMenuStrip1
             // 
@@ -127,6 +131,7 @@ namespace WindowsVirtualDesktopHelper {
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkBoxClickDesktopNumberTaskView);
             this.groupBox1.Controls.Add(this.panel2);
             this.groupBox1.Controls.Add(this.panel1);
             this.groupBox1.Controls.Add(this.label1);
@@ -136,71 +141,76 @@ namespace WindowsVirtualDesktopHelper {
             this.groupBox1.Controls.Add(this.checkBoxShowPrevNextIcons);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(392, 205);
+            this.groupBox1.Size = new System.Drawing.Size(413, 239);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Features";
             // 
-            // checkBoxOverlayTranslucent
+            // checkBoxClickDesktopNumberTaskView
             // 
-            this.checkBoxOverlayTranslucent.AutoSize = true;
-            this.checkBoxOverlayTranslucent.Location = new System.Drawing.Point(43, 111);
-            this.checkBoxOverlayTranslucent.Name = "checkBoxOverlayTranslucent";
-            this.checkBoxOverlayTranslucent.Size = new System.Drawing.Size(82, 17);
-            this.checkBoxOverlayTranslucent.TabIndex = 7;
-            this.checkBoxOverlayTranslucent.Text = "Translucent";
-            this.checkBoxOverlayTranslucent.UseVisualStyleBackColor = true;
+            this.checkBoxClickDesktopNumberTaskView.AutoSize = true;
+            this.checkBoxClickDesktopNumberTaskView.Location = new System.Drawing.Point(15, 198);
+            this.checkBoxClickDesktopNumberTaskView.Name = "checkBoxClickDesktopNumberTaskView";
+            this.checkBoxClickDesktopNumberTaskView.Size = new System.Drawing.Size(290, 17);
+            this.checkBoxClickDesktopNumberTaskView.TabIndex = 20;
+            this.checkBoxClickDesktopNumberTaskView.Text = "Clicking Desktop Number in Icon Tray opens Task View";
+            this.checkBoxClickDesktopNumberTaskView.UseVisualStyleBackColor = true;
+            this.checkBoxClickDesktopNumberTaskView.CheckedChanged += new System.EventHandler(this.checkBoxClickDesktopNumberTaskView_CheckedChanged);
             // 
-            // checkBoxOverlayAnimate
+            // panel2
             // 
-            this.checkBoxOverlayAnimate.AutoSize = true;
-            this.checkBoxOverlayAnimate.Location = new System.Drawing.Point(43, 88);
-            this.checkBoxOverlayAnimate.Name = "checkBoxOverlayAnimate";
-            this.checkBoxOverlayAnimate.Size = new System.Drawing.Size(98, 17);
-            this.checkBoxOverlayAnimate.TabIndex = 6;
-            this.checkBoxOverlayAnimate.Text = "Animate In/Out";
-            this.checkBoxOverlayAnimate.UseVisualStyleBackColor = true;
+            this.panel2.Controls.Add(this.radioButtonOverlayMicroDuration);
+            this.panel2.Controls.Add(this.radioButtonOverlayLongDuration);
+            this.panel2.Controls.Add(this.radioButtonOverlayMediumDuration);
+            this.panel2.Controls.Add(this.radioButtonOverlayShortDuration);
+            this.panel2.Location = new System.Drawing.Point(40, 62);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(360, 25);
+            this.panel2.TabIndex = 19;
             // 
-            // checkBoxShowOverlay
+            // radioButtonOverlayMicroDuration
             // 
-            this.checkBoxShowOverlay.AutoSize = true;
-            this.checkBoxShowOverlay.Location = new System.Drawing.Point(15, 42);
-            this.checkBoxShowOverlay.Name = "checkBoxShowOverlay";
-            this.checkBoxShowOverlay.Size = new System.Drawing.Size(211, 17);
-            this.checkBoxShowOverlay.TabIndex = 2;
-            this.checkBoxShowOverlay.Text = "Show Overlay when switching Desktop";
-            this.checkBoxShowOverlay.UseVisualStyleBackColor = true;
-            this.checkBoxShowOverlay.CheckedChanged += new System.EventHandler(this.checkBoxShowOverlay_CheckedChanged);
+            this.radioButtonOverlayMicroDuration.AutoSize = true;
+            this.radioButtonOverlayMicroDuration.Location = new System.Drawing.Point(5, 5);
+            this.radioButtonOverlayMicroDuration.Name = "radioButtonOverlayMicroDuration";
+            this.radioButtonOverlayMicroDuration.Size = new System.Drawing.Size(56, 17);
+            this.radioButtonOverlayMicroDuration.TabIndex = 9;
+            this.radioButtonOverlayMicroDuration.TabStop = true;
+            this.radioButtonOverlayMicroDuration.Text = "500ms";
+            this.radioButtonOverlayMicroDuration.UseVisualStyleBackColor = true;
             // 
-            // groupBox2
+            // radioButtonOverlayLongDuration
             // 
-            this.groupBox2.Controls.Add(this.checkBoxStartupWithWindows);
-            this.groupBox2.Location = new System.Drawing.Point(12, 223);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(392, 82);
-            this.groupBox2.TabIndex = 3;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Settings";
+            this.radioButtonOverlayLongDuration.AutoSize = true;
+            this.radioButtonOverlayLongDuration.Location = new System.Drawing.Point(203, 5);
+            this.radioButtonOverlayLongDuration.Name = "radioButtonOverlayLongDuration";
+            this.radioButtonOverlayLongDuration.Size = new System.Drawing.Size(62, 17);
+            this.radioButtonOverlayLongDuration.TabIndex = 8;
+            this.radioButtonOverlayLongDuration.TabStop = true;
+            this.radioButtonOverlayLongDuration.Text = "3000ms";
+            this.radioButtonOverlayLongDuration.UseVisualStyleBackColor = true;
             // 
-            // checkBoxStartupWithWindows
+            // radioButtonOverlayMediumDuration
             // 
-            this.checkBoxStartupWithWindows.AutoSize = true;
-            this.checkBoxStartupWithWindows.Location = new System.Drawing.Point(15, 19);
-            this.checkBoxStartupWithWindows.Name = "checkBoxStartupWithWindows";
-            this.checkBoxStartupWithWindows.Size = new System.Drawing.Size(129, 17);
-            this.checkBoxStartupWithWindows.TabIndex = 1;
-            this.checkBoxStartupWithWindows.Text = "Startup with Windows";
-            this.checkBoxStartupWithWindows.UseVisualStyleBackColor = true;
-            this.checkBoxStartupWithWindows.CheckedChanged += new System.EventHandler(this.checkBoxStartupWithWindows_CheckedChanged);
+            this.radioButtonOverlayMediumDuration.AutoSize = true;
+            this.radioButtonOverlayMediumDuration.Location = new System.Drawing.Point(137, 5);
+            this.radioButtonOverlayMediumDuration.Name = "radioButtonOverlayMediumDuration";
+            this.radioButtonOverlayMediumDuration.Size = new System.Drawing.Size(62, 17);
+            this.radioButtonOverlayMediumDuration.TabIndex = 7;
+            this.radioButtonOverlayMediumDuration.TabStop = true;
+            this.radioButtonOverlayMediumDuration.Text = "2000ms";
+            this.radioButtonOverlayMediumDuration.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // radioButtonOverlayShortDuration
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(40, 135);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(47, 13);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "Position:";
+            this.radioButtonOverlayShortDuration.AutoSize = true;
+            this.radioButtonOverlayShortDuration.Location = new System.Drawing.Point(69, 5);
+            this.radioButtonOverlayShortDuration.Name = "radioButtonOverlayShortDuration";
+            this.radioButtonOverlayShortDuration.Size = new System.Drawing.Size(62, 17);
+            this.radioButtonOverlayShortDuration.TabIndex = 6;
+            this.radioButtonOverlayShortDuration.TabStop = true;
+            this.radioButtonOverlayShortDuration.Text = "1000ms";
+            this.radioButtonOverlayShortDuration.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
@@ -217,16 +227,6 @@ namespace WindowsVirtualDesktopHelper {
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(62, 59);
             this.panel1.TabIndex = 18;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.radioButtonOverlayLongDuration);
-            this.panel2.Controls.Add(this.radioButtonOverlayMediumDuration);
-            this.panel2.Controls.Add(this.radioButtonOverlayShortDuration);
-            this.panel2.Location = new System.Drawing.Point(40, 62);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(334, 25);
-            this.panel2.TabIndex = 19;
             // 
             // radioButtonPositionBottomRight
             // 
@@ -318,44 +318,72 @@ namespace WindowsVirtualDesktopHelper {
             this.radioButtonPositionTopLeft.TabStop = true;
             this.radioButtonPositionTopLeft.UseVisualStyleBackColor = true;
             // 
-            // radioButtonOverlayLongDuration
+            // label1
             // 
-            this.radioButtonOverlayLongDuration.AutoSize = true;
-            this.radioButtonOverlayLongDuration.Location = new System.Drawing.Point(213, 3);
-            this.radioButtonOverlayLongDuration.Name = "radioButtonOverlayLongDuration";
-            this.radioButtonOverlayLongDuration.Size = new System.Drawing.Size(92, 17);
-            this.radioButtonOverlayLongDuration.TabIndex = 8;
-            this.radioButtonOverlayLongDuration.TabStop = true;
-            this.radioButtonOverlayLongDuration.Text = "Long Duration";
-            this.radioButtonOverlayLongDuration.UseVisualStyleBackColor = true;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(40, 135);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(47, 13);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Position:";
             // 
-            // radioButtonOverlayMediumDuration
+            // checkBoxOverlayTranslucent
             // 
-            this.radioButtonOverlayMediumDuration.AutoSize = true;
-            this.radioButtonOverlayMediumDuration.Location = new System.Drawing.Point(102, 3);
-            this.radioButtonOverlayMediumDuration.Name = "radioButtonOverlayMediumDuration";
-            this.radioButtonOverlayMediumDuration.Size = new System.Drawing.Size(105, 17);
-            this.radioButtonOverlayMediumDuration.TabIndex = 7;
-            this.radioButtonOverlayMediumDuration.TabStop = true;
-            this.radioButtonOverlayMediumDuration.Text = "Medium Duration";
-            this.radioButtonOverlayMediumDuration.UseVisualStyleBackColor = true;
+            this.checkBoxOverlayTranslucent.AutoSize = true;
+            this.checkBoxOverlayTranslucent.Location = new System.Drawing.Point(43, 111);
+            this.checkBoxOverlayTranslucent.Name = "checkBoxOverlayTranslucent";
+            this.checkBoxOverlayTranslucent.Size = new System.Drawing.Size(82, 17);
+            this.checkBoxOverlayTranslucent.TabIndex = 7;
+            this.checkBoxOverlayTranslucent.Text = "Translucent";
+            this.checkBoxOverlayTranslucent.UseVisualStyleBackColor = true;
             // 
-            // radioButtonOverlayShortDuration
+            // checkBoxOverlayAnimate
             // 
-            this.radioButtonOverlayShortDuration.AutoSize = true;
-            this.radioButtonOverlayShortDuration.Location = new System.Drawing.Point(3, 3);
-            this.radioButtonOverlayShortDuration.Name = "radioButtonOverlayShortDuration";
-            this.radioButtonOverlayShortDuration.Size = new System.Drawing.Size(93, 17);
-            this.radioButtonOverlayShortDuration.TabIndex = 6;
-            this.radioButtonOverlayShortDuration.TabStop = true;
-            this.radioButtonOverlayShortDuration.Text = "Short Duration";
-            this.radioButtonOverlayShortDuration.UseVisualStyleBackColor = true;
+            this.checkBoxOverlayAnimate.AutoSize = true;
+            this.checkBoxOverlayAnimate.Location = new System.Drawing.Point(43, 88);
+            this.checkBoxOverlayAnimate.Name = "checkBoxOverlayAnimate";
+            this.checkBoxOverlayAnimate.Size = new System.Drawing.Size(98, 17);
+            this.checkBoxOverlayAnimate.TabIndex = 6;
+            this.checkBoxOverlayAnimate.Text = "Animate In/Out";
+            this.checkBoxOverlayAnimate.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxShowOverlay
+            // 
+            this.checkBoxShowOverlay.AutoSize = true;
+            this.checkBoxShowOverlay.Location = new System.Drawing.Point(15, 42);
+            this.checkBoxShowOverlay.Name = "checkBoxShowOverlay";
+            this.checkBoxShowOverlay.Size = new System.Drawing.Size(211, 17);
+            this.checkBoxShowOverlay.TabIndex = 2;
+            this.checkBoxShowOverlay.Text = "Show Overlay when switching Desktop";
+            this.checkBoxShowOverlay.UseVisualStyleBackColor = true;
+            this.checkBoxShowOverlay.CheckedChanged += new System.EventHandler(this.checkBoxShowOverlay_CheckedChanged);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.checkBoxStartupWithWindows);
+            this.groupBox2.Location = new System.Drawing.Point(12, 257);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(413, 48);
+            this.groupBox2.TabIndex = 3;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Settings";
+            // 
+            // checkBoxStartupWithWindows
+            // 
+            this.checkBoxStartupWithWindows.AutoSize = true;
+            this.checkBoxStartupWithWindows.Location = new System.Drawing.Point(15, 19);
+            this.checkBoxStartupWithWindows.Name = "checkBoxStartupWithWindows";
+            this.checkBoxStartupWithWindows.Size = new System.Drawing.Size(129, 17);
+            this.checkBoxStartupWithWindows.TabIndex = 1;
+            this.checkBoxStartupWithWindows.Text = "Startup with Windows";
+            this.checkBoxStartupWithWindows.UseVisualStyleBackColor = true;
+            this.checkBoxStartupWithWindows.CheckedChanged += new System.EventHandler(this.checkBoxStartupWithWindows_CheckedChanged);
             // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(416, 317);
+            this.ClientSize = new System.Drawing.Size(439, 317);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.MaximizeBox = false;
@@ -369,12 +397,12 @@ namespace WindowsVirtualDesktopHelper {
             this.contextMenuStrip1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -410,5 +438,7 @@ namespace WindowsVirtualDesktopHelper {
         private System.Windows.Forms.RadioButton radioButtonPositionTopRight;
         private System.Windows.Forms.RadioButton radioButtonPositionTopCenter;
         private System.Windows.Forms.RadioButton radioButtonPositionTopLeft;
+        private System.Windows.Forms.RadioButton radioButtonOverlayMicroDuration;
+        private System.Windows.Forms.CheckBox checkBoxClickDesktopNumberTaskView;
     }
 }

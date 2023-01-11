@@ -58,6 +58,7 @@ namespace WindowsVirtualDesktopHelper {
             if (this.radioButtonOverlayLongDuration.Checked == true) return 3000;
             else if (this.radioButtonOverlayMediumDuration.Checked == true) return 2000;
             else if (this.radioButtonOverlayShortDuration.Checked == true) return 1000;
+            else if (this.radioButtonOverlayMicroDuration.Checked == true) return 500;
             else return 2000;
         }
         public string OverlayPosition() {
@@ -79,9 +80,11 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxShowOverlay.Checked = GetBool("ShowOverlay", true);
             this.checkBoxOverlayAnimate.Checked = GetBool("OverlayAnimate", true);
             this.checkBoxOverlayTranslucent.Checked = GetBool("OverlayTranslucent", true);
+            this.checkBoxClickDesktopNumberTaskView.Checked = GetBool("ClickDesktopNumberOpensTaskView", true);
             this.radioButtonOverlayLongDuration.Checked = GetString("OverlayDuration","medium") == "long";
             this.radioButtonOverlayMediumDuration.Checked = GetString("OverlayDuration", "medium") == "medium";
             this.radioButtonOverlayShortDuration.Checked = GetString("OverlayDuration", "medium") == "short";
+            this.radioButtonOverlayMicroDuration.Checked = GetString("OverlayDuration", "medium") == "micro";
             this.radioButtonPositionTopLeft.Checked = GetString("OverlayPosition", "middlecenter") == "topleft";
             this.radioButtonPositionTopCenter.Checked = GetString("OverlayPosition", "middlecenter") == "topcenter";
             this.radioButtonPositionTopRight.Checked = GetString("OverlayPosition", "middlecenter") == "topright";
@@ -99,9 +102,11 @@ namespace WindowsVirtualDesktopHelper {
             SetBool("ShowOverlay", this.checkBoxShowOverlay.Checked);
             SetBool("OverlayAnimate", this.checkBoxOverlayAnimate.Checked);
             SetBool("OverlayTranslucent", this.checkBoxOverlayTranslucent.Checked);
+            SetBool("ClickDesktopNumberOpensTaskView", this.checkBoxClickDesktopNumberTaskView.Checked);
             if (this.radioButtonOverlayLongDuration.Checked) SetString("OverlayDuration", "long");
             if (this.radioButtonOverlayMediumDuration.Checked) SetString("OverlayDuration", "medium");
             if (this.radioButtonOverlayShortDuration.Checked) SetString("OverlayDuration", "short");
+            if (this.radioButtonOverlayMicroDuration.Checked) SetString("OverlayDuration", "micro");
             if (this.radioButtonPositionTopLeft.Checked) SetString("OverlayPosition", "topleft");
             if (this.radioButtonPositionTopCenter.Checked) SetString("OverlayPosition", "topcenter");
             if (this.radioButtonPositionTopRight.Checked) SetString("OverlayPosition", "topright");
@@ -269,6 +274,7 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         private void checkBoxShowOverlay_CheckedChanged(object sender, EventArgs e) {
+            radioButtonOverlayMicroDuration.Enabled = checkBoxShowOverlay.Checked;
             radioButtonOverlayShortDuration.Enabled = checkBoxShowOverlay.Checked;
             radioButtonOverlayMediumDuration.Enabled = checkBoxShowOverlay.Checked;
             radioButtonOverlayLongDuration.Enabled = checkBoxShowOverlay.Checked;
@@ -292,6 +298,20 @@ namespace WindowsVirtualDesktopHelper {
 
         private void notifyIconNext_DoubleClick(object sender, EventArgs e) {
             //TODO: go to last desktop
+        }
+
+        private void notifyIconNumber_Click(object sender, EventArgs e) {
+            
+        }
+
+        private void notifyIconNumber_MouseClick(object sender, MouseEventArgs e) {
+            if (e.Button == MouseButtons.Left && this.checkBoxClickDesktopNumberTaskView.Checked) {
+                Util.OS.OpenTaskView();
+            }
+        }
+
+        private void checkBoxClickDesktopNumberTaskView_CheckedChanged(object sender, EventArgs e) {
+
         }
     }
 }

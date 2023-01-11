@@ -10,6 +10,10 @@ namespace WindowsVirtualDesktopHelper.Util {
             return GetWindowsBuildVersion() >= 22000;
         }
 
+        public static void OpenTaskView() {
+            System.Diagnostics.Process.Start("explorer.exe", "shell:::{3080F90E-D7AD-11D9-BD98-0000947B0257}");
+        }
+
         public static int GetWindowsBuildVersion() {
             // via https://stackoverflow.com/questions/69038560/detect-windows-11-with-net-framework-or-windows-api
             var reg = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
