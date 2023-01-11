@@ -62,8 +62,11 @@ echo "================================================================"
 echo "= Copying setup to releases..."
 echo "================================================================"
 $SETUP_PATH = "..\Setup\Release\WindowsVirtualDesktopHelper Setup.msi"
-$SETUP_DEST_PATH = $RELEASE_FOLDER + "\WindowsVirtualDesktopHelper Setup v"+$VERSION+".msi"
-Copy-Item -Force -Path $SETUP_PATH -Destination $SETUP_DEST_PATH
+$SETUP_DEST_PATH_RELEASES = $RELEASE_FOLDER + "\WindowsVirtualDesktopHelper Setup v"+$VERSION+".msi"
+$SETUP_DEST_PATH_WINDOWSSTORE = "..\Releases\WindowsStore\WindowsVirtualDesktopHelper.Setup.msi"
+Copy-Item -Force -Path $SETUP_PATH -Destination $SETUP_DEST_PATH_RELEASES
+Copy-Item -Force -Path $SETUP_PATH -Destination $SETUP_DEST_PATH_WINDOWSSTORE
+
 
 echo "================================================================"
 echo "= Done!"
