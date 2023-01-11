@@ -1,3 +1,20 @@
+# v1.9
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
+
+## Changes
+* Added new 500ms option for overlay duration
+* Added show Task View on Desktop Number click feature
+
+
+
 # v1.8
 
 ## Features
