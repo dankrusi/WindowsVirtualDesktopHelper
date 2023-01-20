@@ -1,3 +1,20 @@
+# v1.10
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
+
+## Changes
+* Improved light/dark theme detection
+* Settings now saved per user (note: settings from previous versions are reset when updating to this version)
+
+
+
 # v1.9
 
 ## Features
