@@ -20,11 +20,11 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            App.Instance.OpenURL("https://github.com/dankrusi/WindowsVirtualDesktopHelper");
+            App.Instance.OpenAboutPage();
         }
 
         private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            App.Instance.OpenURL("https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6");
+            App.Instance.OpenDonatePage();
         }
 
         private void AboutForm_Load(object sender, EventArgs e) {
@@ -35,7 +35,7 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         private void linkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            App.Instance.OpenURL("mailto:dan@dankrusi.com");
+            App.Instance.OpenEmailContact();
         }
     }
 }

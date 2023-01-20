@@ -57,6 +57,7 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxShowOverlay = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.checkBoxStartupWithWindows = new System.Windows.Forms.CheckBox();
+            this.toolStripMenuItemDonate = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -77,10 +78,11 @@ namespace WindowsVirtualDesktopHelper {
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemAbout,
+            this.toolStripMenuItemDonate,
             this.toolStripMenuItemSettings,
             this.toolStripMenuItemExit});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(117, 70);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(117, 92);
             this.contextMenuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.contextMenuStrip1_ItemClicked);
             // 
             // toolStripMenuItemAbout
@@ -379,6 +381,13 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxStartupWithWindows.UseVisualStyleBackColor = true;
             this.checkBoxStartupWithWindows.CheckedChanged += new System.EventHandler(this.checkBoxStartupWithWindows_CheckedChanged);
             // 
+            // toolStripMenuItemDonate
+            // 
+            this.toolStripMenuItemDonate.Name = "toolStripMenuItemDonate";
+            this.toolStripMenuItemDonate.Size = new System.Drawing.Size(116, 22);
+            this.toolStripMenuItemDonate.Tag = "donate";
+            this.toolStripMenuItemDonate.Text = "Donate";
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -386,6 +395,7 @@ namespace WindowsVirtualDesktopHelper {
             this.ClientSize = new System.Drawing.Size(439, 317);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SettingsForm";
@@ -440,5 +450,6 @@ namespace WindowsVirtualDesktopHelper {
         private System.Windows.Forms.RadioButton radioButtonPositionTopLeft;
         private System.Windows.Forms.RadioButton radioButtonOverlayMicroDuration;
         private System.Windows.Forms.CheckBox checkBoxClickDesktopNumberTaskView;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDonate;
     }
 }

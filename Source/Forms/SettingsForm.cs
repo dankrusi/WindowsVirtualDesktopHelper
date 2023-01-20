@@ -21,15 +21,8 @@ namespace WindowsVirtualDesktopHelper {
             InitializeComponent();
             LoadSettingsIntoUI();
 
-            if(!App.Instance.IsSystemLightThemeModeEnabled()) {
-                // Dark mode - icons should be white
-                notifyIconPrev.Icon = Resources.Icons.chevron_left_256_white;
-                notifyIconNext.Icon = Resources.Icons.chevron_right_256_white;
-            } else {
-                // Light mode - icons should be black
-                notifyIconPrev.Icon = Resources.Icons.chevron_left_256_black;
-                notifyIconNext.Icon = Resources.Icons.chevron_right_256_black;
-            }
+            // Theme
+            UpdateIconsForTheme(App.Instance.CurrentSystemThemeName);
 
             // Apply some settings
             if (checkBoxShowPrevNextIcons.Checked) {
@@ -43,6 +36,20 @@ namespace WindowsVirtualDesktopHelper {
             //TODO: how to sync the startup setting - best would be to see if the reg key is actually there
 
             IsLoading = false;
+        }
+
+        public void UpdateIconsForTheme(string theme) {
+            // Prev/next
+            if (theme == "dark") {
+                // Dark mode - icons should be white
+                notifyIconPrev.Icon = Resources.Icons.chevron_left_256_white;
+                notifyIconNext.Icon = Resources.Icons.chevron_right_256_white;
+            } else {
+                // Light mode - icons should be black
+                notifyIconPrev.Icon = Resources.Icons.chevron_left_256_black;
+                notifyIconNext.Icon = Resources.Icons.chevron_right_256_black;
+            }
+            UpdateIconForVDDisplayNumber(theme,App.Instance.CurrentVDDisplayNumber);
         }
 
         public bool ShowOverlay() {
@@ -75,92 +82,55 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         private void LoadSettingsIntoUI() {
-            this.checkBoxShowPrevNextIcons.Checked = GetBool("ShowPrevNextIcons", false);
-            this.checkBoxStartupWithWindows.Checked = GetBool("StartupWithWindows", false);
-            this.checkBoxShowOverlay.Checked = GetBool("ShowOverlay", true);
-            this.checkBoxOverlayAnimate.Checked = GetBool("OverlayAnimate", true);
-            this.checkBoxOverlayTranslucent.Checked = GetBool("OverlayTranslucent", true);
-            this.checkBoxClickDesktopNumberTaskView.Checked = GetBool("ClickDesktopNumberOpensTaskView", true);
-            this.radioButtonOverlayLongDuration.Checked = GetString("OverlayDuration","medium") == "long";
-            this.radioButtonOverlayMediumDuration.Checked = GetString("OverlayDuration", "medium") == "medium";
-            this.radioButtonOverlayShortDuration.Checked = GetString("OverlayDuration", "medium") == "short";
-            this.radioButtonOverlayMicroDuration.Checked = GetString("OverlayDuration", "medium") == "micro";
-            this.radioButtonPositionTopLeft.Checked = GetString("OverlayPosition", "middlecenter") == "topleft";
-            this.radioButtonPositionTopCenter.Checked = GetString("OverlayPosition", "middlecenter") == "topcenter";
-            this.radioButtonPositionTopRight.Checked = GetString("OverlayPosition", "middlecenter") == "topright";
-            this.radioButtonPositionMiddleLeft.Checked = GetString("OverlayPosition", "middlecenter") == "middleleft";
-            this.radioButtonPositionMiddleCenter.Checked = GetString("OverlayPosition", "middlecenter") == "middlecenter";
-            this.radioButtonPositionMiddleRight.Checked = GetString("OverlayPosition", "middlecenter") == "middleright";
-            this.radioButtonPositionBottomLeft.Checked = GetString("OverlayPosition", "middlecenter") == "bottomleft";
-            this.radioButtonPositionBottomCenter.Checked = GetString("OverlayPosition", "middlecenter") == "bottomcenter";
-            this.radioButtonPositionBottomRight.Checked = GetString("OverlayPosition", "middlecenter") == "bottomright";
+            this.checkBoxShowPrevNextIcons.Checked = Properties.Settings.Default.ShowPrevNextIcons;
+            this.checkBoxStartupWithWindows.Checked = Properties.Settings.Default.StartupWithWindows;
+            this.checkBoxShowOverlay.Checked = Properties.Settings.Default.ShowOverlay;
+            this.checkBoxOverlayAnimate.Checked = Properties.Settings.Default.OverlayAnimate;
+            this.checkBoxOverlayTranslucent.Checked = Properties.Settings.Default.OverlayTranslucent;
+            this.checkBoxClickDesktopNumberTaskView.Checked = Properties.Settings.Default.ClickDesktopNumberOpensTaskView;
+            this.radioButtonOverlayLongDuration.Checked = Properties.Settings.Default.OverlayDuration == "long";
+            this.radioButtonOverlayMediumDuration.Checked = Properties.Settings.Default.OverlayDuration == "medium";
+            this.radioButtonOverlayShortDuration.Checked = Properties.Settings.Default.OverlayDuration == "short";
+            this.radioButtonOverlayMicroDuration.Checked = Properties.Settings.Default.OverlayDuration == "micro";
+            this.radioButtonPositionTopLeft.Checked = Properties.Settings.Default.OverlayPosition == "topleft";
+            this.radioButtonPositionTopCenter.Checked = Properties.Settings.Default.OverlayPosition == "topcenter";
+            this.radioButtonPositionTopRight.Checked = Properties.Settings.Default.OverlayPosition == "topright";
+            this.radioButtonPositionMiddleLeft.Checked = Properties.Settings.Default.OverlayPosition == "middleleft";
+            this.radioButtonPositionMiddleCenter.Checked = Properties.Settings.Default.OverlayPosition == "middlecenter";
+            this.radioButtonPositionMiddleRight.Checked = Properties.Settings.Default.OverlayPosition == "middleright";
+            this.radioButtonPositionBottomLeft.Checked = Properties.Settings.Default.OverlayPosition == "bottomleft";
+            this.radioButtonPositionBottomCenter.Checked = Properties.Settings.Default.OverlayPosition == "bottomcenter";
+            this.radioButtonPositionBottomRight.Checked = Properties.Settings.Default.OverlayPosition == "bottomright";
             checkBoxShowOverlay_CheckedChanged(this, null);
         }
         private void SaveSettingsFromUI() {
-            SetBool("ShowPrevNextIcons", this.checkBoxShowPrevNextIcons.Checked);
-            SetBool("StartupWithWindows", this.checkBoxStartupWithWindows.Checked);
-            SetBool("ShowOverlay", this.checkBoxShowOverlay.Checked);
-            SetBool("OverlayAnimate", this.checkBoxOverlayAnimate.Checked);
-            SetBool("OverlayTranslucent", this.checkBoxOverlayTranslucent.Checked);
-            SetBool("ClickDesktopNumberOpensTaskView", this.checkBoxClickDesktopNumberTaskView.Checked);
-            if (this.radioButtonOverlayLongDuration.Checked) SetString("OverlayDuration", "long");
-            if (this.radioButtonOverlayMediumDuration.Checked) SetString("OverlayDuration", "medium");
-            if (this.radioButtonOverlayShortDuration.Checked) SetString("OverlayDuration", "short");
-            if (this.radioButtonOverlayMicroDuration.Checked) SetString("OverlayDuration", "micro");
-            if (this.radioButtonPositionTopLeft.Checked) SetString("OverlayPosition", "topleft");
-            if (this.radioButtonPositionTopCenter.Checked) SetString("OverlayPosition", "topcenter");
-            if (this.radioButtonPositionTopRight.Checked) SetString("OverlayPosition", "topright");
-            if (this.radioButtonPositionMiddleLeft.Checked) SetString("OverlayPosition", "middleleft");
-            if (this.radioButtonPositionMiddleCenter.Checked) SetString("OverlayPosition", "middlecenter");
-            if (this.radioButtonPositionMiddleRight.Checked) SetString("OverlayPosition", "middleright");
-            if (this.radioButtonPositionBottomLeft.Checked) SetString("OverlayPosition", "bottomleft");
-            if (this.radioButtonPositionBottomCenter.Checked) SetString("OverlayPosition", "bottomcenter");
-            if (this.radioButtonPositionBottomRight.Checked) SetString("OverlayPosition", "bottomright");
+            Properties.Settings.Default.ShowPrevNextIcons = this.checkBoxShowPrevNextIcons.Checked;
+            Properties.Settings.Default.StartupWithWindows = this.checkBoxStartupWithWindows.Checked;
+            Properties.Settings.Default.ShowOverlay = this.checkBoxShowOverlay.Checked;
+            Properties.Settings.Default.OverlayAnimate = this.checkBoxOverlayAnimate.Checked;
+            Properties.Settings.Default.OverlayTranslucent = this.checkBoxOverlayTranslucent.Checked;
+            Properties.Settings.Default.ClickDesktopNumberOpensTaskView = this.checkBoxClickDesktopNumberTaskView.Checked;
+            if (this.radioButtonOverlayLongDuration.Checked) Properties.Settings.Default.OverlayDuration = "long";
+            if (this.radioButtonOverlayMediumDuration.Checked) Properties.Settings.Default.OverlayDuration = "medium";
+            if (this.radioButtonOverlayShortDuration.Checked) Properties.Settings.Default.OverlayDuration = "short";
+            if (this.radioButtonOverlayMicroDuration.Checked) Properties.Settings.Default.OverlayDuration = "micro";
+            if (this.radioButtonPositionTopLeft.Checked) Properties.Settings.Default.OverlayPosition = "topleft";
+            if (this.radioButtonPositionTopCenter.Checked) Properties.Settings.Default.OverlayPosition = "topcenter";
+            if (this.radioButtonPositionTopRight.Checked) Properties.Settings.Default.OverlayPosition = "topright";
+            if (this.radioButtonPositionMiddleLeft.Checked) Properties.Settings.Default.OverlayPosition = "middleleft";
+            if (this.radioButtonPositionMiddleCenter.Checked) Properties.Settings.Default.OverlayPosition = "middlecenter";
+            if (this.radioButtonPositionMiddleRight.Checked) Properties.Settings.Default.OverlayPosition = "middleright";
+            if (this.radioButtonPositionBottomLeft.Checked) Properties.Settings.Default.OverlayPosition = "bottomleft";
+            if (this.radioButtonPositionBottomCenter.Checked) Properties.Settings.Default.OverlayPosition = "bottomcenter";
+            if (this.radioButtonPositionBottomRight.Checked) Properties.Settings.Default.OverlayPosition = "bottomright";
+            // Save user settings
+            // https://learn.microsoft.com/en-us/dotnet/desktop/winforms/advanced/how-to-write-user-settings-at-run-time-with-csharp?view=netframeworkdesktop-4.8
+            Properties.Settings.Default.Save();
         }
 
-        static string GetString(string key, string defaultValue) {
-            try {
-                var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                var settings = config.AppSettings.Settings;
-                if (settings[key] == null || settings[key].Value == null) return defaultValue;
-                return settings[key].Value;
-            } catch (Exception e) {
-                Util.Logging.WriteLine("Error reading app settings: " + e.Message);
-                return defaultValue;
-            }
-        }
-
-        static void SetString(string key, string value) {
-            try {
-                var config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                var settings = config.AppSettings.Settings;
-                if (settings[key] == null) {
-                    settings.Add(key, value);
-                } else {
-                    settings[key].Value = value;
-                }
-                config.Save(ConfigurationSaveMode.Modified);
-            } catch (Exception e) {
-                Util.Logging.WriteLine("Error saving app settings: " + e.Message);
-            }
-        }
-
-        static bool GetBool(string key, bool defaultValue) {
-            try {
-                return bool.Parse(GetString(key,defaultValue.ToString().ToLower()));
-            } catch (Exception e) {
-                Util.Logging.WriteLine("Error reading app settings: "+e.Message);
-                return defaultValue;
-            }
-        }
-
-        static void SetBool(string key, bool value) {
-            SetString(key, value.ToString().ToLower());
-        }
-
-        public void UpdateIconForVDDisplayNumber(uint number) {
+        public void UpdateIconForVDDisplayNumber(string theme, uint number) {
             number++;
-            if (!App.Instance.IsSystemLightThemeModeEnabled()) {
+            if (theme == "dark") {
                 // White icon
                 if (number == 1) {
                     this.notifyIconNumber.Icon = Resources.Icons.number_1_256_white;
@@ -212,10 +182,11 @@ namespace WindowsVirtualDesktopHelper {
         private void SettingsForm_Load(object sender, EventArgs e) {
             App.Instance.ShowSplash();
             App.Instance.MonitorVDSwitch();
+            App.Instance.MonitorSystemThemeSwitch();
         }
 
         private void SettingsForm_Shown(object sender, EventArgs e) {
-            UpdateIconForVDDisplayNumber(App.Instance.CurrentVDDisplayNumber);
+            UpdateIconForVDDisplayNumber(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayNumber);
             this.notifyIconNumber.Visible = true;
             this.Hide();
         }
@@ -224,6 +195,7 @@ namespace WindowsVirtualDesktopHelper {
             if (e.ClickedItem.Tag.ToString() == "exit") App.Instance.Exit();
             else if (e.ClickedItem.Tag.ToString() == "settings") this.Show();
             else if (e.ClickedItem.Tag.ToString() == "about") App.Instance.ShowAbout();
+            else if (e.ClickedItem.Tag.ToString() == "donate") App.Instance.OpenDonatePage();
         }
 
         private void notifyIconPrev_Click(object sender, EventArgs e) {

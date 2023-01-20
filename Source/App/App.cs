@@ -17,6 +17,7 @@ namespace WindowsVirtualDesktopHelper {
         public string CurrentVDDisplayName = null;
         public uint CurrentVDDisplayNumber = 0;
         public SettingsForm SettingsForm;
+        public string CurrentSystemThemeName = null;
 
         public static string DetectedVDImplementation = null;
 
@@ -26,6 +27,12 @@ namespace WindowsVirtualDesktopHelper {
             // Set the app instance global
             App.Instance = this;
 
+            // Settings
+            {
+                Properties.Settings.Default.Upgrade();
+                Properties.Settings.Default.Save();
+            }
+
             // Load the implementation
             try {
                 this.LoadVDAPI();
@@ -34,6 +41,10 @@ namespace WindowsVirtualDesktopHelper {
             } catch (Exception e) {
                 throw e;
             }
+
+            // Load theme
+            this.CurrentSystemThemeName = this.GetSystemThemeName();
+
             // Create the settings form, which acts as our ui main thread
             this.SettingsForm = new SettingsForm();
         }
@@ -106,7 +117,7 @@ namespace WindowsVirtualDesktopHelper {
         }
 
         public void VDSwitched() {
-            this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentVDDisplayNumber);
+            this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber);
             if (this.SettingsForm.ShowOverlay()) {
                 this.SettingsForm.Invoke((Action)(() => {
                     var form = new SwitchNotificationForm();
@@ -115,6 +126,31 @@ namespace WindowsVirtualDesktopHelper {
                     form.Show();
                 }));
             }
+        }
+
+        public void MonitorSystemThemeSwitch() {
+            var thread = new Thread(new ThreadStart(_MonitorSystemThemeSwitch));
+            thread.Start();
+        }
+
+        private void _MonitorSystemThemeSwitch() {
+            while (true) {
+                try {
+                    var newSystemThemeName = this.GetSystemThemeName();
+                    if (newSystemThemeName != this.CurrentSystemThemeName) {
+                        this.CurrentSystemThemeName = newSystemThemeName;
+                        ThemeSwitched();
+                    }
+                    System.Threading.Thread.Sleep(1000);
+                } catch (Exception e) {
+                    Util.Logging.WriteLine("App: Error: " + e.Message);
+                    System.Threading.Thread.Sleep(5000);
+                }
+            }
+        }
+
+        public void ThemeSwitched() {
+            this.SettingsForm.UpdateIconsForTheme(this.CurrentSystemThemeName);
         }
 
         public void ShowAbout() {
@@ -150,17 +186,8 @@ namespace WindowsVirtualDesktopHelper {
             }
         }
 
-        public bool IsSystemLightThemeModeEnabled() {
-            // https://learn.microsoft.com/en-us/answers/questions/715081/how-to-detect-windows-dark-mode.html
-            try {
-                Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", true);
-                var ret = key.GetValue("SystemUsesLightTheme");
-                var retNumber = (int)ret; // 1 == light
-                if (retNumber == 1) return true;
-                else return false;
-            } catch (Exception e) {
-                throw new Exception("IsDarkThemeMode: could not get dark/light theme setting: " + e.Message);
-            }
+        public string GetSystemThemeName() {
+            return Util.OS.IsSystemLightThemeModeEnabled() == true ? "light" : "dark";
         }
 
         public void DisableStartupWithWindows() {
@@ -171,6 +198,18 @@ namespace WindowsVirtualDesktopHelper {
             } catch (Exception e) {
                 throw new Exception("EnableStartupWithWindows: could not delete registry value: " + e.Message);
             }
+        }
+
+        public void OpenEmailContact() {
+            App.Instance.OpenURL("mailto:dan@dankrusi.com");
+        }
+
+        public void OpenAboutPage() {
+            App.Instance.OpenURL("https://github.com/dankrusi/WindowsVirtualDesktopHelper");
+        }
+
+        public void OpenDonatePage() {
+            App.Instance.OpenURL("https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6");
         }
 
     }
