@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using HWND = System.IntPtr;
 
 namespace WindowsVirtualDesktopHelper.Util {
     public class OS {
@@ -10,8 +13,32 @@ namespace WindowsVirtualDesktopHelper.Util {
             return GetWindowsBuildVersion() >= 22000;
         }
 
+        [DllImport("USER32.DLL")]
+        private static extern int GetWindowText(HWND hWnd, StringBuilder lpString, int nMaxCount);
+
+        [DllImport("USER32.DLL")]
+        private static extern int GetWindowTextLength(HWND hWnd);
+
+        [DllImport("USER32.DLL")]
+        private static extern bool IsWindowVisible(HWND hWnd);
+
+        [DllImport("USER32.DLL")]
+        private static extern IntPtr GetShellWindow();
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        public static string GetForegroundWindowName() {
+            IntPtr handle = GetForegroundWindow();
+            StringBuilder windowName = new StringBuilder(256);
+            GetWindowText(handle, windowName, windowName.Capacity);
+            return windowName.ToString();
+        }
+
         public static void OpenTaskView() {
-            System.Diagnostics.Process.Start("explorer.exe", "shell:::{3080F90E-D7AD-11D9-BD98-0000947B0257}");
+            var simu = new WindowsInput.InputSimulator();
+            simu.Keyboard.ModifiedKeyStroke(WindowsInput.Native.VirtualKeyCode.LWIN, WindowsInput.Native.VirtualKeyCode.TAB);
+            //System.Diagnostics.Process.Start("explorer.exe", "shell:::{3080F90E-D7AD-11D9-BD98-0000947B0257}");
         }
 
         public static bool IsSystemLightThemeModeEnabled() {

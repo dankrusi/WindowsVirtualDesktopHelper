@@ -118,6 +118,29 @@
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_21H2.cs" />
     <Compile Include="VirtualDesktopAPI\IVirtualDesktopManager.cs" />
     <Compile Include="VirtualDesktopAPI\Loader.cs" />
+    <Compile Include="WindowsInputAPI\IInputDeviceStateAdaptor.cs" />
+    <Compile Include="WindowsInputAPI\IInputMessageDispatcher.cs" />
+    <Compile Include="WindowsInputAPI\IInputSimulator.cs" />
+    <Compile Include="WindowsInputAPI\IKeyboardSimulator.cs" />
+    <Compile Include="WindowsInputAPI\IMouseSimulator.cs" />
+    <Compile Include="WindowsInputAPI\InputBuilder.cs" />
+    <Compile Include="WindowsInputAPI\InputSimulator.cs" />
+    <Compile Include="WindowsInputAPI\KeyboardSimulator.cs" />
+    <Compile Include="WindowsInputAPI\MouseButton.cs" />
+    <Compile Include="WindowsInputAPI\MouseSimulator.cs" />
+    <Compile Include="WindowsInputAPI\Native\HARDWAREINPUT.cs" />
+    <Compile Include="WindowsInputAPI\Native\INPUT.cs" />
+    <Compile Include="WindowsInputAPI\Native\InputType.cs" />
+    <Compile Include="WindowsInputAPI\Native\KEYBDINPUT.cs" />
+    <Compile Include="WindowsInputAPI\Native\KeyboardFlag.cs" />
+    <Compile Include="WindowsInputAPI\Native\MouseFlag.cs" />
+    <Compile Include="WindowsInputAPI\Native\MOUSEINPUT.cs" />
+    <Compile Include="WindowsInputAPI\Native\MOUSEKEYBDHARDWAREINPUT.cs" />
+    <Compile Include="WindowsInputAPI\Native\NativeMethods.cs" />
+    <Compile Include="WindowsInputAPI\Native\VirtualKeyCode.cs" />
+    <Compile Include="WindowsInputAPI\Native\XButton.cs" />
+    <Compile Include="WindowsInputAPI\WindowsInputDeviceStateAdaptor.cs" />
+    <Compile Include="WindowsInputAPI\WindowsInputMessageDispatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

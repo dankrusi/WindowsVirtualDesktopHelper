@@ -18,6 +18,7 @@ namespace WindowsVirtualDesktopHelper {
         public uint CurrentVDDisplayNumber = 0;
         public SettingsForm SettingsForm;
         public string CurrentSystemThemeName = null;
+        public List<string> FGWindowHistory = new List<string>(); // needed to detect if Task View was open
 
         public static string DetectedVDImplementation = null;
 
@@ -93,6 +94,27 @@ namespace WindowsVirtualDesktopHelper {
             System.Environment.Exit(0);
         }
 
+        public void MonitorFGWindowName() {
+            var thread = new Thread(new ThreadStart(_MonitorFGWindowName));
+            thread.Start();
+        }
+        private void _MonitorFGWindowName() {
+            while (true) {
+                try {
+                    var fgWindowName = Util.OS.GetForegroundWindowName();
+                    FGWindowHistory.Add(fgWindowName);
+                    var maxHistory = 20;
+                    if(FGWindowHistory.Count > maxHistory) {
+                        FGWindowHistory.RemoveRange(0, FGWindowHistory.Count - maxHistory);
+                    }
+                    System.Threading.Thread.Sleep(20);
+                } catch (Exception e) {
+                    Util.Logging.WriteLine("App: Error: MonitorFGWindowName: " + e.Message);
+                    System.Threading.Thread.Sleep(1000);
+                }
+            }
+        }
+
         public void MonitorVDSwitch() {
             var thread = new Thread(new ThreadStart(_MonitorVDSwitch));
             thread.Start();
@@ -110,14 +132,14 @@ namespace WindowsVirtualDesktopHelper {
                     }
                     System.Threading.Thread.Sleep(100);
                 }catch(Exception e) {
-                    Util.Logging.WriteLine("App: Error: " + e.Message);
+                    Util.Logging.WriteLine("App: Error: MonitorVDSwitch: " + e.Message);
                     System.Threading.Thread.Sleep(1000);
                 }
             }
         }
 
         public void VDSwitched() {
-            this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber);
+            this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
             if (this.SettingsForm.ShowOverlay()) {
                 this.SettingsForm.Invoke((Action)(() => {
                     var form = new SwitchNotificationForm();

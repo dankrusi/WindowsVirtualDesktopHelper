@@ -49,7 +49,7 @@ namespace WindowsVirtualDesktopHelper {
                 notifyIconPrev.Icon = Resources.Icons.chevron_left_256_black;
                 notifyIconNext.Icon = Resources.Icons.chevron_right_256_black;
             }
-            UpdateIconForVDDisplayNumber(theme,App.Instance.CurrentVDDisplayNumber);
+            UpdateIconForVDDisplayNumber(theme,App.Instance.CurrentVDDisplayNumber,App.Instance.CurrentVDDisplayName);
         }
 
         public bool ShowOverlay() {
@@ -128,7 +128,7 @@ namespace WindowsVirtualDesktopHelper {
             Properties.Settings.Default.Save();
         }
 
-        public void UpdateIconForVDDisplayNumber(string theme, uint number) {
+        public void UpdateIconForVDDisplayNumber(string theme, uint number, string name) {
             number++;
             if (theme == "dark") {
                 // White icon
@@ -177,16 +177,18 @@ namespace WindowsVirtualDesktopHelper {
                     this.notifyIconNumber.Icon = Resources.Icons.number_plus_256_black;
                 }
             }
+            this.notifyIconNumber.Text = name;
         }
 
         private void SettingsForm_Load(object sender, EventArgs e) {
             App.Instance.ShowSplash();
             App.Instance.MonitorVDSwitch();
+            App.Instance.MonitorFGWindowName();
             App.Instance.MonitorSystemThemeSwitch();
         }
 
         private void SettingsForm_Shown(object sender, EventArgs e) {
-            UpdateIconForVDDisplayNumber(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayNumber);
+            UpdateIconForVDDisplayNumber(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
             this.notifyIconNumber.Visible = true;
             this.Hide();
         }
@@ -278,7 +280,12 @@ namespace WindowsVirtualDesktopHelper {
 
         private void notifyIconNumber_MouseClick(object sender, MouseEventArgs e) {
             if (e.Button == MouseButtons.Left && this.checkBoxClickDesktopNumberTaskView.Checked) {
-                Util.OS.OpenTaskView();
+                // Already open?
+                if (App.Instance.FGWindowHistory.Contains("Task View")) {
+                    // Do nothing
+                } else {
+                    Util.OS.OpenTaskView();
+                }
             }
         }
 

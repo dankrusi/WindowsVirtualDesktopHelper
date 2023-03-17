@@ -29,6 +29,7 @@ namespace WindowsVirtualDesktopHelper {
             this.notifyIconNumber = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemDonate = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIconPrev = new System.Windows.Forms.NotifyIcon(this.components);
@@ -57,7 +58,6 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxShowOverlay = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.checkBoxStartupWithWindows = new System.Windows.Forms.CheckBox();
-            this.toolStripMenuItemDonate = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -91,6 +91,13 @@ namespace WindowsVirtualDesktopHelper {
             this.toolStripMenuItemAbout.Size = new System.Drawing.Size(116, 22);
             this.toolStripMenuItemAbout.Tag = "about";
             this.toolStripMenuItemAbout.Text = "About";
+            // 
+            // toolStripMenuItemDonate
+            // 
+            this.toolStripMenuItemDonate.Name = "toolStripMenuItemDonate";
+            this.toolStripMenuItemDonate.Size = new System.Drawing.Size(116, 22);
+            this.toolStripMenuItemDonate.Tag = "donate";
+            this.toolStripMenuItemDonate.Text = "Donate";
             // 
             // toolStripMenuItemSettings
             // 
@@ -380,13 +387,6 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxStartupWithWindows.Text = "Startup with Windows";
             this.checkBoxStartupWithWindows.UseVisualStyleBackColor = true;
             this.checkBoxStartupWithWindows.CheckedChanged += new System.EventHandler(this.checkBoxStartupWithWindows_CheckedChanged);
-            // 
-            // toolStripMenuItemDonate
-            // 
-            this.toolStripMenuItemDonate.Name = "toolStripMenuItemDonate";
-            this.toolStripMenuItemDonate.Size = new System.Drawing.Size(116, 22);
-            this.toolStripMenuItemDonate.Tag = "donate";
-            this.toolStripMenuItemDonate.Text = "Donate";
             // 
             // SettingsForm
             // 
