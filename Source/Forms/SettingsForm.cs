@@ -40,16 +40,26 @@ namespace WindowsVirtualDesktopHelper {
 
         public void UpdateIconsForTheme(string theme) {
             // Prev/next
-            if (theme == "dark") {
-                // Dark mode - icons should be white
-                notifyIconPrev.Icon = Resources.Icons.chevron_left_256_white;
-                notifyIconNext.Icon = Resources.Icons.chevron_right_256_white;
-            } else {
-                // Light mode - icons should be black
-                notifyIconPrev.Icon = Resources.Icons.chevron_left_256_black;
-                notifyIconNext.Icon = Resources.Icons.chevron_right_256_black;
-            }
+            // Get prev char
+            // \xE100 = skip back (player style)
+            // \xE112 = previous (arrow style)
+            // \xe26c = previous (chevron style)
+            // \u02C2 = previous (chevron style)
+            // \u2039 = previous (chevron style)
+            var prevChar = "\u2039";
+            // Get next char
+            // \xE101 = skip forward (player style)
+            // \xE111 = next (arrow style)
+            // \xe26b = next (chevron style)
+            // \u02C3 = next (chevron style)
+            // \u203A = next (chevron style)
+            var nextChar = "\u203A";
+            // Set prev/next icons
+            notifyIconPrev.Icon = Util.Icons.GenerateNotificationIcon(prevChar, theme, this.DeviceDpi, true);
+            notifyIconNext.Icon = Util.Icons.GenerateNotificationIcon(nextChar, theme, this.DeviceDpi, true);
+            // Set current display icons
             UpdateIconForVDDisplayNumber(theme,App.Instance.CurrentVDDisplayNumber,App.Instance.CurrentVDDisplayName);
+            UpdateIconForVDDisplayName(theme,App.Instance.CurrentVDDisplayName);
         }
 
         public bool ShowOverlay() {
@@ -177,7 +187,20 @@ namespace WindowsVirtualDesktopHelper {
                     this.notifyIconNumber.Icon = Resources.Icons.number_plus_256_black;
                 }
             }
+            this.notifyIconNumber.Icon = Util.Icons.GenerateNotificationIcon(number.ToString(), theme, this.DeviceDpi, false);
             this.notifyIconNumber.Text = name;
+        }
+
+        public void UpdateIconForVDDisplayName(string theme, string name) {
+            {
+                var nameToShow = name;
+                if (nameToShow == null) nameToShow = "";
+                //nameToShow = nameToShow.ToUpper();
+                if (nameToShow.Length > 1) nameToShow = nameToShow.Substring(0, 1);
+
+                this.notifyIconName.Icon = Util.Icons.GenerateNotificationIcon(nameToShow, theme, this.DeviceDpi, false);
+                this.notifyIconName.Text = name;
+            }
         }
 
         private void SettingsForm_Load(object sender, EventArgs e) {
@@ -189,7 +212,10 @@ namespace WindowsVirtualDesktopHelper {
 
         private void SettingsForm_Shown(object sender, EventArgs e) {
             UpdateIconForVDDisplayNumber(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
+            UpdateIconForVDDisplayName(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayName);
+            this.notifyIconName.Visible = true;
             this.notifyIconNumber.Visible = true;
+            this.notifyIconName.Visible = true;
             this.Hide();
         }
 
@@ -231,6 +257,7 @@ namespace WindowsVirtualDesktopHelper {
                 Hide();
             } else if (e.CloseReason == CloseReason.ApplicationExitCall || e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.TaskManagerClosing) {
                 // Remove all notif icons
+                notifyIconName.Visible = false;
                 notifyIconNumber.Visible = false;
                 notifyIconPrev.Visible = false;
                 notifyIconNext.Visible = false;
@@ -274,8 +301,19 @@ namespace WindowsVirtualDesktopHelper {
             //TODO: go to last desktop
         }
 
-        private void notifyIconNumber_Click(object sender, EventArgs e) {
-            
+        private void checkBoxClickDesktopNumberTaskView_CheckedChanged(object sender, EventArgs e) {
+
+        }
+
+        private void notifyIconName_MouseClick(object sender, MouseEventArgs e) {
+            if (e.Button == MouseButtons.Left && this.checkBoxClickDesktopNumberTaskView.Checked) {
+                // Already open?
+                if (App.Instance.FGWindowHistory.Contains("Task View")) {
+                    // Do nothing
+                } else {
+                    Util.OS.OpenTaskView();
+                }
+            }
         }
 
         private void notifyIconNumber_MouseClick(object sender, MouseEventArgs e) {
@@ -287,10 +325,6 @@ namespace WindowsVirtualDesktopHelper {
                     Util.OS.OpenTaskView();
                 }
             }
-        }
-
-        private void checkBoxClickDesktopNumberTaskView_CheckedChanged(object sender, EventArgs e) {
-
         }
     }
 }

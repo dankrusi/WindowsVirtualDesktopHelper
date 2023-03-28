@@ -140,6 +140,7 @@ namespace WindowsVirtualDesktopHelper {
 
         public void VDSwitched() {
             this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
+            this.SettingsForm.UpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
             if (this.SettingsForm.ShowOverlay()) {
                 this.SettingsForm.Invoke((Action)(() => {
                     var form = new SwitchNotificationForm();

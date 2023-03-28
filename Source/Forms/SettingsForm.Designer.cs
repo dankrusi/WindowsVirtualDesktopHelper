@@ -58,6 +58,7 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxShowOverlay = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.checkBoxStartupWithWindows = new System.Windows.Forms.CheckBox();
+            this.notifyIconName = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -71,7 +72,6 @@ namespace WindowsVirtualDesktopHelper {
             this.notifyIconNumber.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIconNumber.Icon")));
             this.notifyIconNumber.Text = "Windows Virtual Desktop Helper";
             this.notifyIconNumber.Visible = true;
-            this.notifyIconNumber.Click += new System.EventHandler(this.notifyIconNumber_Click);
             this.notifyIconNumber.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIconNumber_MouseClick);
             // 
             // contextMenuStrip1
@@ -388,6 +388,14 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxStartupWithWindows.UseVisualStyleBackColor = true;
             this.checkBoxStartupWithWindows.CheckedChanged += new System.EventHandler(this.checkBoxStartupWithWindows_CheckedChanged);
             // 
+            // notifyIconName
+            // 
+            this.notifyIconName.ContextMenuStrip = this.contextMenuStrip1;
+            this.notifyIconName.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIconName.Icon")));
+            this.notifyIconName.Text = "Desktop Name";
+            this.notifyIconName.Visible = true;
+            this.notifyIconName.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIconName_MouseClick);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -451,5 +459,6 @@ namespace WindowsVirtualDesktopHelper {
         private System.Windows.Forms.RadioButton radioButtonOverlayMicroDuration;
         private System.Windows.Forms.CheckBox checkBoxClickDesktopNumberTaskView;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDonate;
+        private System.Windows.Forms.NotifyIcon notifyIconName;
     }
 }
