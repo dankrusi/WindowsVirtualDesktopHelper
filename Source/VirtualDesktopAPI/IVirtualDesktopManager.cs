@@ -3,14 +3,13 @@
 // License: MIT License (https://github.com/zgdump/windows-virtualdesktopindicator/blob/main/LICENSE)
 
 namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
-    public interface IVirtualDesktopManager
-    {
-        uint Current();
+	public interface IVirtualDesktopManager {
+		uint Current();
 
-        void SwitchForward();
+		void SwitchForward();
 
-        void SwitchBackward();
+		void SwitchBackward();
 
-        string CurrentDisplayName();
-    }
+		string CurrentDisplayName();
+	}
 }
