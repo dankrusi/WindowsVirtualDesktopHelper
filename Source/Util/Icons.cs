@@ -18,7 +18,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 
             // Init
             var size = 16;
-            if (dpi > 96) size = 32;
+            if (dpi > 96) size = 64;
             var renderSize = 128; // GDI has really weak text drawing on transparent, so to get best results we render large then downscale...
             var textStyle = FontStyle.Bold;
             var textToRender = text;
@@ -37,6 +37,7 @@ namespace WindowsVirtualDesktopHelper.Util {
             if (useSymbolsFont) {
                 fontFamily = "Segoe UI Symbol";
                 textToRenderSizeRatio = 1.8f;
+                if (dpi > 96) textToRenderSizeRatio = 1.0f;
                 automaticFontSizeFitTolerance = 2.0f;
                 offsetY = -0.4f;
             }
