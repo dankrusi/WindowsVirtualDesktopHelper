@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WindowsVirtualDesktopHelper.Util {
+
     class Icons {
 
         //private static Font _font = new Font("Segoe UI", 12.0f, FontStyle.Bold);
