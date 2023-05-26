@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Windows Virtual Desktop Helper")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Simple and lightweight app to help with Virtual Desktops for Windows 10 and Windows 11")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dan Krusi")]
 [assembly: AssemblyProduct("Windows Virtual Desktop Helper")]
-[assembly: AssemblyCopyright("Copyright © Dan Krusi 2022")]
+[assembly: AssemblyCopyright("Copyright © Dan Krusi 2022-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,5 +29,9 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.10.0.0")]
-[assembly: AssemblyFileVersion("1.10.0.0")]
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Note: When changing the version make sure to update the Setup project version
+// as well!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+[assembly: AssemblyVersion("1.11.0.0")]
+[assembly: AssemblyFileVersion("1.11.0.0")]
