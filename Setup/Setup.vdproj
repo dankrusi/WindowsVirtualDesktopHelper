@@ -176,15 +176,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Windows Virtual Desktop Helper"
-        "ProductCode" = "8:{5EB96F81-76B2-4F1C-B9F2-3AFAADCB35AE}"
-        "PackageCode" = "8:{EBA1E987-90A3-44DD-BE92-05183F195807}"
+        "ProductCode" = "8:{D733613E-B256-417C-B46A-73D877E02B00}"
+        "PackageCode" = "8:{0812009F-6E27-48BE-9612-261EC3CA9733}"
         "UpgradeCode" = "8:{E12EB062-7579-402D-9B7C-EF5AE3C7DCCF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.10"
+        "ProductVersion" = "8:1.11"
         "Manufacturer" = "8:Dan Krusi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/dankrusi/WindowsVirtualDesktopHelper"
@@ -736,7 +736,6 @@
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
-                "ExcludeFilter" = "8:*.config"
                 }
             }
         }

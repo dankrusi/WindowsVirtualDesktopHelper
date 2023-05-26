@@ -51,11 +51,12 @@ echo "================================================================"
 echo "= Creating Executable ZIP in releases..."
 echo "================================================================"
 $EXE_PATH = "..\Source\bin\Release\WindowsVirtualDesktopHelper.exe"
+$CONFIG_PATH = "..\Source\bin\Release\WindowsVirtualDesktopHelper.exe.config"
 $LICENSE_PATH = "..\LICENSE.md"
 $README_PATH = "..\README.md"
 $CHANGELOG_PATH = "..\CHANGELOG.md"
 $EXE_DEST_PATH = $RELEASE_FOLDER + "\WindowsVirtualDesktopHelper Executable v"+$VERSION+".zip"
-Compress-Archive -Force -Path $EXE_PATH, $LICENSE_PATH, $README_PATH, $CHANGELOG_PATH -DestinationPath $EXE_DEST_PATH
+Compress-Archive -Force -Path $EXE_PATH, $CONFIG_PATH, $LICENSE_PATH, $README_PATH, $CHANGELOG_PATH -DestinationPath $EXE_DEST_PATH
 
 # Copy Setup
 echo "================================================================"

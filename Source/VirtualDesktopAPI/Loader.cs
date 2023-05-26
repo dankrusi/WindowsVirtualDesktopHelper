@@ -48,7 +48,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 			foreach (var implementationName in implementationsToTry) {
 				Util.Logging.WriteLine("LoadImplementationWithFallback: trying to load implementation " + implementationName);
 				try {
-					var impl = LoadImplementation(name);
+					var impl = LoadImplementation(implementationName);
 					impl.Current(); // test for success
 					Util.Logging.WriteLine("LoadImplementationWithFallback: success!");
 					return impl;
