@@ -4,6 +4,7 @@
 * Show desktop number in notification area
 * Show desktop name when switching desktops
 * Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
 * Autostart with Windows
 * Simple and lightweight
 * Configurable
@@ -13,10 +14,11 @@
 * Support for High DPI Monitors
 * Icons are dynamically generated
 * Support for additional icon which shows the first letter of the desktop name
+* Improved detection for Windows 11 Insider Builds
 
 ## Fixes
 * Bug where implementation loading with fallback actually didn't try to load the fallback, but kept trying to load the original suggested implementation
-
+* Fix UI to support desktop name initial
 
 
 
