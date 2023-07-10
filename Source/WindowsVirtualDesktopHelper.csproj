@@ -106,11 +106,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Resources\Icons.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Icons.resx</DependentUpon>
-    </Compile>
     <Compile Include="Util\Icons.cs" />
     <Compile Include="Util\Logging.cs" />
     <Compile Include="Util\OS.cs" />
@@ -175,11 +170,6 @@
     <EmbeddedResource Include="Forms\ErrorForm.resx">
       <DependentUpon>ErrorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Icons.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
-      <LastGenOutput>Icons.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -192,75 +182,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Resources\number-1-256-white.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\number-2-256-white.ico" />
+    <Folder Include="Resources\" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\number-3-256-white.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\number-4-256-white.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\number-5-256-white.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\number-6-256-white.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\number-7-256-white.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\number-8-256-white.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\number-9-256-white.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\number-plus-256-white.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\chevron-left-256-black.ico" />
-    <Content Include="Resources\chevron-left-256-black.png" />
-    <Content Include="Resources\chevron-left-256-white.ico" />
-    <Content Include="Resources\chevron-left-256-white.png" />
-    <Content Include="Resources\chevron-right-256-black.ico" />
-    <Content Include="Resources\chevron-right-256-black.png" />
-    <Content Include="Resources\chevron-right-256-white.ico" />
-    <Content Include="Resources\chevron-right-256-white.png" />
-    <Content Include="Resources\number-1-256-black.ico" />
-    <Content Include="Resources\number-1-256-black.png" />
-    <Content Include="Resources\number-1-256-white.png" />
-    <Content Include="Resources\number-2-256-black.ico" />
-    <Content Include="Resources\number-2-256-black.png" />
-    <Content Include="Resources\number-2-256-white.png" />
-    <Content Include="Resources\number-3-256-black.ico" />
-    <Content Include="Resources\number-3-256-black.png" />
-    <Content Include="Resources\number-3-256-white.png" />
-    <Content Include="Resources\number-4-256-black.ico" />
-    <Content Include="Resources\number-4-256-black.png" />
-    <Content Include="Resources\number-4-256-white.png" />
-    <Content Include="Resources\number-5-256-black.ico" />
-    <Content Include="Resources\number-5-256-black.png" />
-    <Content Include="Resources\number-5-256-white.png" />
-    <Content Include="Resources\number-6-256-black.ico" />
-    <Content Include="Resources\number-6-256-black.png" />
-    <Content Include="Resources\number-6-256-white.png" />
-    <Content Include="Resources\number-7-256-black.ico" />
-    <Content Include="Resources\number-7-256-black.png" />
-    <Content Include="Resources\number-7-256-white.png" />
-    <Content Include="Resources\number-8-256-black.ico" />
-    <Content Include="Resources\number-8-256-black.png" />
-    <Content Include="Resources\number-8-256-white.png" />
-    <Content Include="Resources\number-9-256-black.ico" />
-    <Content Include="Resources\number-9-256-black.png" />
-    <Content Include="Resources\number-9-256-white.png" />
-    <Content Include="Resources\number-plus-256-black.ico" />
-    <Content Include="Resources\number-plus-256-black.png" />
-    <Content Include="Resources\number-plus-256-white.png" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
