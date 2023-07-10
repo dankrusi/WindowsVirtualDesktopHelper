@@ -22,6 +22,7 @@ the software as okay/safe, this warning will go away.
 * Show desktop number in notification area
 * Show desktop name when switching desktops
 * Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
 * Autostart with Windows
 * Simple and lightweight
 * Configurable
