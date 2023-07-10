@@ -24,6 +24,11 @@ namespace WindowsVirtualDesktopHelper {
 				notifyIconPrev.Visible = false;
 				notifyIconNext.Visible = false;
 			}
+			if (checkBoxShowDesktopNameInitial.Checked) {
+				notifyIconName.Visible = true;
+			} else {
+				notifyIconName.Visible = false;
+			}
 
 			//TODO: how to sync the startup setting - best would be to see if the reg key is actually there
 
@@ -85,6 +90,7 @@ namespace WindowsVirtualDesktopHelper {
 
 		private void LoadSettingsIntoUI() {
 			this.checkBoxShowPrevNextIcons.Checked = Properties.Settings.Default.ShowPrevNextIcons;
+			this.checkBoxShowDesktopNameInitial.Checked = Properties.Settings.Default.ShowDesktopNameInitial;
 			this.checkBoxStartupWithWindows.Checked = Properties.Settings.Default.StartupWithWindows;
 			this.checkBoxShowOverlay.Checked = Properties.Settings.Default.ShowOverlay;
 			this.checkBoxOverlayAnimate.Checked = Properties.Settings.Default.OverlayAnimate;
@@ -107,6 +113,7 @@ namespace WindowsVirtualDesktopHelper {
 		}
 		private void SaveSettingsFromUI() {
 			Properties.Settings.Default.ShowPrevNextIcons = this.checkBoxShowPrevNextIcons.Checked;
+			Properties.Settings.Default.ShowDesktopNameInitial = this.checkBoxShowDesktopNameInitial.Checked;
 			Properties.Settings.Default.StartupWithWindows = this.checkBoxStartupWithWindows.Checked;
 			Properties.Settings.Default.ShowOverlay = this.checkBoxShowOverlay.Checked;
 			Properties.Settings.Default.OverlayAnimate = this.checkBoxOverlayAnimate.Checked;
@@ -132,53 +139,6 @@ namespace WindowsVirtualDesktopHelper {
 
 		public void UpdateIconForVDDisplayNumber(string theme, uint number, string name) {
 			number++;
-			if (theme == "dark") {
-				// White icon
-				if (number == 1) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_1_256_white;
-				} else if (number == 2) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_2_256_white;
-				} else if (number == 3) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_3_256_white;
-				} else if (number == 4) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_4_256_white;
-				} else if (number == 5) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_5_256_white;
-				} else if (number == 6) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_6_256_white;
-				} else if (number == 7) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_7_256_white;
-				} else if (number == 8) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_8_256_white;
-				} else if (number == 9) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_9_256_white;
-				} else {
-					this.notifyIconNumber.Icon = Resources.Icons.number_plus_256_white;
-				}
-			} else {
-				// Black icon
-				if (number == 1) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_1_256_black;
-				} else if (number == 2) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_2_256_black;
-				} else if (number == 3) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_3_256_black;
-				} else if (number == 4) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_4_256_black;
-				} else if (number == 5) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_5_256_black;
-				} else if (number == 6) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_6_256_black;
-				} else if (number == 7) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_7_256_black;
-				} else if (number == 8) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_8_256_black;
-				} else if (number == 9) {
-					this.notifyIconNumber.Icon = Resources.Icons.number_9_256_black;
-				} else {
-					this.notifyIconNumber.Icon = Resources.Icons.number_plus_256_black;
-				}
-			}
 			this.notifyIconNumber.Icon = Util.Icons.GenerateNotificationIcon(number.ToString(), theme, this.DeviceDpi, false);
 			this.notifyIconNumber.Text = name;
 		}
@@ -205,9 +165,7 @@ namespace WindowsVirtualDesktopHelper {
 		private void SettingsForm_Shown(object sender, EventArgs e) {
 			UpdateIconForVDDisplayNumber(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
 			UpdateIconForVDDisplayName(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayName);
-			this.notifyIconName.Visible = true;
 			this.notifyIconNumber.Visible = true;
-			this.notifyIconName.Visible = true;
 			this.Hide();
 		}
 
@@ -316,6 +274,16 @@ namespace WindowsVirtualDesktopHelper {
 				} else {
 					Util.OS.OpenTaskView();
 				}
+			}
+		}
+
+		private void checkBoxShowDesktopNameInitial_CheckedChanged(object sender, EventArgs e) {
+			if (IsLoading) return;
+
+			if (checkBoxShowDesktopNameInitial.Checked) {
+				notifyIconName.Visible = true;
+			} else {
+				notifyIconName.Visible = false;
 			}
 		}
 	}
