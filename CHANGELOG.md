@@ -1,3 +1,19 @@
+# v1.12
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
+
+## Changes
+* Support Windows Insider 11.226x1.2050
+
+
 # v1.11
 
 ## Features
