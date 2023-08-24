@@ -1,3 +1,19 @@
+# v1.13
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
+
+## Changes
+* Switch desktop with arrow icons fallback mechanism to use shortcut keys (CTRL+WIN+LEFT/RIGHT) if the API fails
+
+
 # v1.12
 
 ## Features

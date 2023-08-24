@@ -177,11 +177,11 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		private void notifyIconPrev_Click(object sender, EventArgs e) {
-			App.Instance.VDAPI.SwitchBackward();
+			App.Instance.SwitchDesktopBackward();
 		}
 
 		private void notifyIconNext_Click(object sender, EventArgs e) {
-			App.Instance.VDAPI.SwitchForward();
+			App.Instance.SwitchDesktopForward();
 		}
 
 		private void checkBoxShowPrevNextIcons_CheckedChanged(object sender, EventArgs e) {

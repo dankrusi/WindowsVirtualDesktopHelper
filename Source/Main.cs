@@ -16,7 +16,6 @@ namespace WindowsVirtualDesktopHelper {
 				Console.Error.WriteLine(e);
 				var form = new ErrorForm();
 				form.UpdateUIForError(e);
-				//form.Show();
 				Application.Run(form);
 			}
 		}

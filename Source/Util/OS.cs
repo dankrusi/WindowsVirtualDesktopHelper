@@ -37,6 +37,16 @@ namespace WindowsVirtualDesktopHelper.Util {
 			//System.Diagnostics.Process.Start("explorer.exe", "shell:::{3080F90E-D7AD-11D9-BD98-0000947B0257}");
 		}
 
+		public static void DesktopBackwardBySimulatingShortcutKey() {
+			var simu = new WindowsInput.InputSimulator();
+			simu.Keyboard.ModifiedKeyStroke(new[] { WindowsInput.Native.VirtualKeyCode.LCONTROL, WindowsInput.Native.VirtualKeyCode.LWIN }, WindowsInput.Native.VirtualKeyCode.LEFT);
+		}
+
+		public static void DesktopForwardBySimulatingShortcutKey() {
+			var simu = new WindowsInput.InputSimulator();
+			simu.Keyboard.ModifiedKeyStroke(new[] { WindowsInput.Native.VirtualKeyCode.LCONTROL, WindowsInput.Native.VirtualKeyCode.LWIN }, WindowsInput.Native.VirtualKeyCode.RIGHT);
+		}
+
 		public static bool IsSystemLightThemeModeEnabled() {
 			// https://learn.microsoft.com/en-us/answers/questions/715081/how-to-detect-windows-dark-mode.html
 			try {

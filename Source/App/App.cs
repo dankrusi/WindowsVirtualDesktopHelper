@@ -25,6 +25,9 @@ namespace WindowsVirtualDesktopHelper {
 			// Set the app instance global
 			App.Instance = this;
 
+			// Test global error form:
+			throw new Exception("test exception!");
+
 			// Settings
 			{
 				Properties.Settings.Default.Upgrade();
@@ -188,6 +191,24 @@ namespace WindowsVirtualDesktopHelper {
 					form.LabelText = "Virtual Desktop Helper";
 					form.Show();
 				}));
+			}
+		}
+
+		public void SwitchDesktopBackward() {
+			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
+			try {
+				App.Instance.VDAPI.SwitchBackward();
+			} catch(Exception e) {
+				Util.OS.DesktopBackwardBySimulatingShortcutKey();
+			}
+		}
+
+		public void SwitchDesktopForward() {
+			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
+			try {
+				App.Instance.VDAPI.SwitchForward();
+			} catch (Exception e) {
+				Util.OS.DesktopForwardBySimulatingShortcutKey();
 			}
 		}
 
