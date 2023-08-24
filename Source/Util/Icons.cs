@@ -81,16 +81,25 @@ namespace WindowsVirtualDesktopHelper.Util {
                 format.Alignment = StringAlignment.Center;
                 format.LineAlignment = StringAlignment.Center;
 
-                var rect = new Rectangle(0, (int)(renderSize*offsetY), renderSize, renderSize+ (int)(-1*renderSize * offsetY));
+                var rect = new Rectangle(
+					-renderSize/2, // x
+					(int)(renderSize*offsetY), // y
+					renderSize*2, // w (note: we oversize the drawing area so that we never clip text to new lines...
+					renderSize+ (int)(-1*renderSize * offsetY)); // h
 
-                // Automatic text fit
-                if(true){
-                    var measure = g.MeasureString(textToRender, font);
+				// Automatic text fit
+				var fontScaleDownFactor = 1.0f;
+				var fontScaleDownAttempts = 0;
+                while(fontScaleDownAttempts < 10 && fontScaleDownFactor > 0) {
+					fontScaleDownAttempts++;
+					fontScaleDownFactor -= 0.1f;
+					var measure = g.MeasureString(textToRender, font);
                     if (measure.Width > renderSize*(1.0f+ automaticFontSizeFitTolerance)) {
-                        var scaleDownRatio = (float)((renderSize * 1.2) / measure.Width);
-                        
-                        font = new Font(fontFamily, textSize * scaleDownRatio, FontStyle.Bold);
-                    }
+                        //var scaleDownRatio = (float)((renderSize * 1.2) / measure.Width);
+                        font = new Font(fontFamily, textSize * fontScaleDownFactor, FontStyle.Bold);
+                    } else {
+						break;
+					}
                 }
                 //g.Clear(Color.Pink);
                 g.DrawString(textToRender, font, fgBrush, rect, format);
@@ -109,12 +118,12 @@ namespace WindowsVirtualDesktopHelper.Util {
             _cache[cacheKey] = bitmapScaledDown;
 
             // Debug display
-            if (false){
+            if (true && textToRender == "11"){
                 var form = new System.Windows.Forms.Form();
                 form.Width = size;
                 form.Height = size+30;
                 form.BackColor = bgColor;
-                form.BackgroundImage = bitmapScaledDown;
+                form.BackgroundImage = bitmap;
                 form.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
                 form.Show();
             }
