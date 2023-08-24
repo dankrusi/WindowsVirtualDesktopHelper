@@ -26,7 +26,7 @@ namespace WindowsVirtualDesktopHelper {
 			App.Instance = this;
 
 			// Test global error form:
-			throw new Exception("test exception!");
+			//throw new Exception("test exception!");
 
 			// Settings
 			{
