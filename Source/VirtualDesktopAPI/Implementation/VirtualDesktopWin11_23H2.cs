@@ -33,7 +33,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
 			DesktopManager.VirtualDesktopManagerInternal.GetAdjacentDesktop(current, 4, out var adjacent);
 			if (adjacent == null) return;
-			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(IntPtr.Zero, adjacent);
+			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(adjacent);
 		}
 
 		public void SwitchBackward() {
@@ -41,7 +41,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
 			DesktopManager.VirtualDesktopManagerInternal.GetAdjacentDesktop(current, 3, out var adjacent);
 			if (adjacent == null) return;
-			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(IntPtr.Zero, adjacent);
+			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(adjacent);
 		}
 
 		public string CurrentDisplayName() {
@@ -185,7 +185,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 			void GetDesktops(out IObjectArray desktops);
 			[PreserveSig]
 			int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
-			void SwitchDesktop(IntPtr hWndOrMon, IVirtualDesktop desktop);
+			void SwitchDesktop(IVirtualDesktop desktop);
 			IVirtualDesktop CreateDesktop(IntPtr hWndOrMon);
 			void MoveDesktop(IVirtualDesktop desktop, IntPtr hWndOrMon, int nIndex);
 			void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
