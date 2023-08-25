@@ -1,3 +1,19 @@
+# v1.14
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
+
+## Fixes
+* Windows 11 23H2 fix switch desktop with arrow icons
+
+
 # v1.13
 
 ## Features
