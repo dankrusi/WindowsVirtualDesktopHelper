@@ -25,7 +25,6 @@ body:
       label: "WVDH Version"
       description: "What version of our software are you running?"
       placeholder: "1.14 (latest)"
-      value: ""
     validations:
       required: true
   - type: input
@@ -34,7 +33,6 @@ body:
       label: "Windows Version"
       description: "What version of windows are you running?"
       placeholder: "Windows 11 22H2 build 22621"
-      value: ""
     validations:
       required: true
   - type: textarea
