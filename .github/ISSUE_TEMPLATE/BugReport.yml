@@ -14,28 +14,28 @@ body:
   - type: textarea
     id: what-happened
     attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: 
-      value: 
+      label: "What happened?"
+      description: "Also tell us, what did you expect to happen?"
+      placeholder: ""
+      value: ""
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: WVDH Version
-      description: What version of our software are you running?
-      placeholder: 1.14 (latest)
-      value: 
+      label: "WVDH Version"
+      description: "What version of our software are you running?"
+      placeholder: "1.14 (latest)"
+      value: ""
     validations:
       required: true
   - type: input
     id: windowsversion
     attributes:
-      label: Windows Version
-      description: What version of windows are you running?
+      label: "Windows Version"
+      description: "What version of windows are you running?"
       placeholder: "Windows 11 22H2 build 22621"
-      value: 
+      value: ""
     validations:
       required: true
   - type: textarea
