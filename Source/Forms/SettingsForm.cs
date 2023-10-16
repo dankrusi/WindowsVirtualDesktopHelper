@@ -140,7 +140,7 @@ namespace WindowsVirtualDesktopHelper {
 		public void UpdateIconForVDDisplayNumber(string theme, uint number, string name) {
 			number++;
 			this.notifyIconNumber.Icon = Util.Icons.GenerateNotificationIcon(number.ToString(), theme, this.DeviceDpi, false);
-			this.notifyIconNumber.Text = name;
+			//this.notifyIconNumber.Text = name;
 		}
 
 		public void UpdateIconForVDDisplayName(string theme, string name) {
@@ -151,7 +151,7 @@ namespace WindowsVirtualDesktopHelper {
 				if (nameToShow.Length > 1) nameToShow = nameToShow.Substring(0, 1);
 
 				this.notifyIconName.Icon = Util.Icons.GenerateNotificationIcon(nameToShow, theme, this.DeviceDpi, false);
-				this.notifyIconName.Text = name;
+				//this.notifyIconName.Text = name;
 			}
 		}
 
