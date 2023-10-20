@@ -5,6 +5,7 @@
 * Show desktop name when switching desktops
 * Show prev/next desktop by clicking icons in notification area
 * Show desktop initial in notification area
+* Jump to desktop using hot keys
 * Autostart with Windows
 * Simple and lightweight
 * Configurable
