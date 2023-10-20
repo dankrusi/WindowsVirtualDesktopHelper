@@ -21,33 +21,21 @@ namespace WindowsVirtualDesktopHelper.Properties {
             get {
                 return defaultInstance;
             }
-		}
-
-		[global::System.Configuration.UserScopedSettingAttribute()]
-		[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-		[global::System.Configuration.DefaultSettingValueAttribute("False")]
-		public bool ShowPrevNextIcons {
-			get {
-				return ((bool)(this["ShowPrevNextIcons"]));
-			}
-			set {
-				this["ShowPrevNextIcons"] = value;
-			}
-		}
-
-		[global::System.Configuration.UserScopedSettingAttribute()]
-		[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-		[global::System.Configuration.DefaultSettingValueAttribute("False")]
-		public bool ShowDesktopNameInitial {
-			get {
-				return ((bool)(this["ShowDesktopNameInitial"]));
-			}
-			set {
-				this["ShowDesktopNameInitial"] = value;
-			}
-		}
-
-		[global::System.Configuration.UserScopedSettingAttribute()]
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowPrevNextIcons {
+            get {
+                return ((bool)(this["ShowPrevNextIcons"]));
+            }
+            set {
+                this["ShowPrevNextIcons"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool StartupWithWindows {
@@ -128,6 +116,30 @@ namespace WindowsVirtualDesktopHelper.Properties {
             }
             set {
                 this["OverlayPosition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool OverlayShowOnAllMonitors {
+            get {
+                return ((bool)(this["OverlayShowOnAllMonitors"]));
+            }
+            set {
+                this["OverlayShowOnAllMonitors"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowDesktopNameInitial {
+            get {
+                return ((bool)(this["ShowDesktopNameInitial"]));
+            }
+            set {
+                this["ShowDesktopNameInitial"] = value;
             }
         }
     }

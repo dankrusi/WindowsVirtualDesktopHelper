@@ -68,6 +68,9 @@ namespace WindowsVirtualDesktopHelper {
 		public bool OverlayTranslucent() {
 			return this.checkBoxOverlayTranslucent.Checked;
 		}
+		public bool OverlayShowOnAllMonitors() {
+			return this.checkBoxOverlayShowOnAllMonitors.Checked;
+		}
 		public int OverlayDurationMS() {
 			if (this.radioButtonOverlayLongDuration.Checked == true) return 3000;
 			else if (this.radioButtonOverlayMediumDuration.Checked == true) return 2000;
@@ -95,6 +98,7 @@ namespace WindowsVirtualDesktopHelper {
 			this.checkBoxShowOverlay.Checked = Properties.Settings.Default.ShowOverlay;
 			this.checkBoxOverlayAnimate.Checked = Properties.Settings.Default.OverlayAnimate;
 			this.checkBoxOverlayTranslucent.Checked = Properties.Settings.Default.OverlayTranslucent;
+			this.checkBoxOverlayShowOnAllMonitors.Checked = Properties.Settings.Default.OverlayShowOnAllMonitors;
 			this.checkBoxClickDesktopNumberTaskView.Checked = Properties.Settings.Default.ClickDesktopNumberOpensTaskView;
 			this.radioButtonOverlayLongDuration.Checked = Properties.Settings.Default.OverlayDuration == "long";
 			this.radioButtonOverlayMediumDuration.Checked = Properties.Settings.Default.OverlayDuration == "medium";
@@ -118,6 +122,7 @@ namespace WindowsVirtualDesktopHelper {
 			Properties.Settings.Default.ShowOverlay = this.checkBoxShowOverlay.Checked;
 			Properties.Settings.Default.OverlayAnimate = this.checkBoxOverlayAnimate.Checked;
 			Properties.Settings.Default.OverlayTranslucent = this.checkBoxOverlayTranslucent.Checked;
+			Properties.Settings.Default.OverlayShowOnAllMonitors = this.checkBoxOverlayShowOnAllMonitors.Checked;
 			Properties.Settings.Default.ClickDesktopNumberOpensTaskView = this.checkBoxClickDesktopNumberTaskView.Checked;
 			if (this.radioButtonOverlayLongDuration.Checked) Properties.Settings.Default.OverlayDuration = "long";
 			if (this.radioButtonOverlayMediumDuration.Checked) Properties.Settings.Default.OverlayDuration = "medium";
@@ -285,6 +290,10 @@ namespace WindowsVirtualDesktopHelper {
 			} else {
 				notifyIconName.Visible = false;
 			}
+		}
+
+		private void checkBoxOverlayShowOnAllMonitors_CheckedChanged(object sender, EventArgs e) {
+			if (IsLoading) return;
 		}
 	}
 }

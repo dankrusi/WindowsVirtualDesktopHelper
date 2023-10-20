@@ -8,6 +8,7 @@ namespace WindowsVirtualDesktopHelper {
 		public string LabelText;
 		public string Position = "middlecenter";
 		public int DisplayTimeMS = 2000;
+		public int? ScreenNumber = null;
 		public bool FadeIn = false;
 		public bool Translucent = true;
 
@@ -18,9 +19,10 @@ namespace WindowsVirtualDesktopHelper {
 
 		public static event EventHandler WillShowNotificationFormEvent;
 
-		public SwitchNotificationForm() {
+		public SwitchNotificationForm(int? screenNumber = null) {
 			InitializeComponent();
 
+			this.ScreenNumber = screenNumber;
 			this.FadeIn = App.Instance.SettingsForm.OverlayAnimate();
 			this.Translucent = App.Instance.SettingsForm.OverlayTranslucent();
 			this.Position = App.Instance.SettingsForm.OverlayPosition();
@@ -31,31 +33,33 @@ namespace WindowsVirtualDesktopHelper {
 			// Set position
 			var positionOffset = 40;
 			this.StartPosition = FormStartPosition.Manual;
-			var screen = Screen.FromControl(this);
+			var screen = Screen.FromControl(this); // get main screen
+			if(this.ScreenNumber != null) screen = Screen.AllScreens[this.ScreenNumber.Value]; 
 			var screenW = screen.WorkingArea.Width;
 			var screenH = screen.WorkingArea.Height;
+			var screenX = screen.WorkingArea.X;
+			var screenY = screen.WorkingArea.Y;
 			if (this.Position == "topleft") {
-				this.Location = new Point(positionOffset, positionOffset);
+				this.Location = new Point(screenX+positionOffset, screenY + positionOffset);
 			} else if (this.Position == "topcenter") {
-				this.Location = new Point(screenW / 2 - this.Width / 2, positionOffset);
+				this.Location = new Point(screenX + screenW / 2 - this.Width / 2, screenY + positionOffset);
 			} else if (this.Position == "topright") {
-				this.Location = new Point(screenW - this.Width - positionOffset, positionOffset);
+				this.Location = new Point(screenX + screenW - this.Width - positionOffset, screenY + positionOffset);
 			} else if (this.Position == "middleleft") {
-				this.Location = new Point(positionOffset, screenH / 2 - this.Height / 2);
+				this.Location = new Point(screenX + positionOffset, screenY + screenH / 2 - this.Height / 2);
 			} else if (this.Position == "middlecenter") {
-				this.Location = new Point(screenW / 2 - this.Width / 2, screenH / 2 - this.Height / 2);
+				this.Location = new Point(screenX + screenW / 2 - this.Width / 2, screenY + screenH / 2 - this.Height / 2);
 			} else if (this.Position == "middleright") {
-				this.Location = new Point(screenW - this.Width - positionOffset, screenH / 2 - this.Height / 2);
+				this.Location = new Point(screenX + screenW - this.Width - positionOffset, screenY + screenH / 2 - this.Height / 2);
 			} else if (this.Position == "bottomleft") {
-				this.Location = new Point(positionOffset, screenH - this.Height - positionOffset);
+				this.Location = new Point(screenX + positionOffset, screenY + screenH - this.Height - positionOffset);
 			} else if (this.Position == "bottomcenter") {
-				this.Location = new Point(screenW / 2 - this.Width / 2, screenH - this.Height - positionOffset);
+				this.Location = new Point(screenX + screenW / 2 - this.Width / 2, screenY + screenH - this.Height - positionOffset);
 			} else if (this.Position == "bottomright") {
-				this.Location = new Point(screenW - this.Width - positionOffset, screenH - this.Height - positionOffset);
+				this.Location = new Point(screenX + screenW - this.Width - positionOffset, screenY + screenH - this.Height - positionOffset);
 			}
 
-			// Send signal to close all others
-			SwitchNotificationForm.WillShowNotificationFormEvent?.Invoke(this, EventArgs.Empty);
+			
 			// Register for signal to close self
 			WillShowNotificationFormEvent += this.OnWillShowNotificationForm;
 
@@ -66,6 +70,11 @@ namespace WindowsVirtualDesktopHelper {
 				if (this.Translucent) this.Opacity = 0.6;
 				else this.Opacity = 1.0;
 			}
+		}
+
+		public static void CloseAllNotifications(object sender) {
+			// Send signal to close all others
+			SwitchNotificationForm.WillShowNotificationFormEvent?.Invoke(sender, EventArgs.Empty);
 		}
 
 		protected virtual void OnWillShowNotificationForm(object sender, EventArgs e) {

@@ -143,10 +143,20 @@ namespace WindowsVirtualDesktopHelper {
 			this.SettingsForm.UpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
 			if (this.SettingsForm.ShowOverlay()) {
 				this.SettingsForm.Invoke((Action)(() => {
-					var form = new SwitchNotificationForm();
-					form.LabelText = this.CurrentVDDisplayName;
-					form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
-					form.Show();
+					SwitchNotificationForm.CloseAllNotifications(this.SettingsForm);
+					if (this.SettingsForm.OverlayShowOnAllMonitors()) {
+						for(var i = 0; i < Screen.AllScreens.Length; i++) {
+							var form = new SwitchNotificationForm(i);
+							form.LabelText = this.CurrentVDDisplayName;
+							form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
+							form.Show();
+						}
+					} else {
+						var form = new SwitchNotificationForm();
+						form.LabelText = this.CurrentVDDisplayName;
+						form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
+						form.Show();
+					}
 				}));
 			}
 		}

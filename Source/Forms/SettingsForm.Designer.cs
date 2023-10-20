@@ -36,6 +36,7 @@ namespace WindowsVirtualDesktopHelper {
             this.notifyIconNext = new System.Windows.Forms.NotifyIcon(this.components);
             this.checkBoxShowPrevNextIcons = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBoxOverlayShowOnAllMonitors = new System.Windows.Forms.CheckBox();
             this.checkBoxShowDesktopNameInitial = new System.Windows.Forms.CheckBox();
             this.checkBoxClickDesktopNumberTaskView = new System.Windows.Forms.CheckBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -143,6 +144,7 @@ namespace WindowsVirtualDesktopHelper {
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkBoxOverlayShowOnAllMonitors);
             this.groupBox1.Controls.Add(this.checkBoxShowDesktopNameInitial);
             this.groupBox1.Controls.Add(this.checkBoxClickDesktopNumberTaskView);
             this.groupBox1.Controls.Add(this.panel2);
@@ -156,15 +158,27 @@ namespace WindowsVirtualDesktopHelper {
             this.groupBox1.Margin = new System.Windows.Forms.Padding(6);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(6);
-            this.groupBox1.Size = new System.Drawing.Size(757, 464);
+            this.groupBox1.Size = new System.Drawing.Size(757, 495);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Features";
             // 
+            // checkBoxOverlayShowOnAllMonitors
+            // 
+            this.checkBoxOverlayShowOnAllMonitors.AutoSize = true;
+            this.checkBoxOverlayShowOnAllMonitors.Location = new System.Drawing.Point(78, 245);
+            this.checkBoxOverlayShowOnAllMonitors.Margin = new System.Windows.Forms.Padding(6);
+            this.checkBoxOverlayShowOnAllMonitors.Name = "checkBoxOverlayShowOnAllMonitors";
+            this.checkBoxOverlayShowOnAllMonitors.Size = new System.Drawing.Size(219, 29);
+            this.checkBoxOverlayShowOnAllMonitors.TabIndex = 22;
+            this.checkBoxOverlayShowOnAllMonitors.Text = "Show on all Monitors";
+            this.checkBoxOverlayShowOnAllMonitors.UseVisualStyleBackColor = true;
+            this.checkBoxOverlayShowOnAllMonitors.CheckedChanged += new System.EventHandler(this.checkBoxOverlayShowOnAllMonitors_CheckedChanged);
+            // 
             // checkBoxShowDesktopNameInitial
             // 
             this.checkBoxShowDesktopNameInitial.AutoSize = true;
-            this.checkBoxShowDesktopNameInitial.Location = new System.Drawing.Point(28, 407);
+            this.checkBoxShowDesktopNameInitial.Location = new System.Drawing.Point(28, 441);
             this.checkBoxShowDesktopNameInitial.Margin = new System.Windows.Forms.Padding(6);
             this.checkBoxShowDesktopNameInitial.Name = "checkBoxShowDesktopNameInitial";
             this.checkBoxShowDesktopNameInitial.Size = new System.Drawing.Size(378, 29);
@@ -176,7 +190,7 @@ namespace WindowsVirtualDesktopHelper {
             // checkBoxClickDesktopNumberTaskView
             // 
             this.checkBoxClickDesktopNumberTaskView.AutoSize = true;
-            this.checkBoxClickDesktopNumberTaskView.Location = new System.Drawing.Point(28, 366);
+            this.checkBoxClickDesktopNumberTaskView.Location = new System.Drawing.Point(28, 400);
             this.checkBoxClickDesktopNumberTaskView.Margin = new System.Windows.Forms.Padding(6);
             this.checkBoxClickDesktopNumberTaskView.Name = "checkBoxClickDesktopNumberTaskView";
             this.checkBoxClickDesktopNumberTaskView.Size = new System.Drawing.Size(521, 29);
@@ -256,7 +270,7 @@ namespace WindowsVirtualDesktopHelper {
             this.panel1.Controls.Add(this.radioButtonPositionTopRight);
             this.panel1.Controls.Add(this.radioButtonPositionTopCenter);
             this.panel1.Controls.Add(this.radioButtonPositionTopLeft);
-            this.panel1.Location = new System.Drawing.Point(160, 246);
+            this.panel1.Location = new System.Drawing.Point(160, 280);
             this.panel1.Margin = new System.Windows.Forms.Padding(6);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(114, 109);
@@ -364,7 +378,7 @@ namespace WindowsVirtualDesktopHelper {
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(73, 249);
+            this.label1.Location = new System.Drawing.Point(73, 283);
             this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(87, 25);
@@ -408,7 +422,7 @@ namespace WindowsVirtualDesktopHelper {
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.checkBoxStartupWithWindows);
-            this.groupBox2.Location = new System.Drawing.Point(22, 498);
+            this.groupBox2.Location = new System.Drawing.Point(22, 529);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(6);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(6);
@@ -441,7 +455,7 @@ namespace WindowsVirtualDesktopHelper {
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(805, 602);
+            this.ClientSize = new System.Drawing.Size(805, 640);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -503,5 +517,6 @@ namespace WindowsVirtualDesktopHelper {
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDonate;
         private System.Windows.Forms.NotifyIcon notifyIconName;
 		private System.Windows.Forms.CheckBox checkBoxShowDesktopNameInitial;
+		private System.Windows.Forms.CheckBox checkBoxOverlayShowOnAllMonitors;
 	}
 }
