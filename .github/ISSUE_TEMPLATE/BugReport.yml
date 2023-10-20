@@ -24,7 +24,7 @@ body:
     attributes:
       label: "WVDH Version"
       description: "What version of our software are you running?"
-      placeholder: ""
+      placeholder: 
     validations:
       required: true
   - type: input
