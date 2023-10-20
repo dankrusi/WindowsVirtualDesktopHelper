@@ -1,0 +1,36 @@
+name: Feature Request
+description: File a feature request
+title: "[FR]: "
+labels: ["feature request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to make a feature request!
+        Before filing a GitHub issue, please make sure of the following:
+          - You have looked at the latest version
+          - Your feature request doesn't already exist
+          - You are not using patched/modified versions of Windows
+  - type: textarea
+    id: what-feature
+    attributes:
+      label: "What feature?"
+      description: "Describe your feature..."
+      placeholder:  
+    validations:
+      required: true
+  - type: input
+    id: windowsversion
+    attributes:
+      label: "Windows Version"
+      description: "What version of windows are you running?"
+      placeholder: "Windows 11"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  

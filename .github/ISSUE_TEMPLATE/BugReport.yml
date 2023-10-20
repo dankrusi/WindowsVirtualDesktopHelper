@@ -24,14 +24,14 @@ body:
     attributes:
       label: "WVDH Version"
       description: "What version of our software are you running?"
-      placeholder: "1.14 (latest)"
+      placeholder: ""
     validations:
       required: true
   - type: input
     id: windowsversion
     attributes:
       label: "Windows Version"
-      description: "What version of windows are you running?"
+      description: "What version of windows are you running? (be specific)"
       placeholder: "Windows 11 22H2 build 22621"
     validations:
       required: true
