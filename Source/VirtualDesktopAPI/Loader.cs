@@ -9,6 +9,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 		public const string VirtualDesktopWin11_22H2 = "VirtualDesktopWin11_22H2";
 		public const string VirtualDesktopWin11_21H2 = "VirtualDesktopWin11_21H2";
 		public const string VirtualDesktopWin11_Insider = "VirtualDesktopWin11_Insider";
+		public const string VirtualDesktopWin11_InsiderCanary = "VirtualDesktopWin11_InsiderCanary";
 		public const string VirtualDesktopWin10 = "VirtualDesktopWin10";
 
 		public static string GetImplementationForOS() {
@@ -21,7 +22,10 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 				throw new Exception("LoadVDAPI: could not determine Windows version: " + e.Message, e);
 			}
 			Util.Logging.WriteLine("GetImplementationForOS: Windows Build Version: " + currentBuild);
-			if (currentBuild >= 25158) {
+			if (currentBuild >= 25314) {
+				Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 Insider Canary due to build >= 25314");
+				return VirtualDesktopWin11_InsiderCanary;
+			} else if (currentBuild >= 25158) {
 				Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 Insider due to build >= 25158-5267");
 				return VirtualDesktopWin11_Insider;
 			} else if (currentBuild >= 23403) {
@@ -53,6 +57,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 		public static IVirtualDesktopManager LoadImplementationWithFallback(string name) {
 			var implementationsToTry = new List<string>();
 			implementationsToTry.Add(name);
+			if (!implementationsToTry.Contains(VirtualDesktopWin11_InsiderCanary)) implementationsToTry.Add(VirtualDesktopWin11_InsiderCanary);
 			if (!implementationsToTry.Contains(VirtualDesktopWin11_Insider)) implementationsToTry.Add(VirtualDesktopWin11_Insider);
             if (!implementationsToTry.Contains(VirtualDesktopWin11_23H2)) implementationsToTry.Add(VirtualDesktopWin11_23H2);
 			if (!implementationsToTry.Contains(VirtualDesktopWin11_22H2)) implementationsToTry.Add(VirtualDesktopWin11_22H2);
@@ -93,6 +98,13 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 			} else if (name == VirtualDesktopWin11_Insider) {
 				try {
 					impl = new VirtualDesktopAPI.Implementation.VirtualDesktopWin11_Insider();
+					impl.Current();
+				} catch (Exception e) {
+					throw new Exception("LoadImplementation: could not load VirtualDesktop API implementation " + name + ": " + e.Message, e);
+				}
+			} else if (name == VirtualDesktopWin11_InsiderCanary) {
+				try {
+					impl = new VirtualDesktopAPI.Implementation.VirtualDesktopWin11_InsiderCanary();
 					impl.Current();
 				} catch (Exception e) {
 					throw new Exception("LoadImplementation: could not load VirtualDesktop API implementation " + name + ": " + e.Message, e);
