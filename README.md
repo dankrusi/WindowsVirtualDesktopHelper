@@ -4,8 +4,8 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v1.14 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.14/WindowsVirtualDesktopHelper.Setup.v1.14.msi) | 
-[Download v1.14 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.14/WindowsVirtualDesktopHelper.Executable.v1.14.zip)
+[Download v1.15 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.15/WindowsVirtualDesktopHelper.Setup.v1.15.msi) | 
+[Download v1.15 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.15/WindowsVirtualDesktopHelper.Executable.v1.15.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
@@ -40,7 +40,7 @@ Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7 or higher 
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v1.14.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.14/WindowsVirtualDesktopHelper.Setup.v1.14.msi)
+[Download WindowsVirtualDesktopHelper Setup v1.15.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.15/WindowsVirtualDesktopHelper.Setup.v1.15.msi)
 
 Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
@@ -50,7 +50,7 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
-[Download WindowsVirtualDesktopHelper Executable v1.14.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.14/WindowsVirtualDesktopHelper.Executable.v1.14.zip)
+[Download WindowsVirtualDesktopHelper Executable v1.15.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.15/WindowsVirtualDesktopHelper.Executable.v1.15.zip)
 
 
 ## Thanks
@@ -80,6 +80,7 @@ The following builds have been confirmed as working:
   - 21H2 22000
   - 22H2 22621
   - 22H2 25158-25267
+  - 25314 (experimental)
   
 The following builds have been cofnirmed as NOT working:
 
@@ -108,6 +109,10 @@ See [CHANGELOG.md](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/
 
 
 ## Frequently Asked Questions
+
+### Help! This App doesn't work on my version of Windows 11
+
+Microsoft is constantly changing the Windows APIs for managing virtual desktops - thus usually with each new version we have to write a new API wrapper to interface with Windows. This takes time, and sometimes is not easy to integrate with. Don't expect immediate support for un-released versions of Windows (like Insider).
 
 ### Where is the icon showing the screen number?
 
