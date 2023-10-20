@@ -184,7 +184,7 @@
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.14"
+        "ProductVersion" = "8:1.15"
         "Manufacturer" = "8:Dan Krusi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/dankrusi/WindowsVirtualDesktopHelper"
