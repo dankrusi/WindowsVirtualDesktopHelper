@@ -142,5 +142,29 @@ namespace WindowsVirtualDesktopHelper.Properties {
                 this["ShowDesktopNameInitial"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseHotKeysToJumpToDesktop {
+            get {
+                return ((bool)(this["UseHotKeysToJumpToDesktop"]));
+            }
+            set {
+                this["UseHotKeysToJumpToDesktop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt")]
+        public string HotKeysToJumpToDesktop {
+            get {
+                return ((string)(this["HotKeysToJumpToDesktop"]));
+            }
+            set {
+                this["HotKeysToJumpToDesktop"] = value;
+            }
+        }
     }
 }

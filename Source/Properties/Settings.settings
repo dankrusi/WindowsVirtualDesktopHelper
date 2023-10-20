@@ -32,5 +32,11 @@
     <Setting Name="ShowDesktopNameInitial" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="UseHotKeysToJumpToDesktop" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="HotKeysToJumpToDesktop" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Alt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

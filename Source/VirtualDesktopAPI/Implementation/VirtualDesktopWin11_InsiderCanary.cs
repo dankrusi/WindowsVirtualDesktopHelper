@@ -46,6 +46,12 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 			return DesktopNameFromDesktop(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop());
 		}
 
+		public void SwitchToDesktop(int number) {
+			var desktop = DesktopManager.GetDesktop(number);
+			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(desktop);
+
+		}
+
 		#endregion
 
 		private static string DesktopNameFromDesktop(IVirtualDesktop desktop) {

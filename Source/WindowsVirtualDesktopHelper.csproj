@@ -117,6 +117,7 @@
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_21H2.cs" />
     <Compile Include="VirtualDesktopAPI\IVirtualDesktopManager.cs" />
     <Compile Include="VirtualDesktopAPI\Loader.cs" />
+    <Compile Include="WindowsHotKeyAPI\KeyboardHook.cs" />
     <Compile Include="WindowsInputAPI\IInputDeviceStateAdaptor.cs" />
     <Compile Include="WindowsInputAPI\IInputMessageDispatcher.cs" />
     <Compile Include="WindowsInputAPI\IInputSimulator.cs" />

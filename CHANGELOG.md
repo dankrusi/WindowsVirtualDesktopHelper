@@ -1,3 +1,25 @@
+# v1.15
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
+
+## Changes
+
+* Windows 11 Insider Canary initial support
+* Show notification on all monitors
+
+## Fixes
+* Windows 11 use consistent notification tray icon labels so that icon arrangement always stays
+
+
+
 # v1.14
 
 ## Features

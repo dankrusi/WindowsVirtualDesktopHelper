@@ -37,6 +37,11 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 			return DesktopNameFromDesktop(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop());
 		}
 
+		public void SwitchToDesktop(int number) {
+			var desktop = DesktopManager.GetDesktopAtIndex(number);
+			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(desktop);
+		}
+
 		#endregion
 
 		#region Implementation
@@ -230,6 +235,22 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
 				Marshal.ReleaseComObject(desktops);
 				return index;
+			}
+
+			internal static IVirtualDesktop GetDesktopAtIndex(int index) {
+				IVirtualDesktop desktop = null;
+				IObjectArray desktops;
+				VirtualDesktopManagerInternal.GetDesktops(out desktops);
+				object objdesktop;
+				for (int i = 0; i < VirtualDesktopManagerInternal.GetCount(); i++) {
+					desktops.GetAt(i, typeof(IVirtualDesktop).GUID, out objdesktop);
+					if (i == index) {
+						desktop = objdesktop as IVirtualDesktop;
+					}
+				}
+
+				Marshal.ReleaseComObject(desktops);
+				return desktop;
 			}
 		}
 

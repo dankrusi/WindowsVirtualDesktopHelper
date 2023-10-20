@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using WindowsVirtualDesktopHelper.WindowsHotKeyAPI;
 
 namespace WindowsVirtualDesktopHelper {
 	public partial class SettingsForm : Form {
@@ -58,7 +59,16 @@ namespace WindowsVirtualDesktopHelper {
 			UpdateIconForVDDisplayNumber(theme, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
 			UpdateIconForVDDisplayName(theme, App.Instance.CurrentVDDisplayName);
 		}
-
+		public ModifierKeys HotKeysToJumpToDesktop() {
+			if (this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked) return WindowsHotKeyAPI.ModifierKeys.Alt;
+			if (this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked) return WindowsHotKeyAPI.ModifierKeys.Alt | WindowsHotKeyAPI.ModifierKeys.Shift;
+			if (this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked) return WindowsHotKeyAPI.ModifierKeys.Control;
+			if (this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked) return WindowsHotKeyAPI.ModifierKeys.Control | WindowsHotKeyAPI.ModifierKeys.Alt;
+			throw new Exception("invalid modifier");
+		}
+		public bool UseHotKeysToJumpToDesktop() {
+			return this.checkBoxUseHotKeysToJumpToDesktop.Checked;
+		}
 		public bool ShowOverlay() {
 			return this.checkBoxShowOverlay.Checked;
 		}
@@ -100,6 +110,7 @@ namespace WindowsVirtualDesktopHelper {
 			this.checkBoxOverlayTranslucent.Checked = Properties.Settings.Default.OverlayTranslucent;
 			this.checkBoxOverlayShowOnAllMonitors.Checked = Properties.Settings.Default.OverlayShowOnAllMonitors;
 			this.checkBoxClickDesktopNumberTaskView.Checked = Properties.Settings.Default.ClickDesktopNumberOpensTaskView;
+			this.checkBoxUseHotKeysToJumpToDesktop.Checked = Properties.Settings.Default.UseHotKeysToJumpToDesktop;
 			this.radioButtonOverlayLongDuration.Checked = Properties.Settings.Default.OverlayDuration == "long";
 			this.radioButtonOverlayMediumDuration.Checked = Properties.Settings.Default.OverlayDuration == "medium";
 			this.radioButtonOverlayShortDuration.Checked = Properties.Settings.Default.OverlayDuration == "short";
@@ -113,7 +124,12 @@ namespace WindowsVirtualDesktopHelper {
 			this.radioButtonPositionBottomLeft.Checked = Properties.Settings.Default.OverlayPosition == "bottomleft";
 			this.radioButtonPositionBottomCenter.Checked = Properties.Settings.Default.OverlayPosition == "bottomcenter";
 			this.radioButtonPositionBottomRight.Checked = Properties.Settings.Default.OverlayPosition == "bottomright";
+			this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked = Properties.Settings.Default.HotKeysToJumpToDesktop == "Alt";
+			this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked = Properties.Settings.Default.HotKeysToJumpToDesktop == "AltShift";
+			this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked = Properties.Settings.Default.HotKeysToJumpToDesktop == "Ctrl";
+			this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked = Properties.Settings.Default.HotKeysToJumpToDesktop == "CtrlAlt";
 			checkBoxShowOverlay_CheckedChanged(this, null);
+			checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(this, null);
 		}
 		private void SaveSettingsFromUI() {
 			Properties.Settings.Default.ShowPrevNextIcons = this.checkBoxShowPrevNextIcons.Checked;
@@ -124,6 +140,7 @@ namespace WindowsVirtualDesktopHelper {
 			Properties.Settings.Default.OverlayTranslucent = this.checkBoxOverlayTranslucent.Checked;
 			Properties.Settings.Default.OverlayShowOnAllMonitors = this.checkBoxOverlayShowOnAllMonitors.Checked;
 			Properties.Settings.Default.ClickDesktopNumberOpensTaskView = this.checkBoxClickDesktopNumberTaskView.Checked;
+			Properties.Settings.Default.UseHotKeysToJumpToDesktop = this.checkBoxUseHotKeysToJumpToDesktop.Checked;
 			if (this.radioButtonOverlayLongDuration.Checked) Properties.Settings.Default.OverlayDuration = "long";
 			if (this.radioButtonOverlayMediumDuration.Checked) Properties.Settings.Default.OverlayDuration = "medium";
 			if (this.radioButtonOverlayShortDuration.Checked) Properties.Settings.Default.OverlayDuration = "short";
@@ -137,6 +154,10 @@ namespace WindowsVirtualDesktopHelper {
 			if (this.radioButtonPositionBottomLeft.Checked) Properties.Settings.Default.OverlayPosition = "bottomleft";
 			if (this.radioButtonPositionBottomCenter.Checked) Properties.Settings.Default.OverlayPosition = "bottomcenter";
 			if (this.radioButtonPositionBottomRight.Checked) Properties.Settings.Default.OverlayPosition = "bottomright";
+			if (this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "Alt";
+			if (this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "AltShift";
+			if (this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "Ctrl";
+			if (this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "CtrlAlt";
 			// Save user settings
 			// https://learn.microsoft.com/en-us/dotnet/desktop/winforms/advanced/how-to-write-user-settings-at-run-time-with-csharp?view=netframeworkdesktop-4.8
 			Properties.Settings.Default.Save();
@@ -236,6 +257,7 @@ namespace WindowsVirtualDesktopHelper {
 			radioButtonOverlayLongDuration.Enabled = checkBoxShowOverlay.Checked;
 			checkBoxOverlayAnimate.Enabled = checkBoxShowOverlay.Checked;
 			checkBoxOverlayTranslucent.Enabled = checkBoxShowOverlay.Checked;
+			checkBoxOverlayShowOnAllMonitors.Enabled = checkBoxShowOverlay.Checked;
 			radioButtonPositionTopLeft.Enabled = checkBoxShowOverlay.Checked;
 			radioButtonPositionTopCenter.Enabled = checkBoxShowOverlay.Checked;
 			radioButtonPositionTopRight.Enabled = checkBoxShowOverlay.Checked;
@@ -294,6 +316,31 @@ namespace WindowsVirtualDesktopHelper {
 
 		private void checkBoxOverlayShowOnAllMonitors_CheckedChanged(object sender, EventArgs e) {
 			if (IsLoading) return;
+		}
+
+		private void checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(object sender, EventArgs e) {
+			radioButtonUseHotKeysToJumpToDesktopAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopAltShift.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
+
+			if(!IsLoading) App.Instance.SetupHotKeys();
+		}
+
+		private void radioButtonUseHotKeysToJumpToDesktopAlt_CheckedChanged(object sender, EventArgs e) {
+			if (!IsLoading) App.Instance.SetupHotKeys();
+		}
+
+		private void radioButtonUseHotKeysToJumpToDesktopCtrl_CheckedChanged(object sender, EventArgs e) {
+			if (!IsLoading) App.Instance.SetupHotKeys();
+		}
+
+		private void radioButtonUseHotKeysToJumpToDesktopCtrlAlt_CheckedChanged(object sender, EventArgs e) {
+			if (!IsLoading) App.Instance.SetupHotKeys();
+		}
+
+		private void radioButtonUseHotKeysToJumpToDesktopAltShift_CheckedChanged(object sender, EventArgs e) {
+			if (!IsLoading) App.Instance.SetupHotKeys();
 		}
 	}
 }

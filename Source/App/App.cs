@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 using WindowsVirtualDesktopHelper.VirtualDesktopAPI;
+using WindowsVirtualDesktopHelper.WindowsHotKeyAPI;
 
 namespace WindowsVirtualDesktopHelper {
 	class App {
@@ -16,6 +17,7 @@ namespace WindowsVirtualDesktopHelper {
 		public SettingsForm SettingsForm;
 		public string CurrentSystemThemeName = null;
 		public List<string> FGWindowHistory = new List<string>(); // needed to detect if Task View was open
+		KeyboardHook KeyboardHooksJumpToDesktop = null;
 
 		public static string DetectedVDImplementation = null;
 
@@ -25,14 +27,16 @@ namespace WindowsVirtualDesktopHelper {
 			// Set the app instance global
 			App.Instance = this;
 
-			// Test global error form:
-			//throw new Exception("test exception!");
-
 			// Settings
 			{
+				Util.Logging.WriteLine("Using config file: "+AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+
 				Properties.Settings.Default.Upgrade();
 				Properties.Settings.Default.Save();
 			}
+
+			// Test global error form:
+			//throw new Exception("test exception!");
 
 			// Load the implementation
 			try {
@@ -48,6 +52,9 @@ namespace WindowsVirtualDesktopHelper {
 
 			// Create the settings form, which acts as our ui main thread
 			this.SettingsForm = new SettingsForm();
+
+			// Hot keys
+			this.SetupHotKeys();
 		}
 
 
@@ -87,7 +94,39 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
+		public void SetupHotKeys() {
+			if(this.KeyboardHooksJumpToDesktop != null) {
+				this.KeyboardHooksJumpToDesktop.Dispose();
+				this.KeyboardHooksJumpToDesktop = null;
+			}
 
+			if (this.SettingsForm.UseHotKeysToJumpToDesktop()) {
+				this.KeyboardHooksJumpToDesktop = new KeyboardHook();
+				this.KeyboardHooksJumpToDesktop.KeyPressed += new EventHandler<KeyPressedEventArgs>(HotKeyPressed);
+				ModifierKeys modifier = this.SettingsForm.HotKeysToJumpToDesktop();
+				var keys = new List<Keys>() { 
+					Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, 
+					Keys.NumPad1, Keys.NumPad2, Keys.NumPad3, Keys.NumPad4, Keys.NumPad5, Keys.NumPad6, Keys.NumPad7, Keys.NumPad8, Keys.NumPad9
+				};
+				foreach (var key in keys) {
+					this.KeyboardHooksJumpToDesktop.RegisterHotKey(modifier, key);
+				}
+			}
+		}
+
+		public void HotKeyPressed(object sender, KeyPressedEventArgs e) {
+			int? desktopNumber = null;
+			if (e.Key == Keys.D1 || e.Key == Keys.NumPad1) desktopNumber = 1;
+			else if (e.Key == Keys.D2 || e.Key == Keys.NumPad2) desktopNumber = 2;
+			else if (e.Key == Keys.D3 || e.Key == Keys.NumPad3) desktopNumber = 3;
+			else if (e.Key == Keys.D4 || e.Key == Keys.NumPad4) desktopNumber = 4;
+			else if (e.Key == Keys.D5 || e.Key == Keys.NumPad5) desktopNumber = 5;
+			else if (e.Key == Keys.D6 || e.Key == Keys.NumPad6) desktopNumber = 6;
+			else if (e.Key == Keys.D7 || e.Key == Keys.NumPad7) desktopNumber = 7;
+			else if (e.Key == Keys.D8 || e.Key == Keys.NumPad8) desktopNumber = 8;
+			else if (e.Key == Keys.D9 || e.Key == Keys.NumPad9) desktopNumber = 9;
+			if(desktopNumber != null) this.SwitchToDesktop(desktopNumber.Value - 1);
+		}
 
 		public void Exit() {
 			Application.Exit();
@@ -217,6 +256,15 @@ namespace WindowsVirtualDesktopHelper {
 			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
 			try {
 				App.Instance.VDAPI.SwitchForward();
+			} catch (Exception e) {
+				Util.OS.DesktopForwardBySimulatingShortcutKey();
+			}
+		}
+
+		public void SwitchToDesktop(int number) {
+			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
+			try {
+				App.Instance.VDAPI.SwitchToDesktop(number);
 			} catch (Exception e) {
 				Util.OS.DesktopForwardBySimulatingShortcutKey();
 			}

@@ -10,6 +10,8 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 
 		void SwitchBackward();
 
+		void SwitchToDesktop(int number);
+
 		string CurrentDisplayName();
 	}
 }
