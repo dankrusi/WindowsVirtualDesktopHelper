@@ -6,6 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
+        *** DO NOT SUBMIT A BUG REPORT IF YOU ARE NOT USING THE LATEST VERSION ***
         Thanks for taking the time to fill out this bug report!
         Before filing a GitHub issue, please make sure of the following:
           - You are using the latest version
