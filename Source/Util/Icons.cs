@@ -9,7 +9,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 
         private static ConcurrentDictionary<string, Bitmap> _cache = new ConcurrentDictionary<string,Bitmap>();
 
-        public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool useSymbolsFont) {
+        public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool largeScale) {
 
 
             // Init
@@ -29,9 +29,10 @@ namespace WindowsVirtualDesktopHelper.Util {
             }
             var automaticFontSizeFitTolerance = 0.2f;
             var offsetY = 0.0f;
-            var fontFamily = "Segoe UI";
-            if (useSymbolsFont) {
-                fontFamily = "Segoe UI Symbol";
+
+			bool useSymbolsFont = text.Length > 1;
+            var fontFamily = "Segoe UI" + (useSymbolsFont ? " Symbol" : "");
+            if (largeScale) {
                 textToRenderSizeRatio = 1.8f;
                 if (dpi > 96) textToRenderSizeRatio = 1.0f;
                 automaticFontSizeFitTolerance = 2.0f;
