@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows.Forms;
 using WindowsVirtualDesktopHelper.WindowsHotKeyAPI;
 
@@ -173,11 +174,9 @@ namespace WindowsVirtualDesktopHelper {
 			{
 				var nameToShow = name;
 				if (nameToShow == null) nameToShow = "";
-				//nameToShow = nameToShow.ToUpper();
-				if (nameToShow.Length > 1) nameToShow = nameToShow.Substring(0, 1);
+				if (nameToShow.Length > 1) nameToShow = new StringInfo(nameToShow).SubstringByTextElements(0, 1);
 
 				this.notifyIconName.Icon = Util.Icons.GenerateNotificationIcon(nameToShow, theme, this.DeviceDpi, false);
-				//this.notifyIconName.Text = name;
 			}
 		}
 

@@ -106,6 +106,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Util\Emoji.cs" />
     <Compile Include="Util\Icons.cs" />
     <Compile Include="Util\Logging.cs" />
     <Compile Include="Util\OS.cs" />

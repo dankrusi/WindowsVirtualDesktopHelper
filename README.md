@@ -58,8 +58,9 @@ You can just run the executable file WindowsVirtualDesktopHelper.exe to use Wind
 
 Many thanks for the original API work done by [MScholtes](https://github.com/MScholtes) and contributions by [Flaflo](https://github.com/Flaflo).
 
-Special thanks to the following contributors:
+Thanks to the following contributors:
  - [y2nd66](https://github.com/y2nd66)
+ - [SleepyBag](https://github.com/SleepyBag)
 
 
 ## Donate
