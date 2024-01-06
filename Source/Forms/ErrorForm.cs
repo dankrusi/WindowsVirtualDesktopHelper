@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
@@ -10,13 +11,17 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		public void UpdateUIForError(Exception e) {
+			
+			RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+			int buildNumber = Int32.Parse(registryKey.GetValue("UBR").ToString());
+
 			this.labelError.Text = e.Message;
 			this.textBoxDetails.Text = e.Message;
 			if (e.StackTrace != null) this.textBoxDetails.Text += "\r\n" + e.StackTrace.ToString();
 			if (e.InnerException != null) this.textBoxDetails.Text += "\r\n\r\n" + e.InnerException.Message;
 			if (e.InnerException != null && e.InnerException.StackTrace != null) this.textBoxDetails.Text += "\r\n" + e.InnerException.StackTrace.ToString();
 			this.textBoxDetails.Text += "\r\n";
-			this.textBoxDetails.Text += "\r\n" + "Windows Build: " + GetWindowsBuildVersion();
+			this.textBoxDetails.Text += "\r\n" + "Windows Build(.Number): " + GetWindowsBuildVersion() + '.' + buildNumber;
 			this.textBoxDetails.Text += "\r\n" + "Windows Release: " + GetWindowsReleaseId();
 			this.textBoxDetails.Text += "\r\n" + "Windows Product: " + GetWindowsProductName();
 			this.textBoxDetails.Text += "\r\n" + "Windows Version: " + GetWindowsDisplayVersion();
