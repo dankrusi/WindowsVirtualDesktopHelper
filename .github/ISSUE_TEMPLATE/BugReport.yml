@@ -13,6 +13,8 @@ body:
           - You are using the latest version
           - Your issue doesn't already exist
           - You are not using patched/modified versions of Windows
+
+          Please note that unreleased versions of Windows or Insider Builds are not officially supported!
   - type: textarea
     id: what-happened
     attributes:
