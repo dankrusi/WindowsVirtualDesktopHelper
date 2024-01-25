@@ -101,6 +101,9 @@ namespace WindowsVirtualDesktopHelper {
 			else if (this.radioButtonPositionBottomRight.Checked) return "bottomright";
 			else return "middlecenter";
 		}
+		public bool UseHotKeyToJumpToMostRecentDesktop() {
+			return this.checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+		}
 
 		private void LoadSettingsIntoUI() {
 			this.checkBoxShowPrevNextIcons.Checked = Properties.Settings.Default.ShowPrevNextIcons;
@@ -339,6 +342,15 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		private void radioButtonUseHotKeysToJumpToDesktopAltShift_CheckedChanged(object sender, EventArgs e) {
+			if (!IsLoading) App.Instance.SetupHotKeys();
+		}
+		
+		private void checkBoxUseHotKeyToJumpToMostRecentDesktop_CheckedChanged(object sender, EventArgs e) {
+			radioButtonUseHotKeysToJumpToDesktopAlt.Enabled = checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopAltShift.Enabled = checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Enabled = checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+
 			if (!IsLoading) App.Instance.SetupHotKeys();
 		}
 	}

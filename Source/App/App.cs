@@ -18,6 +18,9 @@ namespace WindowsVirtualDesktopHelper {
 		public string CurrentSystemThemeName = null;
 		public List<string> FGWindowHistory = new List<string>(); // needed to detect if Task View was open
 		KeyboardHook KeyboardHooksJumpToDesktop = null;
+		public uint MostRecentVDDisplayNumber = 0;
+		KeyboardHook KeyboardHooksJumpToMostRecentDesktop = null;
+
 
 		public static string DetectedVDImplementation = null;
 
@@ -112,6 +115,24 @@ namespace WindowsVirtualDesktopHelper {
 					this.KeyboardHooksJumpToDesktop.RegisterHotKey(modifier, key);
 				}
 			}
+
+			if(this.KeyboardHooksJumpToMostRecentDesktop != null) {
+				this.KeyboardHooksJumpToMostRecentDesktop.Dispose();
+				this.KeyboardHooksJumpToMostRecentDesktop = null;
+			}
+
+			if (this.SettingsForm.UseHotKeyToJumpToMostRecentDesktop()) {
+				this.KeyboardHooksJumpToMostRecentDesktop= new KeyboardHook();
+				this.KeyboardHooksJumpToMostRecentDesktop.KeyPressed += new EventHandler<KeyPressedEventArgs>(HotKeyPressed);
+				ModifierKeys modifier = this.SettingsForm.HotKeysToJumpToDesktop();
+				var keys = new List<Keys>() { 
+					Keys.D0, 
+					Keys.NumPad0
+				};
+				foreach (var key in keys) {
+					this.KeyboardHooksJumpToMostRecentDesktop.RegisterHotKey(modifier, key);
+				}
+			}
 		}
 
 		public void HotKeyPressed(object sender, KeyPressedEventArgs e) {
@@ -125,6 +146,7 @@ namespace WindowsVirtualDesktopHelper {
 			else if (e.Key == Keys.D7 || e.Key == Keys.NumPad7) desktopNumber = 7;
 			else if (e.Key == Keys.D8 || e.Key == Keys.NumPad8) desktopNumber = 8;
 			else if (e.Key == Keys.D9 || e.Key == Keys.NumPad9) desktopNumber = 9;
+			else if (e.Key == Keys.D0 || e.Key == Keys.NumPad0) desktopNumber = (int) this.MostRecentVDDisplayNumber + 1;
 			if(desktopNumber != null) this.SwitchToDesktop(desktopNumber.Value - 1);
 		}
 
@@ -166,6 +188,7 @@ namespace WindowsVirtualDesktopHelper {
 					if (newVDDisplayNumber != this.CurrentVDDisplayNumber) {
 						//Util.Logging.WriteLine("Switched to " + newVDDisplayName);
 						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
+						this.MostRecentVDDisplayNumber = this.CurrentVDDisplayNumber;
 						this.CurrentVDDisplayNumber = newVDDisplayNumber;
 						VDSwitched();
 					}
