@@ -321,10 +321,10 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		private void checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(object sender, EventArgs e) {
-			radioButtonUseHotKeysToJumpToDesktopAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
-			radioButtonUseHotKeysToJumpToDesktopAltShift.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
-			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
-			radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked || checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopAltShift.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked || checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked || checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked || checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
 
 			if(!IsLoading) App.Instance.SetupHotKeys();
 		}
@@ -346,10 +346,10 @@ namespace WindowsVirtualDesktopHelper {
 		}
 		
 		private void checkBoxUseHotKeyToJumpToMostRecentDesktop_CheckedChanged(object sender, EventArgs e) {
-			radioButtonUseHotKeysToJumpToDesktopAlt.Enabled = checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
-			radioButtonUseHotKeysToJumpToDesktopAltShift.Enabled = checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
-			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
-			radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Enabled = checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked || checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopAltShift.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked || checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked || checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
+			radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked || checkBoxUseHotKeyToJumpToMostRecentDesktop.Checked;
 
 			if (!IsLoading) App.Instance.SetupHotKeys();
 		}
