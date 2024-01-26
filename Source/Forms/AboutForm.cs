@@ -30,5 +30,10 @@ namespace WindowsVirtualDesktopHelper {
 		private void linkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
 			App.Instance.OpenEmailContact();
 		}
+
+		private void linkLabel4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
+			var logForm = new Forms.LogForm();
+			logForm.Show();
+		}
 	}
 }

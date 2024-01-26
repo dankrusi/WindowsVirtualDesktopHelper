@@ -136,3 +136,20 @@ the software as okay/safe, this malware warning will go away. With USD 70 donati
 ### Why is the app based on the older .NET 4.7?
 
 The idea is to make the app as easy and lightweight to run as possible. Most systems have some version of .NET installed, thus we use a low version to cover as many users as possible. 
+
+## How it works
+
+This program works by using some unofficial/undocumented Windows APIs which Windows uses internally to manage the desktop.
+The unofficial nature of these APIs is very unfortunate, because it means that each time Windows 11 makes an update, we have
+to reverse engineer the APIs and their undocumented COM CLSIDs - which is tedius and wastes a lot of time.
+
+This is why the maintainers are reluctant to add too many other features, because its enough of a task to keep
+up with all the Windows updates for the basic features.
+
+### The Hunt for CLSIDs
+
+TODO
+
+### Your help is wanted!
+
+TODO

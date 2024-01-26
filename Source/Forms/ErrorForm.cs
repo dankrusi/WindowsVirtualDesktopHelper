@@ -16,9 +16,9 @@ namespace WindowsVirtualDesktopHelper {
 			if (e.InnerException != null) this.textBoxDetails.Text += "\r\n\r\n" + e.InnerException.Message;
 			if (e.InnerException != null && e.InnerException.StackTrace != null) this.textBoxDetails.Text += "\r\n" + e.InnerException.StackTrace.ToString();
 			this.textBoxDetails.Text += "\r\n";
-			this.textBoxDetails.Text += "\r\n" + "Windows Build: " + GetWindowsBuildVersion();
-			this.textBoxDetails.Text += "\r\n" + "Windows Release: " + GetWindowsReleaseId();
-			this.textBoxDetails.Text += "\r\n" + "Windows Product: " + GetWindowsProductName();
+			this.textBoxDetails.Text += "\r\n" + "Windows Build: " + GetWindowsBuildVersion() + "."+ GetWindowsBuildRevision();
+			//this.textBoxDetails.Text += "\r\n" + "Windows Release: " + GetWindowsReleaseId();
+			//this.textBoxDetails.Text += "\r\n" + "Windows Product: " + GetWindowsProductName();
 			this.textBoxDetails.Text += "\r\n" + "Windows Version: " + GetWindowsDisplayVersion();
 			this.textBoxDetails.Text += "\r\n" + "Windows Virtual Desktop Helper Version: " + GetAppBuildVersion();
 			this.textBoxDetails.Text += "\r\n" + "Virtual Desktop Implementation: " + App.DetectedVDImplementation;
@@ -31,15 +31,23 @@ namespace WindowsVirtualDesktopHelper {
 			try {
 				return Assembly.GetExecutingAssembly().GetName().Version.ToString();
 			} catch (Exception e) {
-				return "Error getting build version: " + e.Message;
+				return "Error getting app version: " + e.Message;
 			}
 		}
 
 		private string GetWindowsBuildVersion() {
 			try {
 				return Util.OS.GetWindowsBuildVersion().ToString();
-			} catch (Exception e) {
+			} catch(Exception e) {
 				return "Error getting build version: " + e.Message;
+			}
+		}
+
+		private string GetWindowsBuildRevision() {
+			try {
+				return Util.OS.GetWindowsBuildRevision().ToString();
+			} catch(Exception e) {
+				return "Error getting build revision: " + e.Message;
 			}
 		}
 
@@ -55,7 +63,7 @@ namespace WindowsVirtualDesktopHelper {
 			try {
 				return Util.OS.GetWindowsDisplayVersion();
 			} catch (Exception e) {
-				return "Error getting build version: " + e.Message;
+				return "Error getting display version: " + e.Message;
 			}
 		}
 
@@ -63,7 +71,7 @@ namespace WindowsVirtualDesktopHelper {
 			try {
 				return Util.OS.GetWindowsReleaseId().ToString();
 			} catch (Exception e) {
-				return "Error getting build version: " + e.Message;
+				return "Error getting release id: " + e.Message;
 			}
 		}
 
