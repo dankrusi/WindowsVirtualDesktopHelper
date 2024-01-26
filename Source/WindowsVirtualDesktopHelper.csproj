@@ -116,10 +116,11 @@
     <Compile Include="Util\Icons.cs" />
     <Compile Include="Util\Logging.cs" />
     <Compile Include="Util\OS.cs" />
-    <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin10.cs" />
+    <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin10.cs" />    
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_Insider25314.cs" />
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_Insider22631.cs" />
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_Insider.cs" />
+    <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_23H2_2921.cs" />
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_23H2.cs" />
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_22H2.cs" />
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_21H2.cs" />

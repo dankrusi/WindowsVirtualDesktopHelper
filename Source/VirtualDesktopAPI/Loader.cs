@@ -5,7 +5,8 @@ using System.Collections.Generic;
 namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 	public class Loader {
 
-        public const string VirtualDesktopWin11_23H2 = "VirtualDesktopWin11_23H2";
+		public const string VirtualDesktopWin11_23H2_2921 = "VirtualDesktopWin11_23H2_2921";
+		public const string VirtualDesktopWin11_23H2 = "VirtualDesktopWin11_23H2";
 		public const string VirtualDesktopWin11_22H2 = "VirtualDesktopWin11_22H2";
 		public const string VirtualDesktopWin11_21H2 = "VirtualDesktopWin11_21H2";
 		public const string VirtualDesktopWin11_Insider = "VirtualDesktopWin11_Insider";
@@ -39,9 +40,10 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 				Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 Insider Canary 22631 due to build >= 22631");
 				return VirtualDesktopWin11_Insider22631;
 			} else if (currentBuild >= 22621) {
-				RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
-				int buildNumber = Int32.Parse(registryKey.GetValue("UBR").ToString());
-				if (buildNumber >= 2050) {
+				if (currentBuildRevision >= 2921 && currentBuildRevision < 3007 ) {
+					Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 23H2 due to build >= 22621.2921 & < 22621.3007");
+					return VirtualDesktopWin11_23H2_2921;
+				} else if (currentBuildRevision >= 2050) {
 					Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 23H2 due to build >= 22621.2050");
 					return VirtualDesktopWin11_23H2;
 				} else {
@@ -66,7 +68,8 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 			if (!implementationsToTry.Contains(VirtualDesktopWin11_Insider25314)) implementationsToTry.Add(VirtualDesktopWin11_Insider25314);
 			if (!implementationsToTry.Contains(VirtualDesktopWin11_Insider22631)) implementationsToTry.Add(VirtualDesktopWin11_Insider22631);
 			if (!implementationsToTry.Contains(VirtualDesktopWin11_Insider)) implementationsToTry.Add(VirtualDesktopWin11_Insider);
-            if (!implementationsToTry.Contains(VirtualDesktopWin11_23H2)) implementationsToTry.Add(VirtualDesktopWin11_23H2);
+			if (!implementationsToTry.Contains(VirtualDesktopWin11_23H2_2921)) implementationsToTry.Add(VirtualDesktopWin11_23H2_2921);
+			if (!implementationsToTry.Contains(VirtualDesktopWin11_23H2)) implementationsToTry.Add(VirtualDesktopWin11_23H2);
 			if (!implementationsToTry.Contains(VirtualDesktopWin11_22H2)) implementationsToTry.Add(VirtualDesktopWin11_22H2);
 			if (!implementationsToTry.Contains(VirtualDesktopWin11_21H2)) implementationsToTry.Add(VirtualDesktopWin11_21H2);
 			if (!implementationsToTry.Contains(VirtualDesktopWin10)) implementationsToTry.Add(VirtualDesktopWin10);
@@ -88,7 +91,14 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 		public static IVirtualDesktopManager LoadImplementation(string name) {
 			Util.Logging.WriteLine("LoadImplementation: Loading VDImplementation: " + name + "...");
 			IVirtualDesktopManager impl = null;
-			if (name == VirtualDesktopWin11_23H2) {                         
+			if (name == VirtualDesktopWin11_23H2_2921) {
+				try {
+					impl = new VirtualDesktopAPI.Implementation.VirtualDesktopWin11_23H2_2921();
+					impl.Current();
+				} catch (Exception e) {
+					throw new Exception("LoadImplementation: could not load VirtualDesktop API implementation " + name + ": " + e.Message, e);
+				}
+			} else if (name == VirtualDesktopWin11_23H2) {                         
 				try {
 					impl = new VirtualDesktopAPI.Implementation.VirtualDesktopWin11_23H2();
 					impl.Current();
