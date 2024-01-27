@@ -2,7 +2,36 @@
 // Contributors: Dan Krusi (https://github.com/dankrusi), MScholtes (https://github.com/MScholtes), Flaflo (https://github.com/Flaflo)
 // License: MIT License (https://github.com/zgdump/windows-virtualdesktopindicator/blob/main/LICENSE)
 
-// Version for Windows 11 Insider Canary Build 25314 and up
+// Version for Windows 11 Insider Canary Build 22631 and up
+// https://github.com/slnz00/VirtualDesktopDumper/blob/master/dumps/Win11-23H2-22631.3085.txt
+// https://blogs.windows.com/windows-insider/2023/11/16/releasing-windows-11-builds-22621-2787-and-22631-2787-to-the-release-preview-channel/
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// DOES NOT WORK YET (but VirtualDesktopWin11_23H2_2921 seems to work on 22631.3085 !?!)
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 using System;
 using System.Collections.Generic;
@@ -15,7 +44,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
 
 
-	public class VirtualDesktopWin11_InsiderCanary : IVirtualDesktopManager {
+	public class VirtualDesktopWin11_Insider22631 : IVirtualDesktopManager {
 
 		#region API
 
@@ -48,9 +77,6 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
 		public void SwitchToDesktop(int number) {
 			var desktop = DesktopManager.GetDesktop(number);
-
-			if (desktop == null) return;
-
 			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(desktop);
 
 		}
@@ -73,9 +99,9 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 		#region COM API
 		internal static class Guids {
 			public static readonly Guid CLSID_ImmersiveShell = new Guid("C2F03A33-21F5-47FA-B4BB-156362A2F239");
-			public static readonly Guid CLSID_VirtualDesktopManagerInternal = new Guid("C5E0CDCA-7B6E-41B2-9FC4-D93975CC467B");
-			public static readonly Guid CLSID_VirtualDesktopManager = new Guid("AA509086-5CA9-4C25-8F95-589D3C07B48A");
-			public static readonly Guid CLSID_VirtualDesktopPinnedApps = new Guid("B5A399E7-1C87-46B8-88E9-FC5747B171BD");
+			public static readonly Guid CLSID_VirtualDesktopManagerInternal = new Guid("53F5CA0B-158F-4124-900C-057158060B27");
+			public static readonly Guid CLSID_VirtualDesktopManager = new Guid("A5CD92FF-29BE-454C-8D04-D82879FB3F1B");
+			public static readonly Guid CLSID_VirtualDesktopPinnedApps = new Guid("4CE81583-1E4C-4632-A621-07A53543148F");
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
@@ -196,7 +222,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
 		[ComImport]
 		[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-		[Guid("A3175F2D-239C-4BD2-8AA0-EEBA8B0B138E")]
+		[Guid("53F5CA0B-158F-4124-900C-057158060B27")]
 		internal interface IVirtualDesktopManagerInternal {
 			int GetCount();
 			void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);

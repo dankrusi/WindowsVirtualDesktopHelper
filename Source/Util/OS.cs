@@ -68,6 +68,13 @@ namespace WindowsVirtualDesktopHelper.Util {
 			return currentBuild;
 		}
 
+		// Revision
+		public static int GetWindowsBuildRevision() {
+			var reg = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+			var currentRevision = (int)reg.GetValue("UBR");
+			return currentRevision;
+		}
+
 		public static string GetWindowsProductName() {
 			var reg = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
 			var retStr = (string)reg.GetValue("ProductName");

@@ -38,32 +38,32 @@ namespace WindowsVirtualDesktopHelper {
             this.labelError.Location = new System.Drawing.Point(22, 17);
             this.labelError.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.labelError.Name = "labelError";
-            this.labelError.Size = new System.Drawing.Size(968, 87);
+            this.labelError.Size = new System.Drawing.Size(968, 157);
             this.labelError.TabIndex = 0;
             // 
             // textBoxDetails
             // 
-            this.textBoxDetails.Location = new System.Drawing.Point(28, 172);
-            this.textBoxDetails.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBoxDetails.Location = new System.Drawing.Point(28, 222);
+            this.textBoxDetails.Margin = new System.Windows.Forms.Padding(6);
             this.textBoxDetails.Multiline = true;
             this.textBoxDetails.Name = "textBoxDetails";
             this.textBoxDetails.ReadOnly = true;
-            this.textBoxDetails.Size = new System.Drawing.Size(959, 466);
+            this.textBoxDetails.Size = new System.Drawing.Size(959, 416);
             this.textBoxDetails.TabIndex = 1;
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(22, 127);
+            this.label2.Location = new System.Drawing.Point(23, 189);
             this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(968, 39);
+            this.label2.Size = new System.Drawing.Size(968, 25);
             this.label2.TabIndex = 2;
             this.label2.Text = "Error Details";
             // 
             // buttonExit
             // 
             this.buttonExit.Location = new System.Drawing.Point(853, 652);
-            this.buttonExit.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.buttonExit.Margin = new System.Windows.Forms.Padding(6);
             this.buttonExit.Name = "buttonExit";
             this.buttonExit.Size = new System.Drawing.Size(138, 42);
             this.buttonExit.TabIndex = 3;
@@ -74,7 +74,7 @@ namespace WindowsVirtualDesktopHelper {
             // buttonOpenIssue
             // 
             this.buttonOpenIssue.Location = new System.Drawing.Point(585, 652);
-            this.buttonOpenIssue.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.buttonOpenIssue.Margin = new System.Windows.Forms.Padding(6);
             this.buttonOpenIssue.Name = "buttonOpenIssue";
             this.buttonOpenIssue.Size = new System.Drawing.Size(257, 42);
             this.buttonOpenIssue.TabIndex = 4;
@@ -105,10 +105,11 @@ namespace WindowsVirtualDesktopHelper {
             this.Controls.Add(this.textBoxDetails);
             this.Controls.Add(this.labelError);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ErrorForm";
+            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Error";
             this.ResumeLayout(false);
