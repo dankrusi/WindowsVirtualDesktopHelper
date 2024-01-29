@@ -1,0 +1,47 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ** DO NOT SUBMIT A BUG REPORT IF YOU ARE NOT USING THE LATEST VERSION **
+        
+        Thanks for taking the time to fill out this bug report!
+        Before filing a GitHub issue, please make sure of the following:
+          - You are using the latest version
+          - Your issue doesn't already exist
+          - You are not using patched/modified versions of Windows
+          - Please note that unreleased versions of Windows or Insider Builds are not officially supported as their APIs are changing too fast!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: "What happened?"
+      description: "Also tell us, what did you expect to happen?"
+      placeholder:  
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "WVDH Version"
+      description: "What version of our software are you running?"
+      placeholder: 
+    validations:
+      required: true
+  - type: input
+    id: windowsversion
+    attributes:
+      label: "Windows Version"
+      description: "What exact version of windows are you running? (be specific, for example Windows 11 22H2 build 22621.3085)"
+      placeholder:
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  
