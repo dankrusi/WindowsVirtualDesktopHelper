@@ -35,7 +35,7 @@ body:
     attributes:
       label: "Windows Version"
       description: "What exact version of windows are you running? (be specific, for example Windows 11 22H2 build 22621.3085)"
-      placeholder: ""
+      placeholder:
     validations:
       required: true
   - type: textarea
