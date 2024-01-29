@@ -135,7 +135,7 @@ namespace WindowsVirtualDesktopHelper {
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(721, 347);
+            this.ClientSize = new System.Drawing.Size(735, 357);
             this.Controls.Add(this.linkLabel4);
             this.Controls.Add(this.linkLabel3);
             this.Controls.Add(this.label4);
@@ -145,7 +145,7 @@ namespace WindowsVirtualDesktopHelper {
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AboutForm";
