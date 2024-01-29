@@ -11,8 +11,10 @@
 * Configurable
 * Free
 
-## Changes
+## Fixes
+* Support Windows 11 22621
 
+## Changes
 * Support for Emojis on Windows 11 (Windows 10 it is not possible)
 
 
@@ -30,7 +32,6 @@
 * Free
 
 ## Changes
-
 * Windows 11 Insider Canary initial support
 * Show notification on all monitors
 

@@ -1,27 +1,20 @@
-name: Bug Report
-description: File a bug report
-title: "[Bug]: "
-labels: ["bug"]
+name: Windows Compatibility
+description: File a compatibility report if your version of Windows does not work with WVDH
+title: "[Compatibility]: Windows ## ##H# #####.##"
+labels: ["windows compatibility"]
 body:
   - type: markdown
     attributes:
       value: |
-        ** DO NOT SUBMIT A BUG REPORT IF YOU ARE NOT USING THE LATEST VERSION **
+        ** DO NOT SUBMIT A COMPATIBILITY REPORT IF YOU ARE NOT USING THE LATEST VERSION **
         
         Thanks for taking the time to fill out this bug report!
         Before filing a GitHub issue, please make sure of the following:
           - You are using the latest version
           - Your issue doesn't already exist
           - You are not using patched/modified versions of Windows
+          - Include your exact Windows version in the title of this report (for example, Windows 11 22H2 build 22621.3085)
           - Please note that unreleased versions of Windows or Insider Builds are not officially supported as their APIs are changing too fast!
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: "What happened?"
-      description: "Also tell us, what did you expect to happen?"
-      placeholder:  
-    validations:
-      required: true
   - type: input
     id: version
     attributes:

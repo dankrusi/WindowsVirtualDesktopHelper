@@ -29,23 +29,28 @@ namespace WindowsVirtualDesktopHelper.Forms {
             // 
             // textBoxLog
             // 
-            this.textBoxLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxLog.Location = new System.Drawing.Point(12, 12);
+            this.textBoxLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxLog.Location = new System.Drawing.Point(0, 0);
             this.textBoxLog.Multiline = true;
             this.textBoxLog.Name = "textBoxLog";
-            this.textBoxLog.Size = new System.Drawing.Size(1107, 788);
+            this.textBoxLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBoxLog.Size = new System.Drawing.Size(1228, 884);
             this.textBoxLog.TabIndex = 0;
+            this.textBoxLog.WordWrap = false;
             // 
             // LogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1131, 812);
+            this.ClientSize = new System.Drawing.Size(1228, 884);
             this.Controls.Add(this.textBoxLog);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "LogForm";
             this.ShowIcon = false;
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Log";
             this.ResumeLayout(false);
             this.PerformLayout();
