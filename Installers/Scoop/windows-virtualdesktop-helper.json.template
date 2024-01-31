@@ -1,6 +1,4 @@
 {
-    "## Comment 1": "https://github.com/ScoopInstaller/Scoop/wiki/App-Manifests",
-    "## Comment 2": "https://github.com/ScoopInstaller/Scoop/wiki/Creating-an-app-manifest",
     "version": "{version}",
     "description": "Simple and lightweight app to help with Virtual Desktops for Windows 10 and Windows 11.",
     "homepage": "https://github.com/dankrusi/WindowsVirtualDesktopHelper",
@@ -10,5 +8,22 @@
             "url": "{zip-url}",
             "hash": "{zip-hash}"
         }
-    }
+    },
+    "shortcuts": [
+        [
+            "WindowsVirtualDesktopHelper.exe",
+            "Windows Virtual Desktop Helper"
+        ]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v$version/WindowsVirtualDesktopHelper.Executable.v$version.zip",
+        "hash": {
+            "url": "https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v$version/WindowsVirtualDesktopHelper.Executable.v$version.zip.sha256"
+        }
+    },
+    "## Internal Comment 1": "https://github.com/ScoopInstaller/Scoop/wiki/App-Manifests",
+    "## Internal Comment 2": "https://github.com/ScoopInstaller/Scoop/wiki/Creating-an-app-manifest",
+    "## Internal Comment 3": "https://github.com/ScoopInstaller/Extras",
+    "## Internal Comment 4": "https://github.com/ScoopInstaller/Scoop/wiki/App-Manifest-Autoupdate"
 }

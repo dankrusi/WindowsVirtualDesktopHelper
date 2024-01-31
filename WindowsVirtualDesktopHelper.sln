@@ -20,6 +20,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CCD7
 		Scripts\create-version.ps1 = Scripts\create-version.ps1
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installers", "Installers", "{9FEB8DAE-5E39-495E-9BF9-5C0733033FE1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scoop", "Scoop", "{DE7ABE25-05E4-4A6B-BA08-A995FC608737}"
+	ProjectSection(SolutionItems) = preProject
+		Installers\Scoop\windows-virtualdesktop-helper.json = Installers\Scoop\windows-virtualdesktop-helper.json
+		Installers\Scoop\windows-virtualdesktop-helper.json.template = Installers\Scoop\windows-virtualdesktop-helper.json.template
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +47,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CCD7DB49-839B-4BD0-B28B-30B7F8A8F355} = {8D5AC9C5-CA17-450A-B63E-66BFF5261906}
+		{9FEB8DAE-5E39-495E-9BF9-5C0733033FE1} = {8D5AC9C5-CA17-450A-B63E-66BFF5261906}
+		{DE7ABE25-05E4-4A6B-BA08-A995FC608737} = {9FEB8DAE-5E39-495E-9BF9-5C0733033FE1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4501F245-0997-4EFA-9053-549FD6135156}

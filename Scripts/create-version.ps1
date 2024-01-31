@@ -57,9 +57,10 @@ $README_PATH = "..\README.md"
 $CHANGELOG_PATH = "..\CHANGELOG.md"
 $EXE_DEST_PATH = $RELEASE_FOLDER + "\WindowsVirtualDesktopHelper Executable v"+$VERSION+".zip"
 Compress-Archive -Force -Path $EXE_PATH, $CONFIG_PATH, $LICENSE_PATH, $README_PATH, $CHANGELOG_PATH -DestinationPath $EXE_DEST_PATH
-# Calculate the SHA-256 hash for the file and store it in a variable
 $EXE_DEST_PATH_HASH = (Get-FileHash -Algorithm SHA256 -Path $EXE_DEST_PATH).Hash
+$EXE_DEST_PATH_HASH | Set-Content -NoNewline -Force -Path ($EXE_DEST_PATH + ".sha256")
 $EXE_DEST_URL = "https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v"+$VERSION+"/WindowsVirtualDesktopHelper.Executable.v"+$VERSION+".zip"
+
 
 # Copy Setup
 echo "================================================================"
@@ -67,8 +68,10 @@ echo "= Copying setup to releases..."
 echo "================================================================"
 $SETUP_PATH = "..\Setup\Release\WindowsVirtualDesktopHelper Setup.msi"
 $SETUP_DEST_PATH_RELEASES = $RELEASE_FOLDER + "\WindowsVirtualDesktopHelper Setup v"+$VERSION+".msi"
-#$SETUP_DEST_PATH_WINDOWSSTORE = "..\Releases\WindowsStore\WindowsVirtualDesktopHelper.Setup.msi"
 Copy-Item -Force -Path $SETUP_PATH -Destination $SETUP_DEST_PATH_RELEASES
+$SETUP_DEST_PATH_RELEASES_HASH = (Get-FileHash -Algorithm SHA256 -Path $SETUP_DEST_PATH_RELEASES).Hash
+$SETUP_DEST_PATH_RELEASES_HASH | Set-Content -NoNewline -Force -Path ($SETUP_DEST_PATH_RELEASES + ".sha256")
+#$SETUP_DEST_PATH_WINDOWSSTORE = "..\Releases\WindowsStore\WindowsVirtualDesktopHelper.Setup.msi"
 #Copy-Item -Force -Path $SETUP_PATH -Destination $SETUP_DEST_PATH_WINDOWSSTORE
 
 # Scoop
@@ -79,7 +82,7 @@ $SCOOP_MANIFEST_TEMPLATE = "..\Installers\Scoop\windows-virtualdesktop-helper.js
 $SCOOP_MANIFEST_DEST = "..\Installers\Scoop\windows-virtualdesktop-helper.json"
 $SCOOP_MANIFEST = Get-Content -Path $SCOOP_MANIFEST_TEMPLATE
 $SCOOP_MANIFEST = $SCOOP_MANIFEST -replace '{version}', $VERSION -replace '{zip-url}', $EXE_DEST_URL -replace '{zip-hash}', $EXE_DEST_PATH_HASH
-$SCOOP_MANIFEST | Set-Content -Path $SCOOP_MANIFEST_DEST
+$SCOOP_MANIFEST | Set-Content -Force -Path $SCOOP_MANIFEST_DEST
 
 echo "================================================================"
 echo "= Done!"
