@@ -53,6 +53,15 @@ You can just run the executable file WindowsVirtualDesktopHelper.exe to use Wind
 
 [Download WindowsVirtualDesktopHelper Executable v1.16.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.16/WindowsVirtualDesktopHelper.Executable.v1.16.zip)
 
+### Scoop
+
+A command-line installer for Windows
+
+[https://scoop.sh/](https://scoop.sh/)
+
+```scoop bucket add extras```
+
+```scoop install windows-virtualdesktop-helper```
 
 ## Thanks
 
