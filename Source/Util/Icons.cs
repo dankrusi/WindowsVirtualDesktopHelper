@@ -1,15 +1,14 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing;
+using System.Globalization;
 
 namespace WindowsVirtualDesktopHelper.Util {
 
     class Icons {
 
-        //private static Font _font = new Font("Segoe UI", 12.0f, FontStyle.Bold);
-
         private static ConcurrentDictionary<string, Bitmap> _cache = new ConcurrentDictionary<string,Bitmap>();
 
-        public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool useSymbolsFont) {
+        public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol) {
 
 
             // Init
@@ -19,18 +18,20 @@ namespace WindowsVirtualDesktopHelper.Util {
             var textStyle = FontStyle.Bold;
             var textToRender = text;
             if (textToRender == null) textToRender = ""; // sanity
-            if (textToRender.Length > 2) textToRender = textToRender.Substring(0, 2);
-            var textToRenderSizeRatio = 1.0f;
-            if (textToRender.Length == 1) textToRenderSizeRatio = 0.9f;
-            if (textToRender.Length == 2) textToRenderSizeRatio = 0.5f;
-            if (textToRender.Length == 2) {
+			var textToRenderInfo = new StringInfo(textToRender);
+			if (textToRenderInfo.LengthInTextElements > 2) textToRender = new StringInfo(textToRender).SubstringByTextElements(0, 2);
+			var textToRenderSizeRatio = 1.0f;
+            if (textToRenderInfo.LengthInTextElements == 1) textToRenderSizeRatio = 0.9f;
+            if (textToRenderInfo.LengthInTextElements == 2) textToRenderSizeRatio = 0.5f;
+            if (textToRenderInfo.LengthInTextElements == 2) {
                 textToRenderSizeRatio = 0.75f;
                 textStyle = FontStyle.Regular;
             }
             var automaticFontSizeFitTolerance = 0.2f;
             var offsetY = 0.0f;
             var fontFamily = "Segoe UI";
-            if (useSymbolsFont) {
+			if(Util.Emoji.HasEmoji(textToRender)) fontFamily = "Segoe UI Symbol";
+			if (drawAsSymbol) {
                 fontFamily = "Segoe UI Symbol";
                 textToRenderSizeRatio = 1.8f;
                 if (dpi > 96) textToRenderSizeRatio = 1.0f;
@@ -118,7 +119,7 @@ namespace WindowsVirtualDesktopHelper.Util {
             _cache[cacheKey] = bitmapScaledDown;
 
             // Debug display
-            if (true && textToRender == "11"){
+            if (false && textToRender == "11"){
                 var form = new System.Windows.Forms.Form();
                 form.Width = size;
                 form.Height = size+30;

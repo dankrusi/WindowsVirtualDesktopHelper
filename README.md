@@ -4,8 +4,8 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v1.15 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.15/WindowsVirtualDesktopHelper.Setup.v1.15.msi) | 
-[Download v1.15 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.15/WindowsVirtualDesktopHelper.Executable.v1.15.zip)
+[Download v1.16 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.16/WindowsVirtualDesktopHelper.Setup.v1.16.msi) | 
+[Download v1.16 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.16/WindowsVirtualDesktopHelper.Executable.v1.16.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
@@ -41,7 +41,7 @@ Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7 or higher 
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v1.15.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.15/WindowsVirtualDesktopHelper.Setup.v1.15.msi)
+[Download WindowsVirtualDesktopHelper Setup v1.16.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.16/WindowsVirtualDesktopHelper.Setup.v1.16.msi)
 
 Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
@@ -51,15 +51,16 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
-[Download WindowsVirtualDesktopHelper Executable v1.15.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.15/WindowsVirtualDesktopHelper.Executable.v1.15.zip)
+[Download WindowsVirtualDesktopHelper Executable v1.16.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.16/WindowsVirtualDesktopHelper.Executable.v1.16.zip)
 
 
 ## Thanks
 
 Many thanks for the original API work done by [MScholtes](https://github.com/MScholtes) and contributions by [Flaflo](https://github.com/Flaflo).
 
-Special thanks to the following contributors:
+Thanks to the following contributors:
  - [y2nd66](https://github.com/y2nd66)
+ - [SleepyBag](https://github.com/SleepyBag)
 
 
 ## Donate
@@ -135,3 +136,20 @@ the software as okay/safe, this malware warning will go away. With USD 70 donati
 ### Why is the app based on the older .NET 4.7?
 
 The idea is to make the app as easy and lightweight to run as possible. Most systems have some version of .NET installed, thus we use a low version to cover as many users as possible. 
+
+## How it works
+
+This program works by using some unofficial/undocumented Windows APIs which Windows uses internally to manage the desktop.
+The unofficial nature of these APIs is very unfortunate, because it means that each time Windows 11 makes an update, we have
+to reverse engineer the APIs and their undocumented COM CLSIDs - which is tedius and wastes a lot of time.
+
+This is why the maintainers are reluctant to add too many other features, because its enough of a task to keep
+up with all the Windows updates for the basic features.
+
+### The Hunt for CLSIDs
+
+TODO
+
+### Your help is wanted!
+
+TODO

@@ -86,5 +86,6 @@ echo "= Done!"
 echo "================================================================"
 
 
-$null = Read-Host "Press enter to open release at GitHub..."
+$null = Read-Host "Press enter to open release folder and create a release at GitHub..."
+Start-Process $RELEASE_FOLDER
 Start-Process "https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/new"

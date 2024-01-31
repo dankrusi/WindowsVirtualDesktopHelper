@@ -49,6 +49,9 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
 		public void SwitchToDesktop(int number) {
 			var desktop = DesktopManager.GetDesktopAtIndex(number);
+
+			if (desktop == null) return;
+
 			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(IntPtr.Zero, desktop);
 		}
 
