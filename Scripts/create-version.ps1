@@ -57,6 +57,9 @@ $README_PATH = "..\README.md"
 $CHANGELOG_PATH = "..\CHANGELOG.md"
 $EXE_DEST_PATH = $RELEASE_FOLDER + "\WindowsVirtualDesktopHelper Executable v"+$VERSION+".zip"
 Compress-Archive -Force -Path $EXE_PATH, $CONFIG_PATH, $LICENSE_PATH, $README_PATH, $CHANGELOG_PATH -DestinationPath $EXE_DEST_PATH
+# Calculate the SHA-256 hash for the file and store it in a variable
+$EXE_DEST_PATH_HASH = (Get-FileHash -Algorithm SHA256 -Path $EXE_DEST_PATH).Hash
+$EXE_DEST_URL = "https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v"+$VERSION+"/WindowsVirtualDesktopHelper.Executable.v"+$VERSION+".zip"
 
 # Copy Setup
 echo "================================================================"
@@ -68,6 +71,15 @@ $SETUP_DEST_PATH_RELEASES = $RELEASE_FOLDER + "\WindowsVirtualDesktopHelper Setu
 Copy-Item -Force -Path $SETUP_PATH -Destination $SETUP_DEST_PATH_RELEASES
 #Copy-Item -Force -Path $SETUP_PATH -Destination $SETUP_DEST_PATH_WINDOWSSTORE
 
+# Scoop
+echo "================================================================"
+echo "= Creating Scoop Manifest "
+echo "================================================================"
+$SCOOP_MANIFEST_TEMPLATE = "..\Installers\Scoop\windows-virtualdesktop-helper.json.template"
+$SCOOP_MANIFEST_DEST = "..\Installers\Scoop\windows-virtualdesktop-helper.json"
+$SCOOP_MANIFEST = Get-Content -Path $SCOOP_MANIFEST_TEMPLATE
+$SCOOP_MANIFEST = $SCOOP_MANIFEST -replace '{version}', $VERSION -replace '{zip-url}', $EXE_DEST_URL -replace '{zip-hash}', $EXE_DEST_PATH_HASH
+$SCOOP_MANIFEST | Set-Content -Path $SCOOP_MANIFEST_DEST
 
 echo "================================================================"
 echo "= Done!"

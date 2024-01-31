@@ -1,0 +1,14 @@
+{
+    "## Comment 1": "https://github.com/ScoopInstaller/Scoop/wiki/App-Manifests",
+    "## Comment 2": "https://github.com/ScoopInstaller/Scoop/wiki/Creating-an-app-manifest",
+    "version": "{version}",
+    "description": "Simple and lightweight app to help with Virtual Desktops for Windows 10 and Windows 11.",
+    "homepage": "https://github.com/dankrusi/WindowsVirtualDesktopHelper",
+    "license": "AGPL-3.0-only",
+    "architecture": {
+        "64bit": {
+            "url": "{zip-url}",
+            "hash": "{zip-hash}"
+        }
+    }
+}
