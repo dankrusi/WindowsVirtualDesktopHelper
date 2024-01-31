@@ -33,6 +33,7 @@ namespace WindowsVirtualDesktopHelper {
 
 				Properties.Settings.Default.Upgrade();
 				Properties.Settings.Default.Save();
+				Properties.Settings.Default.Reload();
 			}
 
 			// Test global error form:

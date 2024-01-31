@@ -161,6 +161,7 @@ namespace WindowsVirtualDesktopHelper {
 			// Save user settings
 			// https://learn.microsoft.com/en-us/dotnet/desktop/winforms/advanced/how-to-write-user-settings-at-run-time-with-csharp?view=netframeworkdesktop-4.8
 			Properties.Settings.Default.Save();
+			Properties.Settings.Default.Reload();
 		}
 
 		public void UpdateIconForVDDisplayNumber(string theme, uint number, string name) {
