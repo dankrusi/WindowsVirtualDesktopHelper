@@ -166,5 +166,29 @@ namespace WindowsVirtualDesktopHelper.Properties {
                 this["HotKeysToJumpToDesktop"] = value;
             }
         }
+
+		[global::System.Configuration.UserScopedSettingAttribute()]
+		[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+		[global::System.Configuration.DefaultSettingValueAttribute("False")]
+		public bool UseHotKeyToJumpToMostRecentDesktop {
+			get {
+				return ((bool)(this["UseHotKeyToJumpToMostRecentDesktop"]));
+			}
+			set {
+				this["UseHotKeyToJumpToMostRecentDesktop"] = value;
+			}
+		}
+
+		[global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Alt")]
+        public string HotKeysToJumpToMostRecentDesktop {
+            get {
+                return ((string)(this["HotKeysToJumpToMostRecentDesktop"]));
+            }
+            set {
+                this["HotKeysToJumpToMostRecentDesktop"] = value;
+            }
+        }
     }
 }
