@@ -43,7 +43,7 @@ namespace WindowsVirtualDesktopHelper {
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(448, 38);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Windows Virtual Destkop Helper";
+            this.label1.Text = "Windows Virtual Desktop Helper";
             // 
             // linkLabel1
             // 
