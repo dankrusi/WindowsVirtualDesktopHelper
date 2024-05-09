@@ -143,7 +143,6 @@ namespace WindowsVirtualDesktopHelper {
 			if (desktopNumber != null) {
 				this.storeLastWinFocused(CurrentVDDisplayNumber);
 				this.SwitchToDesktop(desktopNumber.Value - 1);
-				this.restorePrevWinFocus(desktopNumber.Value - 1);
 			}
 		}
 
@@ -284,7 +283,10 @@ namespace WindowsVirtualDesktopHelper {
 			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
 			try {
 				App.Instance.VDAPI.SwitchToDesktop(number);
-			} catch (Exception e) { } // Dont want to switch virt desktop if that doesn't exists
+			} catch (Exception e) {
+				return;
+			} 
+			this.restorePrevWinFocus(number);
 		}
 
 		public void OpenURL(string url) {
