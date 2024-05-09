@@ -284,9 +284,7 @@ namespace WindowsVirtualDesktopHelper {
 			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
 			try {
 				App.Instance.VDAPI.SwitchToDesktop(number);
-			} catch (Exception e) {
-				Util.OS.DesktopForwardBySimulatingShortcutKey();
-			}
+			} catch (Exception e) { } // Dont want to switch virt desktop if that doesn't exists
 		}
 
 		public void OpenURL(string url) {
