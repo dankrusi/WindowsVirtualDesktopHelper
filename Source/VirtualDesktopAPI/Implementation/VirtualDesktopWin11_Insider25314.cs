@@ -49,6 +49,10 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 			return DesktopNameFromDesktop(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop());
 		}
 
+		public uint GetVDCount() {
+			return (uint)DesktopManager.GetTotalVDCount();
+		}
+
 		public void SwitchToDesktop(int number) {
 			var desktop = DesktopManager.GetDesktop(number);
 
@@ -288,6 +292,10 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 				desktops.GetAt(index, typeof(IVirtualDesktop).GUID, out objdesktop);
 				Marshal.ReleaseComObject(desktops);
 				return (IVirtualDesktop)objdesktop;
+			}
+
+			internal static int GetTotalVDCount() {
+				return VirtualDesktopManagerInternal.GetCount();
 			}
 
 			internal static int GetDesktopIndex(IVirtualDesktop desktop) { // get index of desktop
