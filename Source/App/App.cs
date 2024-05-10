@@ -284,7 +284,6 @@ namespace WindowsVirtualDesktopHelper {
 			try {
 				App.Instance.VDAPI.SwitchToDesktop(number);
 			} catch (Exception e) {
-				Util.OS.DesktopForwardBySimulatingShortcutKey();
 				return;
 			} 
 			this.restorePrevWinFocus(number);
