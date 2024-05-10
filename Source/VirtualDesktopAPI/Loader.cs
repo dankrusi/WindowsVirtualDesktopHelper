@@ -37,14 +37,15 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 				Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 Insider due to build >= 23403 ");
 				return VirtualDesktopWin11_Insider;
 			} 
-			// fixes for newer vuild number for which a PR was already raised
-		    else if (currentBuild >= 22621) {
+		//	  else if(currentBuild >= 22631) {
+		//		Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 Insider Canary 22631 due to build >= 22631");
+		//		return VirtualDesktopWin11_Insider22631;
+		//	}
+		      else if (currentBuild >= 22621) {
+				// 22631 = 22621 + Enablement Package (windows11.0-kb5027397-x64.cab)
+				// 22635 = 22621 + Enablement Package (windows11.0-kb5031483-x64.cab) and this would be maybe 24H2
 				if ((currentBuildRevision >= 2921 && currentBuildRevision < 3007) || (currentBuildRevision >= 3061)) {
 					Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 23H2 due to build >= 22621 and revision >= 2921 & < 3007 or >= 3061");
-					return VirtualDesktopWin11_23H2_2921;
-				} else if (currentBuildRevision >= 2050) {
-					Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 23H2 due to build >= 22621.2050");	
-					Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 23H2 due to build >= 22621.2921 & < 22621.3007");
 					return VirtualDesktopWin11_23H2_2921;
 				} else if (currentBuildRevision >= 2050) {
 					Util.Logging.WriteLine("GetImplementationForOS: Detected Windows 11 23H2 due to build >= 22621.2050");
