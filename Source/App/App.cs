@@ -141,7 +141,6 @@ namespace WindowsVirtualDesktopHelper {
 			else if (e.Key == Keys.D8 || e.Key == Keys.NumPad8) desktopNumber = 8;
 			else if (e.Key == Keys.D9 || e.Key == Keys.NumPad9) desktopNumber = 9;
 			if (desktopNumber != null && App.Instance.VDAPI.GetVDCount() > desktopNumber.Value -1) {
-				this.storeLastWinFocused(CurrentVDDisplayNumber);
 				this.SwitchToDesktop(desktopNumber.Value - 1);
 			}
 		}
@@ -186,6 +185,9 @@ namespace WindowsVirtualDesktopHelper {
 						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
 						this.CurrentVDDisplayNumber = newVDDisplayNumber;
 						VDSwitched();
+					}
+					else {
+						storeLastWinFocused(newVDDisplayNumber);
 					}
 					System.Threading.Thread.Sleep(100);
 				} catch (Exception e) {
