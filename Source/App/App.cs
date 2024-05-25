@@ -141,6 +141,7 @@ namespace WindowsVirtualDesktopHelper {
 			else if (e.Key == Keys.D8 || e.Key == Keys.NumPad8) desktopNumber = 8;
 			else if (e.Key == Keys.D9 || e.Key == Keys.NumPad9) desktopNumber = 9;
 			if (desktopNumber != null && App.Instance.VDAPI.GetVDCount() > desktopNumber.Value -1) {
+				storeLastWinFocused(CurrentVDDisplayNumber);
 				this.SwitchToDesktop(desktopNumber.Value - 1);
 			}
 		}
