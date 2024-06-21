@@ -24,11 +24,19 @@ namespace WindowsVirtualDesktopHelper.Util {
 		[DllImport("user32.dll")]
 		private static extern IntPtr GetForegroundWindow();
 
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)] 
+		private static extern bool SetForegroundWindow(IntPtr hWnd);
+
 		public static string GetForegroundWindowName() {
 			IntPtr handle = GetForegroundWindow();
 			StringBuilder windowName = new StringBuilder(256);
 			GetWindowText(handle, windowName, windowName.Capacity);
 			return windowName.ToString();
+		}
+
+		public static bool SetFocusWindow() {
+			return SetForegroundWindow(GetForegroundWindow());
 		}
 
 		public static void OpenTaskView() {
