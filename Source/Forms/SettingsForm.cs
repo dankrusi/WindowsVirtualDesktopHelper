@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
 using WindowsVirtualDesktopHelper.WindowsHotKeyAPI;
@@ -59,6 +60,7 @@ namespace WindowsVirtualDesktopHelper {
 			// Set current display icons
 			UpdateIconForVDDisplayNumber(theme, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
 			UpdateIconForVDDisplayName(theme, App.Instance.CurrentVDDisplayName);
+			UpdateNextPrevIconVisibility();
 		}
 		public ModifierKeys HotKeysToJumpToDesktop() {
 			if (this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked) return WindowsHotKeyAPI.ModifierKeys.Alt;
@@ -167,8 +169,7 @@ namespace WindowsVirtualDesktopHelper {
 
 		public void UpdateIconForVDDisplayNumber(string theme, uint number, string name) {
 			number++;
-			this.notifyIconNumber.Icon = Util.Icons.GenerateNotificationIcon(number.ToString(), theme, this.DeviceDpi, false);
-			//this.notifyIconNumber.Text = name;
+			this.notifyIconNumber.Icon = Util.Icons.GenerateNotificationIcon(number.ToString(), theme, this.DeviceDpi, false, FontStyle.Bold);
 		}
 
 		public void UpdateIconForVDDisplayName(string theme, string name) {
@@ -181,16 +182,31 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
+		public void UpdateNextPrevIconVisibility() {
+			int count = App.Instance.CurrentVDDisplayCount - 1;
+			if (checkBoxShowPrevNextIcons.Checked) {
+				if (count == 0 || App.Instance.CurrentVDDisplayNumber == count)
+					notifyIconNext.Visible = false;
+				else notifyIconNext.Visible = true;
+
+				if (App.Instance.CurrentVDDisplayNumber == 0)
+					notifyIconPrev.Visible = false;
+				else notifyIconPrev.Visible = true;
+			}
+		}
+
 		private void SettingsForm_Load(object sender, EventArgs e) {
 			App.Instance.ShowSplash();
 			App.Instance.MonitorVDSwitch();
 			App.Instance.MonitorFGWindowName();
 			App.Instance.MonitorSystemThemeSwitch();
+			App.Instance.MonitorVDisplayCount();
 		}
 
 		private void SettingsForm_Shown(object sender, EventArgs e) {
 			UpdateIconForVDDisplayNumber(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
 			UpdateIconForVDDisplayName(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayName);
+			UpdateNextPrevIconVisibility();
 			this.notifyIconNumber.Visible = true;
 			this.Hide();
 		}
@@ -214,8 +230,9 @@ namespace WindowsVirtualDesktopHelper {
 			if (IsLoading) return;
 
 			if (checkBoxShowPrevNextIcons.Checked) {
-				notifyIconPrev.Visible = true;
-				notifyIconNext.Visible = true;
+				UpdateNextPrevIconVisibility();
+				//notifyIconPrev.Visible = true;
+				//notifyIconNext.Visible = true;
 			} else {
 				notifyIconPrev.Visible = false;
 				notifyIconNext.Visible = false;

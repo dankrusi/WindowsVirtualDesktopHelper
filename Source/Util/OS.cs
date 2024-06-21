@@ -34,7 +34,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 			GetWindowText(handle, windowName, windowName.Capacity);
 			return windowName.ToString();
 		}
-
+		
 		public static bool SetFocusWindow() {
 			return SetForegroundWindow(GetForegroundWindow());
 		}

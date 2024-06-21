@@ -14,6 +14,7 @@ namespace WindowsVirtualDesktopHelper {
 		public IVirtualDesktopManager VDAPI = null;
 		public string CurrentVDDisplayName = null;
 		public uint CurrentVDDisplayNumber = 0;
+		public int CurrentVDDisplayCount = 1;
 		public SettingsForm SettingsForm;
 		public string CurrentSystemThemeName = null;
 		public List<string> FGWindowHistory = new List<string>(); // needed to detect if Task View was open
@@ -51,6 +52,8 @@ namespace WindowsVirtualDesktopHelper {
 			// Load theme
 			this.CurrentSystemThemeName = this.GetSystemThemeName();
 
+			this.CurrentVDDisplayCount = this.GetVDDisplayCount();
+
 			// Create the settings form, which acts as our ui main thread
 			this.SettingsForm = new SettingsForm();
 
@@ -84,6 +87,10 @@ namespace WindowsVirtualDesktopHelper {
 				if (throwException) throw new Exception("GetVDDisplayNumber: could not get current display number: " + e.Message, e);
 				else return 0;
 			}
+		}
+
+		public int GetVDDisplayCount() {
+			return this.VDAPI.DisplayCount();
 		}
 
 		public string GetVDDisplayName(bool throwException) {
@@ -134,6 +141,26 @@ namespace WindowsVirtualDesktopHelper {
 			System.Environment.Exit(0);
 		}
 
+		public void MonitorVDisplayCount() {
+			var thread = new Thread(new ThreadStart(_MonitorVDDisplayCount));
+			thread.Start();
+		}
+		private void _MonitorVDDisplayCount() {
+			while (true) {
+				try {
+					var newCurrentVDDisplayCount = this.GetVDDisplayCount();
+					if (newCurrentVDDisplayCount != CurrentVDDisplayCount) {
+						CurrentVDDisplayCount = newCurrentVDDisplayCount;
+						//Debug.WriteLine("Update Count: " + Thread.CurrentThread.ManagedThreadId);
+					}
+					System.Threading.Thread.Sleep(100);
+				} catch (Exception e) {
+					Util.Logging.WriteLine("App: Error: MonitorVDDisplayCount: " + e.Message);
+					System.Threading.Thread.Sleep(1000);
+				}
+			}
+		}
+
 		public void MonitorFGWindowName() {
 			var thread = new Thread(new ThreadStart(_MonitorFGWindowName));
 			thread.Start();
@@ -157,7 +184,9 @@ namespace WindowsVirtualDesktopHelper {
 
 		public void MonitorVDSwitch() {
 			var thread = new Thread(new ThreadStart(_MonitorVDSwitch));
+			//var thread2 = new Thread(new ThreadStart(delegate { UpdateSettingFormSafe(); }));
 			thread.Start();
+			//thread2.Start();
 		}
 
 		private void _MonitorVDSwitch() {
@@ -166,9 +195,10 @@ namespace WindowsVirtualDesktopHelper {
 					var newVDDisplayNumber = this.GetVDDisplayNumber(false);
 					if (newVDDisplayNumber != this.CurrentVDDisplayNumber) {
 						//Util.Logging.WriteLine("Switched to " + newVDDisplayName);
+						//Debug.WriteLine("Switch VD: " + Thread.CurrentThread.ManagedThreadId);
 						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
 						this.CurrentVDDisplayNumber = newVDDisplayNumber;
-						VDSwitched();
+						VDSwitchedSafe();
 					}
 					System.Threading.Thread.Sleep(100);
 				} catch (Exception e) {
@@ -178,14 +208,44 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
+		public void VDSwitchedSafe() {
+			if (this.SettingsForm.InvokeRequired) {
+				Action safeAction = delegate { VDSwitchedSafe(); };
+				this.SettingsForm.Invoke(safeAction);
+			} else {
+				this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
+				this.SettingsForm.UpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
+				this.SettingsForm.UpdateNextPrevIconVisibility();
+				if (this.SettingsForm.ShowOverlay()) {
+					this.SettingsForm.Invoke((Action)(() => {
+						SwitchNotificationForm.CloseAllNotifications(this.SettingsForm);
+						if (this.SettingsForm.OverlayShowOnAllMonitors()) {
+							for (var i = 0; i < Screen.AllScreens.Length; i++) {
+								var form = new SwitchNotificationForm(i);
+								form.LabelText = this.CurrentVDDisplayName;
+								form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
+								form.Show();
+							}
+						} else {
+							var form = new SwitchNotificationForm();
+							form.LabelText = this.CurrentVDDisplayName;
+							form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
+							form.Show();
+						}
+					}));
+				}
+			}
+		}
+
 		public void VDSwitched() {
 			this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
 			this.SettingsForm.UpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
+			// this cause flicker when switch VD from windows Task View
 			if (this.SettingsForm.ShowOverlay()) {
 				this.SettingsForm.Invoke((Action)(() => {
 					SwitchNotificationForm.CloseAllNotifications(this.SettingsForm);
 					if (this.SettingsForm.OverlayShowOnAllMonitors()) {
-						for(var i = 0; i < Screen.AllScreens.Length; i++) {
+						for (var i = 0; i < Screen.AllScreens.Length; i++) {
 							var form = new SwitchNotificationForm(i);
 							form.LabelText = this.CurrentVDDisplayName;
 							form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
