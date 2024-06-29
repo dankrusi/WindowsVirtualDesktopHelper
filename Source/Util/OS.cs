@@ -25,7 +25,6 @@ namespace WindowsVirtualDesktopHelper.Util {
 		private static extern IntPtr GetForegroundWindow();
 
 		[DllImport("user32.dll")]
-		[return: MarshalAs(UnmanagedType.Bool)] 
 		private static extern bool SetForegroundWindow(IntPtr hWnd);
 
 		public static string GetForegroundWindowName() {
@@ -36,7 +35,13 @@ namespace WindowsVirtualDesktopHelper.Util {
 		}
 		
 		public static bool SetFocusWindow() {
-			return SetForegroundWindow(GetForegroundWindow());
+			IntPtr handle = GetForegroundWindow();
+			return SetForegroundWindow(handle);
+		}
+
+		public static void SetFocusWindowToDesktop() {
+			IntPtr desktopHandle = (IntPtr)0x0000000000070776;
+			SetForegroundWindow(desktopHandle);
 		}
 
 		public static void OpenTaskView() {
