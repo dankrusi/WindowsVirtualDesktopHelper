@@ -18,6 +18,7 @@ namespace WindowsVirtualDesktopHelper {
 		public SettingsForm SettingsForm;
 		public string CurrentSystemThemeName = null;
 		public List<string> FGWindowHistory = new List<string>(); // needed to detect if Task View was open
+		public IntPtr LastForegroundhWnd = IntPtr.Zero;
 		KeyboardHook KeyboardHooksJumpToDesktop = null;
 
 		public static string DetectedVDImplementation = null;
@@ -173,6 +174,9 @@ namespace WindowsVirtualDesktopHelper {
 					var maxHistory = 20;
 					if (FGWindowHistory.Count > maxHistory) {
 						FGWindowHistory.RemoveRange(0, FGWindowHistory.Count - maxHistory);
+					}
+					if (LastForegroundhWnd == IntPtr.Zero) {
+						LastForegroundhWnd = Util.OS.GetFolderViewHandle();
 					}
 					System.Threading.Thread.Sleep(20);
 				} catch (Exception e) {

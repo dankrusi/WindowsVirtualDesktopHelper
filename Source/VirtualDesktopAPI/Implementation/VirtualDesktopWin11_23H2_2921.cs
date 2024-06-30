@@ -54,7 +54,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 
 			bool isDifferentVD = App.Instance.CurrentVDDisplayNumber != number;
 			if (isDifferentVD)
-				Util.OS.SetFocusWindowToDesktop();
+				Util.OS.SetFocusWindowToDesktop(App.Instance.LastForegroundhWnd);
 			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(desktop);
 			Util.OS.SetFocusWindow();
 		}
