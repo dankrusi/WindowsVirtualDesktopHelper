@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 using WindowsVirtualDesktopHelper.VirtualDesktopAPI;
 using WindowsVirtualDesktopHelper.WindowsHotKeyAPI;
@@ -17,6 +18,7 @@ namespace WindowsVirtualDesktopHelper {
 		public int CurrentVDDisplayCount = 1;
 		public SettingsForm SettingsForm;
 		public string CurrentSystemThemeName = null;
+		private Dictionary<int, IntPtr> VDDToLastFocusedWin = new Dictionary<int, IntPtr>();
 		public List<string> FGWindowHistory = new List<string>(); // needed to detect if Task View was open
 		public IntPtr LastForegroundhWnd = IntPtr.Zero;
 		KeyboardHook KeyboardHooksJumpToDesktop = null;
@@ -24,6 +26,18 @@ namespace WindowsVirtualDesktopHelper {
 		public static string DetectedVDImplementation = null;
 
 		public static App Instance;
+
+		// To enable auto refocus of lastly used windows
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		static extern bool SetForegroundWindow(IntPtr hWnd);
+
+		[DllImport("user32.dll")]
+		static extern IntPtr GetForegroundWindow();
+
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		static extern bool IsWindow(IntPtr hWnd);	
 
 		public App() {
 			// Set the app instance global
@@ -134,7 +148,10 @@ namespace WindowsVirtualDesktopHelper {
 			else if (e.Key == Keys.D7 || e.Key == Keys.NumPad7) desktopNumber = 7;
 			else if (e.Key == Keys.D8 || e.Key == Keys.NumPad8) desktopNumber = 8;
 			else if (e.Key == Keys.D9 || e.Key == Keys.NumPad9) desktopNumber = 9;
-			if(desktopNumber != null) this.SwitchToDesktop(desktopNumber.Value - 1);
+			if (desktopNumber != null && App.Instance.VDAPI.GetVDCount() > desktopNumber.Value -1) {
+				storeLastWinFocused(CurrentVDDisplayNumber);
+				this.SwitchToDesktop(desktopNumber.Value - 1);
+			}
 		}
 
 		public void Exit() {
@@ -203,6 +220,9 @@ namespace WindowsVirtualDesktopHelper {
 						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
 						this.CurrentVDDisplayNumber = newVDDisplayNumber;
 						VDSwitchedSafe();
+					}
+					else {
+						storeLastWinFocused(newVDDisplayNumber);
 					}
 					System.Threading.Thread.Sleep(100);
 				} catch (Exception e) {
@@ -331,8 +351,9 @@ namespace WindowsVirtualDesktopHelper {
 			try {
 				App.Instance.VDAPI.SwitchToDesktop(number);
 			} catch (Exception e) {
-				Util.OS.DesktopForwardBySimulatingShortcutKey();
-			}
+				return;
+			} 
+			this.restorePrevWinFocus(number);
 		}
 
 		public void OpenURL(string url) {
@@ -361,6 +382,28 @@ namespace WindowsVirtualDesktopHelper {
 				key.DeleteValue(Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyTitleAttribute>().Title, false);
 			} catch (Exception e) {
 				throw new Exception("EnableStartupWithWindows: could not delete registry value: " + e.Message);
+			}
+		}
+
+
+		public void storeLastWinFocused(uint currVDDWinNo) {
+			IntPtr hWnd = GetForegroundWindow();
+			if (hWnd != IntPtr.Zero) {
+				if (VDDToLastFocusedWin.ContainsKey((int)currVDDWinNo)) {
+					VDDToLastFocusedWin[(int)currVDDWinNo] = hWnd;
+				}
+				else {
+					VDDToLastFocusedWin.Add((int)currVDDWinNo, hWnd);
+				}
+			}	
+		}
+
+		public void restorePrevWinFocus(int prevVDDWinNo) {
+			if (VDDToLastFocusedWin.ContainsKey(prevVDDWinNo)) {
+				IntPtr lastWindowHandle = VDDToLastFocusedWin[prevVDDWinNo];
+				if (IsWindow(lastWindowHandle)) {
+					SetForegroundWindow(lastWindowHandle);
+				}
 			}
 		}
 
