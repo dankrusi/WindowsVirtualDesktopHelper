@@ -8,47 +8,47 @@ namespace WindowsVirtualDesktopHelper.Util {
 
         private static ConcurrentDictionary<string, Bitmap> _cache = new ConcurrentDictionary<string,Bitmap>();
 
-        public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol) {
+		public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol, FontStyle textStyle = FontStyle.Regular) {
 
 
-            // Init
-            var size = 16;
-            if (dpi > 96) size = 64;
-            var renderSize = 128; // GDI has really weak text drawing on transparent, so to get best results we render large then downscale...
-            var textStyle = FontStyle.Bold;
-            var textToRender = text;
-            if (textToRender == null) textToRender = ""; // sanity
+			// Init
+			var size = 16;
+			if (dpi > 96) size = 64;
+			var renderSize = 128; // GDI has really weak text drawing on transparent, so to get best results we render large then downscale...
+			//var textStyle = FontStyle.Bold;
+			var textToRender = text;
+			if (textToRender == null) textToRender = ""; // sanity
 			var textToRenderInfo = new StringInfo(textToRender);
 			if (textToRenderInfo.LengthInTextElements > 2) textToRender = new StringInfo(textToRender).SubstringByTextElements(0, 2);
 			var textToRenderSizeRatio = 1.0f;
-            if (textToRenderInfo.LengthInTextElements == 1) textToRenderSizeRatio = 0.9f;
-            if (textToRenderInfo.LengthInTextElements == 2) textToRenderSizeRatio = 0.5f;
-            if (textToRenderInfo.LengthInTextElements == 2) {
-                textToRenderSizeRatio = 0.75f;
-                textStyle = FontStyle.Regular;
-            }
-            var automaticFontSizeFitTolerance = 0.2f;
-            var offsetY = 0.0f;
-            var fontFamily = "Segoe UI";
-			if(Util.Emoji.HasEmoji(textToRender)) fontFamily = "Segoe UI Symbol";
+			if (textToRenderInfo.LengthInTextElements == 1) textToRenderSizeRatio = 0.9f;
+			if (textToRenderInfo.LengthInTextElements == 2) textToRenderSizeRatio = 0.5f;
+			if (textToRenderInfo.LengthInTextElements == 2) {
+				textToRenderSizeRatio = 0.75f;
+				textStyle = FontStyle.Regular;
+			}
+			var automaticFontSizeFitTolerance = 0.2f;
+			var offsetY = 0.0f;
+			var fontFamily = "Segoe UI";
+			if (Util.Emoji.HasEmoji(textToRender)) fontFamily = "Segoe UI Symbol";
 			if (drawAsSymbol) {
-                fontFamily = "Segoe UI Symbol";
-                textToRenderSizeRatio = 1.8f;
-                if (dpi > 96) textToRenderSizeRatio = 1.0f;
-                automaticFontSizeFitTolerance = 2.0f;
-                offsetY = -0.4f;
-            }
-            var textSize = renderSize * textToRenderSizeRatio;
+				fontFamily = "Segoe UI Symbol";
+				textToRenderSizeRatio = 1.8f;
+				if (dpi > 96) textToRenderSizeRatio = 1.0f;
+				automaticFontSizeFitTolerance = 2.0f;
+				offsetY = -0.4f;
+			}
+			var textSize = renderSize * textToRenderSizeRatio;
 
-            // Cache hit?
-            var cacheKey = textToRender + "_" + textSize + "_" + theme;
-            if(_cache.ContainsKey(cacheKey)) {
-                var cachedBitmap = _cache[cacheKey];
-                return Icon.FromHandle(cachedBitmap.GetHicon());
-            }
+			// Cache hit?
+			var cacheKey = textToRender + "_" + textSize + "_" + theme + "_" + textStyle;
+			if (_cache.ContainsKey(cacheKey)) {
+				var cachedBitmap = _cache[cacheKey];
+				return Icon.FromHandle(cachedBitmap.GetHicon());
+			}
 
-            // Theme
-            var fgBrush = Brushes.White;
+			// Theme
+			var fgBrush = Brushes.White;
             var fgColor = Color.White;
             var bgBrush = Brushes.Black;
             var bgColor = Color.Black;
@@ -115,11 +115,11 @@ namespace WindowsVirtualDesktopHelper.Util {
                 g.Flush();
             }
 
-            // Register in cache
-            _cache[cacheKey] = bitmapScaledDown;
+			// Register in cache
+			_cache[cacheKey] = bitmapScaledDown;
 
-            // Debug display
-            if (false && textToRender == "11"){
+			// Debug display
+			if (false && textToRender == "11"){
                 var form = new System.Windows.Forms.Form();
                 form.Width = size;
                 form.Height = size+30;

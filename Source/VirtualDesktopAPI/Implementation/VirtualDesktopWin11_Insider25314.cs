@@ -73,6 +73,10 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 			return desktopName;
 		}
 
+		public int DisplayCount() {
+			return DesktopManager.VirtualDesktopManagerInternal.GetCount();
+		}
+
 		#region COM API
 		internal static class Guids {
 			public static readonly Guid CLSID_ImmersiveShell = new Guid("C2F03A33-21F5-47FA-B4BB-156362A2F239");

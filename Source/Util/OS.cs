@@ -24,11 +24,67 @@ namespace WindowsVirtualDesktopHelper.Util {
 		[DllImport("user32.dll")]
 		private static extern IntPtr GetForegroundWindow();
 
+		[DllImport("user32.dll")]
+		private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+		[DllImport("user32.dll")]
+		private static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
+
+		private delegate bool EnumChildProc(IntPtr hWnd, IntPtr lParam);
+
+		[DllImport("user32.dll")]
+		private static extern IntPtr FindWindowA(string lpClassName, string lpWindowName);
+
 		public static string GetForegroundWindowName() {
 			IntPtr handle = GetForegroundWindow();
+			string windowName = GetHandleWndName(handle);
+			return windowName;
+		}
+		
+		public static bool SetFocusWindow() {
+			IntPtr handle = GetForegroundWindow();
+			return SetForegroundWindow(handle);
+		}
+
+		public static void SetFocusWindowToDesktop(IntPtr hWnd) {
+			if (GetHandleWndName(hWnd) == "Folder View") {
+				SetForegroundWindow(hWnd);
+				return;
+			}
+			
+			// fallback
+			IntPtr desktopHandle = FindWindowA("Progman", "Program Manager");
+			if (desktopHandle == IntPtr.Zero) {
+				desktopHandle = FindWindowA("WorkerW", null);
+			}
+			
+			SetForegroundWindow(desktopHandle);
+		}
+
+		public static string GetHandleWndName(IntPtr hWnd) {
 			StringBuilder windowName = new StringBuilder(256);
-			GetWindowText(handle, windowName, windowName.Capacity);
+			GetWindowText(hWnd, windowName, windowName.Capacity);
 			return windowName.ToString();
+		}
+
+		public static IntPtr GetFolderViewHandle() {
+			IntPtr handle = GetForegroundWindow();
+			EnumChildWindows(handle, (hWndChild, lParam) => {
+				if (IsWindowVisible(hWndChild)) {
+					int length = GetWindowTextLength(hWndChild);
+					if (length > 0) {
+						StringBuilder sb = new StringBuilder(length + 1);
+						GetWindowText(hWndChild, sb, sb.Capacity);
+						if (sb.ToString() == "Folder View") {
+							handle = hWndChild;
+							return false;
+						}
+					}
+				}
+				return true;
+			}, IntPtr.Zero);
+
+			return handle;
 		}
 
 		public static void OpenTaskView() {
