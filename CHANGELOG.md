@@ -1,3 +1,26 @@
+# v1.17
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
+* Jump to desktop using hot keys
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
+
+## Fixes
+* Support Windows 11 23H2 2921
+* Minor typos
+
+## Changes
+* Show hide prev/next icon based on current index
+* Automatically grab focus on last focused window when switching desktop
+
+
+
 # v1.16
 
 ## Features
