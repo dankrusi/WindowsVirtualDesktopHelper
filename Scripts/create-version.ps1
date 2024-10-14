@@ -1,6 +1,6 @@
 # Init
 $SCRIPTPATH = $PSScriptRoot
-$VISUALSTUDIO_PATH = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community"
+$VISUALSTUDIO_PATH = "C:\Program Files\Microsoft Visual Studio\2022\Community"
 $MSBUILD = $VISUALSTUDIO_PATH + "\MSBuild\Current\Bin\msbuild.exe"
 $DEVENV = $VISUALSTUDIO_PATH + "\Common7\IDE\devenv.com"
 
