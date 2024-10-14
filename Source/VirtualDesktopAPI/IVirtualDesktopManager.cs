@@ -15,5 +15,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 		void SwitchToDesktop(int number);
 
 		string CurrentDisplayName();
+
+		uint GetVDCount();
 	}
 }
