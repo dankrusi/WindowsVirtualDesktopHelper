@@ -93,7 +93,7 @@ The following builds have been confirmed as working:
   - 22H2 25158-25267
   - 25314 (experimental)
   
-The following builds have been cofnirmed as NOT working:
+The following builds have been confirmed as NOT working:
 
 * na
   
@@ -150,7 +150,7 @@ The idea is to make the app as easy and lightweight to run as possible. Most sys
 
 This program works by using some unofficial/undocumented Windows APIs which Windows uses internally to manage the desktop.
 The unofficial nature of these APIs is very unfortunate, because it means that each time Windows 11 makes an update, we have
-to reverse engineer the APIs and their undocumented COM CLSIDs - which is tedius and wastes a lot of time.
+to reverse engineer the APIs and their undocumented COM CLSIDs - which is tedious and wastes a lot of time.
 
 This is why the maintainers are reluctant to add too many other features, because its enough of a task to keep
 up with all the Windows updates for the basic features.
