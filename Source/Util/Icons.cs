@@ -1,6 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Globalization;
+using System.Windows.Forms;
 
 namespace WindowsVirtualDesktopHelper.Util {
 
@@ -8,7 +10,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 
         private static ConcurrentDictionary<string, Bitmap> _cache = new ConcurrentDictionary<string,Bitmap>();
 
-		public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol, FontStyle textStyle = FontStyle.Regular) {
+		public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol, FontStyle textStyle = FontStyle.Regular, double opacity = 1.0) {
 
 
 			// Init
@@ -41,7 +43,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 			var textSize = renderSize * textToRenderSizeRatio;
 
 			// Cache hit?
-			var cacheKey = textToRender + "_" + textSize + "_" + theme + "_" + textStyle;
+			var cacheKey = textToRender + "_" + textSize + "_" + theme + "_" + textStyle + "_" + opacity;
 			if (_cache.ContainsKey(cacheKey)) {
 				var cachedBitmap = _cache[cacheKey];
 				return Icon.FromHandle(cachedBitmap.GetHicon());
@@ -102,8 +104,11 @@ namespace WindowsVirtualDesktopHelper.Util {
 						break;
 					}
                 }
-                //g.Clear(Color.Pink);
-                g.DrawString(textToRender, font, fgBrush, rect, format);
+				if(opacity != 1.0) {
+					fgColor = Color.FromArgb((int)(255.0f * opacity), fgColor);
+					fgBrush = new SolidBrush(fgColor);
+				}
+				g.DrawString(textToRender, font, fgBrush, rect, format);
                 g.Flush();
             }
             

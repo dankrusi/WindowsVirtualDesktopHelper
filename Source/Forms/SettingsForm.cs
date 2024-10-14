@@ -39,28 +39,10 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		public void UpdateIconsForTheme(string theme) {
-			// Prev/next
-			// Get prev char
-			// \xE100 = skip back (player style)
-			// \xE112 = previous (arrow style)
-			// \xe26c = previous (chevron style)
-			// \u02C2 = previous (chevron style)
-			// \u2039 = previous (chevron style)
-			var prevChar = "\u2039";
-			// Get next char
-			// \xE101 = skip forward (player style)
-			// \xE111 = next (arrow style)
-			// \xe26b = next (chevron style)
-			// \u02C3 = next (chevron style)
-			// \u203A = next (chevron style)
-			var nextChar = "\u203A";
-			// Set prev/next icons
-			notifyIconPrev.Icon = Util.Icons.GenerateNotificationIcon(prevChar, theme, this.DeviceDpi, true);
-			notifyIconNext.Icon = Util.Icons.GenerateNotificationIcon(nextChar, theme, this.DeviceDpi, true);
 			// Set current display icons
 			UpdateIconForVDDisplayNumber(theme, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
 			UpdateIconForVDDisplayName(theme, App.Instance.CurrentVDDisplayName);
-			UpdateNextPrevIconVisibility();
+			UpdateNextPrevIconVisibility(theme);
 		}
 		public ModifierKeys HotKeysToJumpToDesktop() {
 			if (this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked) return WindowsHotKeyAPI.ModifierKeys.Alt;
@@ -162,9 +144,12 @@ namespace WindowsVirtualDesktopHelper {
 			if (this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "Ctrl";
 			if (this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "CtrlAlt";
 			// Save user settings
+			// Old System:
 			// https://learn.microsoft.com/en-us/dotnet/desktop/winforms/advanced/how-to-write-user-settings-at-run-time-with-csharp?view=netframeworkdesktop-4.8
 			Properties.Settings.Default.Save();
 			Properties.Settings.Default.Reload();
+			// New system:
+			Settings.SaveConfig();
 		}
 
 		public void UpdateIconForVDDisplayNumber(string theme, uint number, string name) {
@@ -182,16 +167,37 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
-		public void UpdateNextPrevIconVisibility() {
+		public void UpdateNextPrevIconVisibility(string theme) {
+			// Prev/next
+			// Get prev char
+			// \xE100 = skip back (player style)
+			// \xE112 = previous (arrow style)
+			// \xe26c = previous (chevron style)
+			// \u02C2 = previous (chevron style)
+			// \u2039 = previous (chevron style)
+			var prevChar = "\u2039";
+			// Get next char
+			// \xE101 = skip forward (player style)
+			// \xE111 = next (arrow style)
+			// \xe26b = next (chevron style)
+			// \u02C3 = next (chevron style)
+			// \u203A = next (chevron style)
+			var nextChar = "\u203A";
 			int count = App.Instance.CurrentVDDisplayCount - 1;
 			if (checkBoxShowPrevNextIcons.Checked) {
-				if (count == 0 || App.Instance.CurrentVDDisplayNumber == count)
-					notifyIconNext.Visible = false;
-				else notifyIconNext.Visible = true;
-
-				if (App.Instance.CurrentVDDisplayNumber == 0)
-					notifyIconPrev.Visible = false;
-				else notifyIconPrev.Visible = true;
+				var hasNextDesktop = count != 0 && App.Instance.CurrentVDDisplayNumber != count;
+				var hasPrevDesktop = App.Instance.CurrentVDDisplayNumber != 0;
+				// Update prev/next icons
+				notifyIconPrev.Icon = Util.Icons.GenerateNotificationIcon(prevChar, theme, this.DeviceDpi, true, FontStyle.Regular, hasPrevDesktop ? 1.0f : 0.5f);
+				notifyIconNext.Icon = Util.Icons.GenerateNotificationIcon(nextChar, theme, this.DeviceDpi, true, FontStyle.Regular, hasNextDesktop ? 1.0f : 0.5f);
+				// Show or hide?
+				if(Settings.GetBool("feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds")) {
+					notifyIconNext.Visible = hasNextDesktop;
+					notifyIconPrev.Visible = hasPrevDesktop;
+				} else {
+					notifyIconNext.Visible = true;
+					notifyIconPrev.Visible = true;
+				}
 			}
 		}
 
@@ -206,7 +212,7 @@ namespace WindowsVirtualDesktopHelper {
 		private void SettingsForm_Shown(object sender, EventArgs e) {
 			UpdateIconForVDDisplayNumber(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
 			UpdateIconForVDDisplayName(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayName);
-			UpdateNextPrevIconVisibility();
+			UpdateNextPrevIconVisibility(App.Instance.CurrentSystemThemeName);
 			this.notifyIconNumber.Visible = true;
 			this.Hide();
 		}
@@ -230,9 +236,7 @@ namespace WindowsVirtualDesktopHelper {
 			if (IsLoading) return;
 
 			if (checkBoxShowPrevNextIcons.Checked) {
-				UpdateNextPrevIconVisibility();
-				//notifyIconPrev.Visible = true;
-				//notifyIconNext.Visible = true;
+				UpdateNextPrevIconVisibility(App.Instance.CurrentSystemThemeName);
 			} else {
 				notifyIconPrev.Visible = false;
 				notifyIconNext.Visible = false;

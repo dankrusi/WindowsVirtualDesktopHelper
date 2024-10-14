@@ -6,7 +6,14 @@ namespace WindowsVirtualDesktopHelper {
 
 		[STAThread]
 		public static void Main(string[] args) {
+			// Settings
+			Settings.LoadDefaults();
+			Settings.RegisterLaunchArgs(args);
+			// Catch all exceptions in global exception handler
 			try {
+				// Load config
+				Settings.LoadConfig();
+				// Start app
 				Application.EnableVisualStyles();
 				Application.SetCompatibleTextRenderingDefault(false);
 				var app = new App();

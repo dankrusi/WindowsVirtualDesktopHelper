@@ -239,7 +239,7 @@ namespace WindowsVirtualDesktopHelper {
 			} else {
 				this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
 				this.SettingsForm.UpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
-				this.SettingsForm.UpdateNextPrevIconVisibility();
+				this.SettingsForm.UpdateNextPrevIconVisibility(this.CurrentSystemThemeName);
 				if (this.SettingsForm.ShowOverlay()) {
 					this.SettingsForm.Invoke((Action)(() => {
 						SwitchNotificationForm.CloseAllNotifications(this.SettingsForm);
