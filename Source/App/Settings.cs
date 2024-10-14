@@ -33,6 +33,11 @@ namespace WindowsVirtualDesktopHelper {
 			RegisterDefault("theme.icons.iconFG.dark", "white");
 			RegisterDefault("theme.icons.iconBG.light", "white");
 			RegisterDefault("theme.icons.iconFG.light", "black");
+			
+			// Feature: splash
+			RegisterDefault("feature.showSplashScreen", true, "If enabled, a splash screen is shown on startup of the app. Overlays must be enabled.");
+			RegisterDefault("feature.showSplashScreen.duration", 2000, "Splash duration in milliseconds.");
+			RegisterDefault("feature.showSplashScreen.text", "Virtual Desktop Helper", "The splash text to show.");
 
 			// Feature: showPrevNextIcons
 			RegisterDefault("feature.showPrevNextIcons", false, "If enabled, a previous and next arrow will appear in the icons tray of Windows to allow easy switching between desktops.");
@@ -120,10 +125,36 @@ namespace WindowsVirtualDesktopHelper {
 			var ret = _get(key, defaultValueStr);
 			if(ret is bool) return (bool)ret;
 			if(ret is string) return bool.Parse((string)ret);
-			throw new Exception($"Setting {key} is not a bool");
+			throw new Exception($"Setting {key} is not a bool (value is ${ret})");
 		}
 
 		public static void SetBool(string key, bool value) {
+			_set(key, value);
+		}
+
+		public static int GetInt(string key, int? defaultValue = null) {
+			string defaultValueStr = null;
+			if(defaultValue != null) defaultValueStr = defaultValue.ToString();
+			var ret = _get(key, defaultValueStr);
+			if(ret is int) return (int)ret;
+			if(ret is string) return int.Parse((string)ret);
+			throw new Exception($"Setting {key} is not a int (value is ${ret})");
+		}
+
+		public static void SetInt(string key, int value) {
+			_set(key, value);
+		}
+
+		public static double GetDouble(string key, double? defaultValue = null) {
+			string defaultValueStr = null;
+			if(defaultValue != null) defaultValueStr = defaultValue.ToString();
+			var ret = _get(key, defaultValueStr);
+			if(ret is double) return (double)ret;
+			if(ret is string) return double.Parse((string)ret);
+			throw new Exception($"Setting {key} is not a double (value is ${ret})");
+		}
+
+		public static void SetDouble(string key, int value) {
 			_set(key, value);
 		}
 

@@ -318,13 +318,15 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		public void ShowSplash() {
-			if (this.SettingsForm.ShowOverlay()) {
-				this.SettingsForm.Invoke((Action)(() => {
-					var form = new SwitchNotificationForm();
-					form.DisplayTimeMS = 2000;
-					form.LabelText = "Virtual Desktop Helper";
-					form.Show();
-				}));
+			if(Settings.GetBool("feature.showSplashScreen")) {
+				if(this.SettingsForm.ShowOverlay()) {
+					this.SettingsForm.Invoke((Action)(() => {
+						var form = new SwitchNotificationForm();
+						form.DisplayTimeMS = Settings.GetInt("feature.showSplashScreen.duration");
+						form.LabelText = Settings.GetString("feature.showSplashScreen.text");
+						form.Show();
+					}));
+				}
 			}
 		}
 
