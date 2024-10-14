@@ -4,8 +4,8 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v1.16 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.16/WindowsVirtualDesktopHelper.Setup.v1.16.msi) | 
-[Download v1.16 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.16/WindowsVirtualDesktopHelper.Executable.v1.16.zip)
+[Download v1.17 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.17/WindowsVirtualDesktopHelper.Setup.v1.17.msi) | 
+[Download v1.17 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.17/WindowsVirtualDesktopHelper.Executable.v1.17.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
@@ -41,7 +41,7 @@ Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7 or higher 
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v1.16.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.16/WindowsVirtualDesktopHelper.Setup.v1.16.msi)
+[Download WindowsVirtualDesktopHelper Setup v1.17.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.17/WindowsVirtualDesktopHelper.Setup.v1.17.msi)
 
 Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
@@ -51,7 +51,7 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
-[Download WindowsVirtualDesktopHelper Executable v1.16.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.16/WindowsVirtualDesktopHelper.Executable.v1.16.zip)
+[Download WindowsVirtualDesktopHelper Executable v1.17.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.17/WindowsVirtualDesktopHelper.Executable.v1.17.zip)
 
 ### Scoop
 
@@ -70,6 +70,9 @@ Many thanks for the original API work done by [MScholtes](https://github.com/MSc
 Thanks to the following contributors:
  - [y2nd66](https://github.com/y2nd66)
  - [SleepyBag](https://github.com/SleepyBag)
+ - [yossdev](https://github.com/yossdev)
+ - [MadoScientist97](https://github.com/MadoScientist97)
+ - [...and more](https://github.com/dankrusi/WindowsVirtualDesktopHelper/pulls?q=is%3Apr+is%3Aclosed)
 
 
 ## Donate
@@ -81,22 +84,10 @@ Do you like Windows Virtual Desktop Helper?
 
 ## Compatibility
 
-Currently this app is compatible with Windows 10 and Windows 11. Microsoft is constantly changing their API for the Virtual Desktops, so it appears not all builds of Windows are fully working yet.
+Currently this app is compatible with Windows 10 and Windows 11. 
+Microsoft is constantly changing their API for the Virtual Desktops, so it appears not all builds of Windows are fully working yet.
+Please note that if you use bleeding-edge insider buildes, this app may not yet be compatible.
 
-The following builds have been confirmed as working:
-
-* Windows 10
-  - 21H2 19044 
-* Windows 11
-  - 21H2 22000
-  - 22H2 22621
-  - 22H2 25158-25267
-  - 25314 (experimental)
-  
-The following builds have been confirmed as NOT working:
-
-* na
-  
 The following versions are not supported:
 
 * Windows 7
@@ -112,6 +103,14 @@ While the goal of this app is to remain simple and lightweight, there are some f
 
 * Settings: more configuration options
 * Console-Mode: allow a console-mode which can be used by scripts
+
+Technical Roadmap:
+
+- Refactor settings from .net settings loader to own system (the .net system is so bloated and crappy)
+- Add support for setting settings via command line
+- Split out settings UI and app UI
+- =============
+- Make features more modular
 
 
 ## Changelog
@@ -154,6 +153,14 @@ to reverse engineer the APIs and their undocumented COM CLSIDs - which is tediou
 
 This is why the maintainers are reluctant to add too many other features, because its enough of a task to keep
 up with all the Windows updates for the basic features.
+
+
+## Building
+
+Install Visual Studio 2022 or later with ".NET desktop development" feature set, and open the solution file WindowsVirtualDesktopHelper.sln. You can then build the project.
+
+Note: The Setup project which creates the MSI installer will require the following extension to be installed: [Microsoft Visual Studio Installer Projects 2022](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2022InstallerProjects)
+
 
 ### The Hunt for CLSIDs
 
