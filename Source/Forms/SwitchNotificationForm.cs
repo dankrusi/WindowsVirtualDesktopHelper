@@ -120,6 +120,7 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		private void timerClose_Tick(object sender, EventArgs e) {
+			if(this.DisplayTimeMS == 0) return; // we dont close if DisplayTimeMS is 0
 
 			if (this.FadeIn) {
 				this.animationOpacityCurrent = this.animationOpacityTarget;
