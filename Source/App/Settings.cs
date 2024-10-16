@@ -40,14 +40,37 @@ namespace WindowsVirtualDesktopHelper {
 			RegisterDefault("feature.showSplashScreen.text", "Virtual Desktop Helper", "The splash text to show.");
 
 			// Feature: showPrevNextIcons
-			RegisterDefault("feature.showPrevNextIcons", false, "If enabled, a previous and next arrow will appear in the icons tray of Windows to allow easy switching between desktops.");
+			RegisterDefault("feature.showPrevNextIcons", true, "If enabled, a previous and next arrow will appear in the icons tray of Windows to allow easy switching between desktops.");
 			RegisterDefault("feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds", false, "If enabled, the prev/next icon will automatically hide if there is no prev/next desktop.");
+
+			// Feature: showDesktopSwitchOverlay
+			RegisterDefault("feature.showDesktopSwitchOverlay", true);
+			RegisterDefault("feature.showDesktopSwitchOverlay.duration", 2000);
+			RegisterDefault("feature.showDesktopSwitchOverlay.animate", true);
+			RegisterDefault("feature.showDesktopSwitchOverlay.translucent", true);
+			RegisterDefault("feature.showDesktopSwitchOverlay.showOnAllMonitors", true);
+			RegisterDefault("feature.showDesktopSwitchOverlay.position", "middlecenter");
+
+			// Feature: useHotKeysToJumpToDesktop
+			RegisterDefault("feature.useHotKeysToJumpToDesktop", false);
+			RegisterDefault("feature.useHotKeysToJumpToDesktop.hotkey", "Alt+H");
+
+			// Feature: showDesktopNumberInIconTray
+			RegisterDefault("feature.showDesktopNumberInIconTray", true);
+			RegisterDefault("feature.showDesktopNumberInIconTray.clickToOpenTaskView", true);
+
+			// Feature: showDesktopNameInIconTray
+			RegisterDefault("feature.showDesktopNameInIconTray", false);
 
 		}
 
 		#endregion
 
 		#region Settings API
+
+		public static List<string> GetUsedConfigFiles() {
+			return _settingsConfigFilesUsed;
+		}
 
 		public static void RegisterDefault(string key, object value, string documentation = null) {
 			_settingsDefaults[key] = value;
@@ -85,12 +108,20 @@ namespace WindowsVirtualDesktopHelper {
 				var val = _serializeValAsType(kvp.Value);
 				lines.Add($"{key}: {val}");
 			}
-			// Sort the lines
-			lines.Sort((a, b) => {
-				var aKey = a.Trim().StartsWith("#") ? a.Trim().Substring(1) : a.Trim();
-				var bKey = b.Trim().StartsWith("#") ? b.Trim().Substring(1) : b.Trim();
-				return string.Compare(aKey, bKey, StringComparison.Ordinal);
-			});
+            // Sort the lines by key but so that parent keys appear first (ie feature.showSplashScreen appears before feature.showSplashScreen.duration)
+            lines.Sort((a, b) => {
+                var aKey = a.Trim().StartsWith("#") ? a.Trim().Substring(1) : a.Trim();
+                var bKey = b.Trim().StartsWith("#") ? b.Trim().Substring(1) : b.Trim();
+
+                // Check if aKey and bKey have the same parent key
+                var aParentKey = aKey.Substring(0, aKey.LastIndexOf('.'));
+                var bParentKey = bKey.Substring(0, bKey.LastIndexOf('.'));
+                if(aParentKey == bParentKey) {
+                    return string.Compare(aKey, bKey, StringComparison.Ordinal);
+                } else {
+                    return string.Compare(aParentKey, bParentKey, StringComparison.Ordinal);
+                }
+            });
 			// Write the lines to the config file
 			System.IO.File.WriteAllLines(path, lines);
 		}
@@ -167,6 +198,7 @@ namespace WindowsVirtualDesktopHelper {
 		static private Dictionary<string, object> _settingsLaunchArgs = new Dictionary<string, object>();
 		static private Dictionary<string, object> _settingsConfig = new Dictionary<string, object>();
 		static private Dictionary<string, object> _settingsDefaults = new Dictionary<string, object>();
+		static private List<string> _settingsConfigFilesUsed = new List<string>();
 
 		private static object _get(string key, string defaultValue = null) {
 			// Check all our sources in the following priority:
@@ -239,6 +271,8 @@ namespace WindowsVirtualDesktopHelper {
 
 		private static void _loadConfigPath(string path) {
 			if(System.IO.File.Exists(path)) {
+				// Register the config file as used
+				_settingsConfigFilesUsed.Add(path);
 				// Load the config file
 				var lines = System.IO.File.ReadAllLines(path);
 				// Parse the lines, split by colon, adding each to the _settingsConfig

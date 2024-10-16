@@ -87,68 +87,64 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		private void LoadSettingsIntoUI() {
-			this.checkBoxShowPrevNextIcons.Checked = Properties.Settings.Default.ShowPrevNextIcons;
-			this.checkBoxShowDesktopNameInitial.Checked = Properties.Settings.Default.ShowDesktopNameInitial;
-			this.checkBoxStartupWithWindows.Checked = Properties.Settings.Default.StartupWithWindows;
-			this.checkBoxShowOverlay.Checked = Properties.Settings.Default.ShowOverlay;
-			this.checkBoxOverlayAnimate.Checked = Properties.Settings.Default.OverlayAnimate;
-			this.checkBoxOverlayTranslucent.Checked = Properties.Settings.Default.OverlayTranslucent;
-			this.checkBoxOverlayShowOnAllMonitors.Checked = Properties.Settings.Default.OverlayShowOnAllMonitors;
-			this.checkBoxClickDesktopNumberTaskView.Checked = Properties.Settings.Default.ClickDesktopNumberOpensTaskView;
-			this.checkBoxUseHotKeysToJumpToDesktop.Checked = Properties.Settings.Default.UseHotKeysToJumpToDesktop;
-			this.radioButtonOverlayLongDuration.Checked = Properties.Settings.Default.OverlayDuration == "long";
-			this.radioButtonOverlayMediumDuration.Checked = Properties.Settings.Default.OverlayDuration == "medium";
-			this.radioButtonOverlayShortDuration.Checked = Properties.Settings.Default.OverlayDuration == "short";
-			this.radioButtonOverlayMicroDuration.Checked = Properties.Settings.Default.OverlayDuration == "micro";
-			this.radioButtonPositionTopLeft.Checked = Properties.Settings.Default.OverlayPosition == "topleft";
-			this.radioButtonPositionTopCenter.Checked = Properties.Settings.Default.OverlayPosition == "topcenter";
-			this.radioButtonPositionTopRight.Checked = Properties.Settings.Default.OverlayPosition == "topright";
-			this.radioButtonPositionMiddleLeft.Checked = Properties.Settings.Default.OverlayPosition == "middleleft";
-			this.radioButtonPositionMiddleCenter.Checked = Properties.Settings.Default.OverlayPosition == "middlecenter";
-			this.radioButtonPositionMiddleRight.Checked = Properties.Settings.Default.OverlayPosition == "middleright";
-			this.radioButtonPositionBottomLeft.Checked = Properties.Settings.Default.OverlayPosition == "bottomleft";
-			this.radioButtonPositionBottomCenter.Checked = Properties.Settings.Default.OverlayPosition == "bottomcenter";
-			this.radioButtonPositionBottomRight.Checked = Properties.Settings.Default.OverlayPosition == "bottomright";
-			this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked = Properties.Settings.Default.HotKeysToJumpToDesktop == "Alt";
-			this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked = Properties.Settings.Default.HotKeysToJumpToDesktop == "AltShift";
-			this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked = Properties.Settings.Default.HotKeysToJumpToDesktop == "Ctrl";
-			this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked = Properties.Settings.Default.HotKeysToJumpToDesktop == "CtrlAlt";
+			this.checkBoxShowPrevNextIcons.Checked = Settings.GetBool("feature.showPrevNextIcons");
+			this.checkBoxShowDesktopNameInitial.Checked = Settings.GetBool("feature.showDesktopNameInIconTray");
+			this.checkBoxStartupWithWindows.Checked = Settings.GetBool("general.startupWithWindows");
+			this.checkBoxShowOverlay.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay");
+			this.checkBoxOverlayAnimate.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay.animate");
+			this.checkBoxOverlayTranslucent.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay.translucent");
+			this.checkBoxOverlayShowOnAllMonitors.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors");
+			this.checkBoxClickDesktopNumberTaskView.Checked = Settings.GetBool("feature.showDesktopNumberInIconTray.clickToOpenTaskView");
+			this.checkBoxUseHotKeysToJumpToDesktop.Checked = Settings.GetBool("feature.useHotKeysToJumpToDesktop");
+			this.radioButtonOverlayLongDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 3000;
+			this.radioButtonOverlayMediumDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 2000;
+			this.radioButtonOverlayShortDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 1000;
+			this.radioButtonOverlayMicroDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 500;
+			this.radioButtonPositionTopLeft.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "topleft";
+			this.radioButtonPositionTopCenter.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "topcenter";
+			this.radioButtonPositionTopRight.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "topright";
+			this.radioButtonPositionMiddleLeft.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "middleleft";
+			this.radioButtonPositionMiddleCenter.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "middlecenter";
+			this.radioButtonPositionMiddleRight.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "middleright";
+			this.radioButtonPositionBottomLeft.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "bottomleft";
+			this.radioButtonPositionBottomCenter.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "bottomcenter";
+			this.radioButtonPositionBottomRight.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "bottomright";
+			this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked = Settings.GetString("feature.useHotKeysToJumpToDesktop.hotkey") == "Alt";
+			this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked = Settings.GetString("feature.useHotKeysToJumpToDesktop.hotkey") == "AltShift";
+			this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked = Settings.GetString("feature.useHotKeysToJumpToDesktop.hotkey") == "Ctrl";
+			this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked = Settings.GetString("feature.useHotKeysToJumpToDesktop.hotkey") == "CtrlAlt";
+
 			checkBoxShowOverlay_CheckedChanged(this, null);
 			checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(this, null);
 		}
 		private void SaveSettingsFromUI() {
-			Properties.Settings.Default.ShowPrevNextIcons = this.checkBoxShowPrevNextIcons.Checked;
-			Properties.Settings.Default.ShowDesktopNameInitial = this.checkBoxShowDesktopNameInitial.Checked;
-			Properties.Settings.Default.StartupWithWindows = this.checkBoxStartupWithWindows.Checked;
-			Properties.Settings.Default.ShowOverlay = this.checkBoxShowOverlay.Checked;
-			Properties.Settings.Default.OverlayAnimate = this.checkBoxOverlayAnimate.Checked;
-			Properties.Settings.Default.OverlayTranslucent = this.checkBoxOverlayTranslucent.Checked;
-			Properties.Settings.Default.OverlayShowOnAllMonitors = this.checkBoxOverlayShowOnAllMonitors.Checked;
-			Properties.Settings.Default.ClickDesktopNumberOpensTaskView = this.checkBoxClickDesktopNumberTaskView.Checked;
-			Properties.Settings.Default.UseHotKeysToJumpToDesktop = this.checkBoxUseHotKeysToJumpToDesktop.Checked;
-			if (this.radioButtonOverlayLongDuration.Checked) Properties.Settings.Default.OverlayDuration = "long";
-			if (this.radioButtonOverlayMediumDuration.Checked) Properties.Settings.Default.OverlayDuration = "medium";
-			if (this.radioButtonOverlayShortDuration.Checked) Properties.Settings.Default.OverlayDuration = "short";
-			if (this.radioButtonOverlayMicroDuration.Checked) Properties.Settings.Default.OverlayDuration = "micro";
-			if (this.radioButtonPositionTopLeft.Checked) Properties.Settings.Default.OverlayPosition = "topleft";
-			if (this.radioButtonPositionTopCenter.Checked) Properties.Settings.Default.OverlayPosition = "topcenter";
-			if (this.radioButtonPositionTopRight.Checked) Properties.Settings.Default.OverlayPosition = "topright";
-			if (this.radioButtonPositionMiddleLeft.Checked) Properties.Settings.Default.OverlayPosition = "middleleft";
-			if (this.radioButtonPositionMiddleCenter.Checked) Properties.Settings.Default.OverlayPosition = "middlecenter";
-			if (this.radioButtonPositionMiddleRight.Checked) Properties.Settings.Default.OverlayPosition = "middleright";
-			if (this.radioButtonPositionBottomLeft.Checked) Properties.Settings.Default.OverlayPosition = "bottomleft";
-			if (this.radioButtonPositionBottomCenter.Checked) Properties.Settings.Default.OverlayPosition = "bottomcenter";
-			if (this.radioButtonPositionBottomRight.Checked) Properties.Settings.Default.OverlayPosition = "bottomright";
-			if (this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "Alt";
-			if (this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "AltShift";
-			if (this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "Ctrl";
-			if (this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked) Properties.Settings.Default.HotKeysToJumpToDesktop = "CtrlAlt";
+			Settings.SetBool("feature.showPrevNextIcons", this.checkBoxShowPrevNextIcons.Checked);
+			Settings.SetBool("feature.showDesktopNameInIconTray", this.checkBoxShowDesktopNameInitial.Checked);
+			Settings.SetBool("general.startupWithWindows", this.checkBoxStartupWithWindows.Checked);
+			Settings.SetBool("feature.showDesktopSwitchOverlay", this.checkBoxShowOverlay.Checked);
+			Settings.SetBool("feature.showDesktopSwitchOverlay.animate", this.checkBoxOverlayAnimate.Checked);
+			Settings.SetBool("feature.showDesktopSwitchOverlay.translucent", this.checkBoxOverlayTranslucent.Checked);
+			Settings.SetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors", this.checkBoxOverlayShowOnAllMonitors.Checked);
+			Settings.SetBool("feature.showDesktopNumberInIconTray.clickToOpenTaskView", this.checkBoxClickDesktopNumberTaskView.Checked);
+			Settings.SetBool("feature.useHotKeysToJumpToDesktop", this.checkBoxUseHotKeysToJumpToDesktop.Checked);
+			if(this.radioButtonOverlayLongDuration.Checked) Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 3000);
+			if(this.radioButtonOverlayMediumDuration.Checked) Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 2000);
+			if(this.radioButtonOverlayShortDuration.Checked) Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 1000);
+			if(this.radioButtonOverlayMicroDuration.Checked) Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 500);
+			if(this.radioButtonPositionTopLeft.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "topleft");
+			if(this.radioButtonPositionTopCenter.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "topcenter");
+			if(this.radioButtonPositionTopRight.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "topright");
+			if(this.radioButtonPositionMiddleLeft.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "middleleft");
+			if(this.radioButtonPositionMiddleCenter.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "middlecenter");
+			if(this.radioButtonPositionMiddleRight.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "middleright");
+			if(this.radioButtonPositionBottomLeft.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomleft");
+			if(this.radioButtonPositionBottomCenter.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomcenter");
+			if(this.radioButtonPositionBottomRight.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomright");
+			if(this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked) Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "Alt");
+			if(this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked) Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "AltShift");
+			if(this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked) Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "Ctrl");
+			if(this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked) Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "CtrlAlt");
 			// Save user settings
-			// Old System:
-			// https://learn.microsoft.com/en-us/dotnet/desktop/winforms/advanced/how-to-write-user-settings-at-run-time-with-csharp?view=netframeworkdesktop-4.8
-			Properties.Settings.Default.Save();
-			Properties.Settings.Default.Reload();
-			// New system:
 			Settings.SaveConfig();
 		}
 
