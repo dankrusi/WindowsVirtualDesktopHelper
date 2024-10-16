@@ -49,7 +49,8 @@ namespace WindowsVirtualDesktopHelper {
 
 			// Settings
 			{
-				Util.Logging.WriteLine("Using config file(s): \r\n"+string.Join("\r\n  ", Settings.GetUsedConfigFiles()));
+				Util.Logging.WriteLine("Using config file(s):\r\n   "+string.Join("\r\n   ", Settings.GetUsedConfigFiles()));
+				Util.Logging.WriteLine("Config: \r\n   "+Settings.GetSettingsAsString().Replace("\n", "\r\n   "));
 			}
 
 			// Test global error form:

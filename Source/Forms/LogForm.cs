@@ -12,10 +12,11 @@ namespace WindowsVirtualDesktopHelper.Forms {
 	public partial class LogForm : Form {
 		public LogForm() {
 			InitializeComponent();
-
-			this.textBoxLog.Text = string.Join("\r\n",Util.Logging.GetLogHistory());
 		}
 
-		
+		public void SetLogText(string text) {
+			this.textBoxLog.Text = text.Replace("\n", "\r\n");
+		}
+
 	}
 }

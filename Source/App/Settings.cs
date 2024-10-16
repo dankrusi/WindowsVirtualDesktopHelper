@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using WindowsInput.Native;
 
@@ -85,6 +86,18 @@ namespace WindowsVirtualDesktopHelper {
 			return _settingsConfigFilesUsed;
 		}
 
+		public static string GetSettingsAsString() {
+			return _compileSettingsDocumentation(_createMergedSettingsDictionary(true, false), false, false);
+		}
+
+		public static string GetDocumentationAsString() {
+			return _compileSettingsDocumentation(_settingsDefaults, true, false);
+		}
+
+		public static string GetDocumentationAsMarkdown() {
+			return _compileSettingsDocumentation(_settingsDefaults, true, true);
+		}
+
 		public static void RegisterDefault(string key, object value, string documentation = null) {
 			_settingsDefaults[key] = value;
 			if(documentation != null) _settingsDocumentations[key] = documentation;
@@ -104,15 +117,7 @@ namespace WindowsVirtualDesktopHelper {
 			var path = _getConfigPath();
 
 			// Create a merged dictionary of all config and defaults settings
-			var allSettings = new Dictionary<string, object>();
-			foreach(var kvp in _settingsConfig) {
-				allSettings[kvp.Key] = kvp.Value;
-			}
-			foreach(var kvp in _settingsDefaults) {
-				if(!allSettings.ContainsKey(kvp.Key)) {
-					allSettings["#"+kvp.Key] = kvp.Value; // Add this default as a comment
-				}
-			}
+			var allSettings = _createMergedSettingsDictionary(false, true);
 
 			// Serialize _settingsConfig to text, each setting on a line split by colon, sorting each line by trimming # comments out (ie sorting with comments inline)
 			var lines = new List<string>();
@@ -225,6 +230,48 @@ namespace WindowsVirtualDesktopHelper {
 		static private Dictionary<string, object> _settingsConfig = new Dictionary<string, object>();
 		static private Dictionary<string, object> _settingsDefaults = new Dictionary<string, object>();
 		static private List<string> _settingsConfigFilesUsed = new List<string>();
+
+		private static Dictionary<string, object> _createMergedSettingsDictionary(bool includeRuntimeSettings = false, bool includeDefaults = false) {
+			var allSettings = new Dictionary<string, object>();
+			if(includeRuntimeSettings) {
+				foreach(var kvp in _settingsLaunchArgs) {
+					if(!allSettings.ContainsKey(kvp.Key)) {
+						allSettings[kvp.Key] = kvp.Value; // Add this default as a comment
+					}
+				}
+			}
+			foreach(var kvp in _settingsConfig) {
+				if(!allSettings.ContainsKey(kvp.Key)) {
+					allSettings[kvp.Key] = kvp.Value;
+				}
+			}
+			if(includeDefaults) {
+				foreach(var kvp in _settingsDefaults) {
+					if(!allSettings.ContainsKey(kvp.Key)) {
+						allSettings["#" + kvp.Key] = kvp.Value; // Add this default as a comment
+					}
+				}
+			}
+			return allSettings;
+		}
+
+		private static string _compileSettingsDocumentation(Dictionary<string, object> settingsToUse, bool includeDocumentation, bool asMarkdown) {
+			// Compile the defaults and documentation into a string
+			var lines = new List<string>();
+			if(asMarkdown) lines.Add(includeDocumentation ? "|Config|Default|Description|" : "|Config|Default|");
+			if(asMarkdown) lines.Add(includeDocumentation ? "| --- | --- | --- |" : "| --- | --- |");
+			foreach(var kvp in settingsToUse) {
+				var key = kvp.Key;
+				var val = _serializeValAsType(kvp.Value);
+				var line = asMarkdown ? $"| {key} | ``{val}`` |" : $"{key}: {val}";
+				if(includeDocumentation) {
+					var doc = _settingsDocumentations.ContainsKey(key) ? _settingsDocumentations[key] : null;
+					if(doc != null || asMarkdown) line += asMarkdown ? $" {doc} |" : $", {doc}";
+				}
+				lines.Add(line);
+			}
+			return string.Join("\n",lines);
+		}
 
 		private static object _get(string key, string defaultValue = null) {
 			// Check all our sources in the following priority:
