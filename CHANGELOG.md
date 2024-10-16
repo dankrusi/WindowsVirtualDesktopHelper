@@ -19,6 +19,7 @@
 * Support theming of icons (fonts, colors)
 * Support theming of overlays (fonts, colors)
 
+### Note: configuration from previous versions are not migrated - sorry!
  
 
 # v1.17
