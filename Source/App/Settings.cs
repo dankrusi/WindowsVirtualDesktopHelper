@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using WindowsInput.Native;
 
 namespace WindowsVirtualDesktopHelper {
 
@@ -243,11 +244,35 @@ namespace WindowsVirtualDesktopHelper {
 			return path;
 		}
 
+		private static string _unescapeString(string str) {
+			// Strings are stored using the " character, and can contain the following:
+			//  - \n for new line
+			//  - \" for quote
+			//  - \u2039 for unicode characters (for example)
+			if(str == null) return null;
+			str = str.Trim('"');
+			//str = str.Replace("\\n", "\n");
+			//str = str.Replace("\\\"", "\"");
+			return System.Text.RegularExpressions.Regex.Unescape(str);
+		}
+
+		private static string _escapeString(string str) {
+			if(str == null) return null;
+			str = str.Replace("\\", "\\\\");
+			str = str.Replace("\n", "\\n");
+			str = str.Replace("\"", "\\\"");
+			var escaped = new System.Text.StringBuilder();
+			foreach(char c in str) {
+				if(c > 127) escaped.AppendFormat("\\u{0:X4}", (int)c);
+				else escaped.Append(c);
+			}
+			return "\"" + escaped + "\"";
+		}
+
 		private static object _parseValAsType(string value) {
 			// Try to parse val as int, float, bool, or string, returning the appropriate type
 			if(value.StartsWith("\"") && value.EndsWith("\"")) {
-				// Remove leading and trailing quotes and replace \n with actual new line characters
-				return value.Trim('"').Replace("\\n", "\n").Replace("\\\"", "\"");
+				return _unescapeString(value);
 			}
 			if(int.TryParse(value, out int intValue)) {
 				return intValue;
@@ -266,7 +291,7 @@ namespace WindowsVirtualDesktopHelper {
 			if(val is bool) return (bool)val ? "true" : "false";
 			if(val is int) return ((int)val).ToString();
 			if(val is float) return ((float)val).ToString();
-			return "\"" + val.ToString().Replace("\"", "\\\"").Replace("\n", "\\\n") + "\""; // string default
+			return _escapeString(val?.ToString()); // string default
 		}
 
 		private static void _loadConfigPath(string path) {
