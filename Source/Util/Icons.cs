@@ -11,8 +11,6 @@ namespace WindowsVirtualDesktopHelper.Util {
         private static ConcurrentDictionary<string, Bitmap> _cache = new ConcurrentDictionary<string,Bitmap>();
 
 		public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol, FontStyle textStyle = FontStyle.Regular, double opacity = 1.0) {
-
-
 			// Init
 			var size = 16;
 			if (dpi > 96) size = 64;
@@ -31,10 +29,10 @@ namespace WindowsVirtualDesktopHelper.Util {
 			}
 			var automaticFontSizeFitTolerance = 0.2f;
 			var offsetY = 0.0f;
-			var fontFamily = "Segoe UI";
-			if (Util.Emoji.HasEmoji(textToRender)) fontFamily = "Segoe UI Symbol";
+			var fontFamily = Settings.GetString("theme.icons.font");
+			if (Util.Emoji.HasEmoji(textToRender)) fontFamily = Settings.GetString("theme.icons.emojiFont");
 			if (drawAsSymbol) {
-				fontFamily = "Segoe UI Symbol";
+				fontFamily = Settings.GetString("theme.icons.symbolsFont");
 				textToRenderSizeRatio = 1.8f;
 				if (dpi > 96) textToRenderSizeRatio = 1.0f;
 				automaticFontSizeFitTolerance = 2.0f;
@@ -50,21 +48,10 @@ namespace WindowsVirtualDesktopHelper.Util {
 			}
 
 			// Theme
-			var fgBrush = Brushes.White;
-            var fgColor = Color.White;
-            var bgBrush = Brushes.Black;
-            var bgColor = Color.Black;
-            if(theme == "dark") {
-                fgBrush = Brushes.White;
-                fgColor = Color.White;
-                bgBrush = Brushes.Black;
-                bgColor = Color.Black;
-            } else {
-                fgBrush = Brushes.Black;
-                fgColor = Color.Black;
-                bgBrush = Brushes.White;
-                bgColor = Color.White;
-            }
+            var fgColor = ColorTranslator.FromHtml(Settings.GetString("theme.icons.iconFG."+theme));
+			var bgColor = ColorTranslator.FromHtml(Settings.GetString("theme.icons.iconBG." + theme));
+			var fgBrush = new SolidBrush(fgColor);
+			var bgBrush = new SolidBrush(bgColor);
 
             // Init drawing
             Bitmap bitmap = new Bitmap(renderSize, renderSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);

@@ -25,10 +25,13 @@ namespace WindowsVirtualDesktopHelper {
 
 			// General
 			RegisterDefault("general.startupWithWindows", false, "If true, the app will register itself with Windows to startup when Windows starts (via the registry).");
+			RegisterDefault("general.theme", "auto", "Can be either auto, dark or light. If set to auto, the theme is derived from the current windows theme (dark or light).");
 			
 			// Theme
+			RegisterDefault("theme.icons.disabledOpacity", 0.5, "Defines the opacity to use for icons which are disabled.");
 			RegisterDefault("theme.icons.font", "Segoe UI", "Defines the font name to use for the icons (for regular numbers, characters).");
-			RegisterDefault("theme.icons.emojiFont", "Segoe UI Symbol", "Defines the font name to use for symbol and emoji icons.");
+			RegisterDefault("theme.icons.emojiFont", "Segoe UI Symbol", "Defines the font name to use for emoji icons.");
+			RegisterDefault("theme.icons.symbolsFont", "Segoe UI Symbol", "Defines the font name to use for symbol icons.");
 			RegisterDefault("theme.icons.iconBG.dark", "black");
 			RegisterDefault("theme.icons.iconFG.dark", "white");
 			RegisterDefault("theme.icons.iconBG.light", "white");
@@ -42,10 +45,12 @@ namespace WindowsVirtualDesktopHelper {
 			// Feature: showPrevNextIcons
 			RegisterDefault("feature.showPrevNextIcons", true, "If enabled, a previous and next arrow will appear in the icons tray of Windows to allow easy switching between desktops.");
 			RegisterDefault("feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds", false, "If enabled, the prev/next icon will automatically hide if there is no prev/next desktop.");
+			RegisterDefault("feature.showPrevNextIcons.nextChar", "\u203A", "Defines the character to use for next desktop icon (typically a unicode character like the chevron, for example \\xE101 = skip forward (player style), \xE111 = next (arrow style), \\xe26b = next (chevron style), \\u02C3 = next (chevron style), \\u203A = next (chevron style))");
+			RegisterDefault("feature.showPrevNextIcons.prevChar", "\u2039", "Defines the character to use for prev desktop icon (typically a unicode character like the chevron, for example \\xE100 = skip back (player style), \\xE112 = previous (arrow style), \\xe26c = previous (chevron style), \\u02C2 = previous (chevron style), \\u2039 = previous (chevron style))");
 
 			// Feature: showDesktopSwitchOverlay
 			RegisterDefault("feature.showDesktopSwitchOverlay", true);
-			RegisterDefault("feature.showDesktopSwitchOverlay.duration", 2000);
+			RegisterDefault("feature.showDesktopSwitchOverlay.duration", 2000, "Defines the duration in milliseconds for a switch overlay to show. If set to zero, then the overlay is shown indefinately.");
 			RegisterDefault("feature.showDesktopSwitchOverlay.animate", true);
 			RegisterDefault("feature.showDesktopSwitchOverlay.translucent", true);
 			RegisterDefault("feature.showDesktopSwitchOverlay.showOnAllMonitors", true);
