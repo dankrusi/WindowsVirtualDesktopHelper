@@ -12,40 +12,14 @@ namespace WindowsVirtualDesktopHelper {
 		public SettingsForm() {
 			IsLoading = true;
 
-			// Make sure the form is invisible on load
-			this.Visible = false;
-			this.ShowInTaskbar = false;
-
 			// Init UI
 			InitializeComponent();
 			LoadSettingsIntoUI();
 
-			// Theme
-			UpdateIconsForTheme(App.Instance.CurrentSystemThemeName);
-
-			// Apply some settings
-			if (checkBoxShowPrevNextIcons.Checked) {
-				notifyIconPrev.Visible = true;
-				notifyIconNext.Visible = true;
-			} else {
-				notifyIconPrev.Visible = false;
-				notifyIconNext.Visible = false;
-			}
-			if (checkBoxShowDesktopNameInitial.Checked) {
-				notifyIconName.Visible = true;
-			} else {
-				notifyIconName.Visible = false;
-			}
 
 			IsLoading = false;
 		}
 
-		public void UpdateIconsForTheme(string theme) {
-			// Set current display icons
-			UpdateIconForVDDisplayNumber(theme, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
-			UpdateIconForVDDisplayName(theme, App.Instance.CurrentVDDisplayName);
-			UpdateNextPrevIconVisibility(theme);
-		}
 		
 
 		private void LoadSettingsIntoUI() {
@@ -82,147 +56,39 @@ namespace WindowsVirtualDesktopHelper {
 			checkBoxShowOverlay_CheckedChanged(this, null);
 			checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(this, null);
 		}
+		
 		private void SaveSettingsFromUI() {
 			// Save user settings to storage
 			Settings.SaveConfig();
 		}
 
-		public void UpdateIconForVDDisplayNumber(string theme, uint number, string name) {
-			number++;
-			this.notifyIconNumber.Icon = Util.Icons.GenerateNotificationIcon(number.ToString(), theme, this.DeviceDpi, false, FontStyle.Bold);
-		}
-
-		public void UpdateIconForVDDisplayName(string theme, string name) {
-			{
-				var nameToShow = name;
-				if (nameToShow == null) nameToShow = "";
-				if (nameToShow.Length > 1) nameToShow = new StringInfo(nameToShow).SubstringByTextElements(0, 1);
-
-				this.notifyIconName.Icon = Util.Icons.GenerateNotificationIcon(nameToShow, theme, this.DeviceDpi, false);
-			}
-		}
-
-		public void UpdateNextPrevIconVisibility(string theme) {
-			// Prev/next
-			// Get prev char
-			// \xE100 = skip back (player style)
-			// \xE112 = previous (arrow style)
-			// \xe26c = previous (chevron style)
-			// \u02C2 = previous (chevron style)
-			// \u2039 = previous (chevron style)
-			var prevChar = "\u2039";
-			// Get next char
-			// \xE101 = skip forward (player style)
-			// \xE111 = next (arrow style)
-			// \xe26b = next (chevron style)
-			// \u02C3 = next (chevron style)
-			// \u203A = next (chevron style)
-			var nextChar = "\u203A";
-			int count = App.Instance.CurrentVDDisplayCount - 1;
-			if (checkBoxShowPrevNextIcons.Checked) {
-				var hasNextDesktop = count != 0 && App.Instance.CurrentVDDisplayNumber != count;
-				var hasPrevDesktop = App.Instance.CurrentVDDisplayNumber != 0;
-				// Update prev/next icons
-				notifyIconPrev.Icon = Util.Icons.GenerateNotificationIcon(prevChar, theme, this.DeviceDpi, true, FontStyle.Regular, hasPrevDesktop ? 1.0f : 0.5f);
-				notifyIconNext.Icon = Util.Icons.GenerateNotificationIcon(nextChar, theme, this.DeviceDpi, true, FontStyle.Regular, hasNextDesktop ? 1.0f : 0.5f);
-				// Show or hide?
-				if(Settings.GetBool("feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds")) {
-					notifyIconNext.Visible = hasNextDesktop;
-					notifyIconPrev.Visible = hasPrevDesktop;
-				} else {
-					notifyIconNext.Visible = true;
-					notifyIconPrev.Visible = true;
-				}
-			}
-		}
 
 		#region Form Events
 
 		private void SettingsForm_Load(object sender, EventArgs e) {
-			App.Instance.ShowSplash();
-			App.Instance.MonitorVDSwitch();
-			App.Instance.MonitorFGWindowName();
-			App.Instance.MonitorSystemThemeSwitch();
-			App.Instance.MonitorVDisplayCount();
+			
 		}
 
 		private void SettingsForm_Shown(object sender, EventArgs e) {
-			UpdateIconForVDDisplayNumber(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
-			UpdateIconForVDDisplayName(App.Instance.CurrentSystemThemeName, App.Instance.CurrentVDDisplayName);
-			UpdateNextPrevIconVisibility(App.Instance.CurrentSystemThemeName);
-			this.notifyIconNumber.Visible = true;
-			this.Hide();
+			
 		}
 
 		private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) {
-
+			
 		}
 
 		private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e) {
+
 			if(e.CloseReason == CloseReason.UserClosing) {
 				e.Cancel = true;
 				SaveSettingsFromUI();
 				Hide();
-			} else if(e.CloseReason == CloseReason.ApplicationExitCall || e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.TaskManagerClosing) {
-				// Remove all notif icons
-				notifyIconName.Visible = false;
-				notifyIconNumber.Visible = false;
-				notifyIconPrev.Visible = false;
-				notifyIconNext.Visible = false;
 			}
+			
+				
 		}
 
 		#endregion
-
-		#region Menu and Icon Tray Events
-
-		private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e) {
-			if(e.ClickedItem.Tag.ToString() == "exit") App.Instance.Exit();
-			else if(e.ClickedItem.Tag.ToString() == "settings") App.Instance.ShowSettings();
-			else if(e.ClickedItem.Tag.ToString() == "about") App.Instance.ShowAbout();
-			else if(e.ClickedItem.Tag.ToString() == "donate") App.Instance.OpenDonatePage();
-		}
-
-		private void notifyIconPrev_Click(object sender, EventArgs e) {
-			App.Instance.SwitchDesktopBackward();
-		}
-
-		private void notifyIconNext_Click(object sender, EventArgs e) {
-			App.Instance.SwitchDesktopForward();
-		}
-
-		private void notifyIconPrev_DoubleClick(object sender, EventArgs e) {
-			//TODO: got to first desktop
-		}
-
-		private void notifyIconNext_DoubleClick(object sender, EventArgs e) {
-			//TODO: go to last desktop
-		}
-
-		private void notifyIconName_MouseClick(object sender, MouseEventArgs e) {
-			if(e.Button == MouseButtons.Left && this.checkBoxClickDesktopNumberTaskView.Checked) {
-				// Already open?
-				if(App.Instance.FGWindowHistory.Contains("Task View")) {
-					// Do nothing
-				} else {
-					Util.OS.OpenTaskView();
-				}
-			}
-		}
-
-		private void notifyIconNumber_MouseClick(object sender, MouseEventArgs e) {
-			if(e.Button == MouseButtons.Left && this.checkBoxClickDesktopNumberTaskView.Checked) {
-				// Already open?
-				if(App.Instance.FGWindowHistory.Contains("Task View")) {
-					// Do nothing
-				} else {
-					Util.OS.OpenTaskView();
-				}
-			}
-		}
-
-		#endregion
-
 
 
 
@@ -245,23 +111,14 @@ namespace WindowsVirtualDesktopHelper {
 			if(IsLoading) return;
 			Settings.SetBool("feature.showPrevNextIcons", this.checkBoxShowPrevNextIcons.Checked);
 
-			if(checkBoxShowPrevNextIcons.Checked) {
-				UpdateNextPrevIconVisibility(App.Instance.CurrentSystemThemeName);
-			} else {
-				notifyIconPrev.Visible = false;
-				notifyIconNext.Visible = false;
-			}
+			App.Instance.UIUpdate();
 		}
 
 		private void checkBoxShowDesktopNameInitial_CheckedChanged(object sender, EventArgs e) {
 			if (IsLoading) return;
 			Settings.SetBool("feature.showDesktopNameInIconTray", this.checkBoxShowDesktopNameInitial.Checked);
 
-			if (checkBoxShowDesktopNameInitial.Checked) {
-				notifyIconName.Visible = true;
-			} else {
-				notifyIconName.Visible = false;
-			}
+			App.Instance.UIUpdate();
 		}
 
 		private void checkBoxClickDesktopNumberTaskView_CheckedChanged(object sender, EventArgs e) {
@@ -306,7 +163,7 @@ namespace WindowsVirtualDesktopHelper {
 			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
 			radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
 
-			if(!IsLoading) App.Instance.SetupHotKeys();
+			App.Instance.SetupHotKeys();
 		}
 
 		private void radioButtonUseHotKeysToJumpToDesktopAlt_CheckedChanged(object sender, EventArgs e) {

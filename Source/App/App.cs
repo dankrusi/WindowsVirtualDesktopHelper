@@ -9,6 +9,8 @@ using System.Runtime.InteropServices;
 using WindowsVirtualDesktopHelper.VirtualDesktopAPI;
 using WindowsVirtualDesktopHelper.WindowsHotKeyAPI;
 using System.Drawing.Text;
+using System.Drawing;
+using System.Globalization;
 
 namespace WindowsVirtualDesktopHelper {
 	class App {
@@ -18,6 +20,7 @@ namespace WindowsVirtualDesktopHelper {
 		public uint CurrentVDDisplayNumber = 0;
 		public int CurrentVDDisplayCount = 1;
 		public SettingsForm SettingsForm;
+		public AppForm AppForm;
 		public string CurrentSystemThemeName = null;
 		private Dictionary<int, IntPtr> VDDToLastFocusedWin = new Dictionary<int, IntPtr>();
 		public List<string> FGWindowHistory = new List<string>(); // needed to detect if Task View was open
@@ -66,11 +69,15 @@ namespace WindowsVirtualDesktopHelper {
 
 			this.CurrentVDDisplayCount = this.GetVDDisplayCount();
 
-			// Create the settings form, which acts as our ui main thread
+			// Create the app form, which acts as our ui main thread (we need such a main thread form for many of the win api calls)
+			this.AppForm = new AppForm();
+
+			// Create settings form
 			this.SettingsForm = new SettingsForm();
 
 			// Hot keys
 			this.SetupHotKeys();
+
 		}
 
 
@@ -240,16 +247,16 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		public void VDSwitchedSafe() {
-			if (this.SettingsForm.InvokeRequired) {
+			if (this.AppForm.InvokeRequired) {
 				Action safeAction = delegate { VDSwitchedSafe(); };
-				this.SettingsForm.Invoke(safeAction);
+				this.AppForm.Invoke(safeAction);
 			} else {
-				this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
-				this.SettingsForm.UpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
-				this.SettingsForm.UpdateNextPrevIconVisibility(this.CurrentSystemThemeName);
+				this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
+				this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
+				this.UIUpdateNextPrevIconVisibility(this.CurrentSystemThemeName);
 				if (Settings.GetBool("feature.showDesktopSwitchOverlay")) {
-					this.SettingsForm.Invoke((Action)(() => {
-						SwitchNotificationForm.CloseAllNotifications(this.SettingsForm);
+					this.AppForm.Invoke((Action)(() => {
+						SwitchNotificationForm.CloseAllNotifications(this.AppForm);
 						if (Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors")) {
 							for (var i = 0; i < Screen.AllScreens.Length; i++) {
 								var form = new SwitchNotificationForm(i);
@@ -269,12 +276,12 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		public void VDSwitched() {
-			this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
-			this.SettingsForm.UpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
+			this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
+			this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
 			// this cause flicker when switch VD from windows Task View
 			if (Settings.GetBool("feature.showDesktopSwitchOverlay")) {
-				this.SettingsForm.Invoke((Action)(() => {
-					SwitchNotificationForm.CloseAllNotifications(this.SettingsForm);
+				this.AppForm.Invoke((Action)(() => {
+					SwitchNotificationForm.CloseAllNotifications(this.AppForm);
 					if (Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors")) {
 						for (var i = 0; i < Screen.AllScreens.Length; i++) {
 							var form = new SwitchNotificationForm(i);
@@ -314,11 +321,11 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		public void ThemeSwitched() {
-			this.SettingsForm.UpdateIconsForTheme(this.CurrentSystemThemeName);
+			this.UIUpdateIcons();
 		}
 
 		public void ShowAbout() {
-			this.SettingsForm.Invoke((Action)(() => {
+			this.AppForm.Invoke((Action)(() => {
 				var form = new AboutForm();
 				form.Show();
 			}));
@@ -331,7 +338,7 @@ namespace WindowsVirtualDesktopHelper {
 		public void ShowSplash() {
 			if(Settings.GetBool("feature.showSplashScreen")) {
 				if(Settings.GetBool("feature.showDesktopSwitchOverlay")) {
-					this.SettingsForm.Invoke((Action)(() => {
+					this.AppForm.Invoke((Action)(() => {
 						var form = new SwitchNotificationForm();
 						form.DisplayTimeMS = Settings.GetInt("feature.showSplashScreen.duration");
 						form.LabelText = Settings.GetString("feature.showSplashScreen.text");
@@ -420,6 +427,81 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
+		#region UI
+
+		public void UIUpdate() {
+			// Icons
+			UIUpdateIcons();
+		}
+
+		public void UIUpdateIcons() {
+			var theme = App.Instance.CurrentSystemThemeName;
+			// Set current display icons
+			UIUpdateIconForVDDisplayNumber(theme, App.Instance.CurrentVDDisplayNumber, App.Instance.CurrentVDDisplayName);
+			UIUpdateIconForVDDisplayName(theme, App.Instance.CurrentVDDisplayName);
+			UIUpdateNextPrevIconVisibility(theme);
+			// Visibility by feature
+			this.AppForm.notifyIconName.Visible = Settings.GetBool("feature.showDesktopNameInIconTray");
+			this.AppForm.notifyIconNumber.Visible = Settings.GetBool("feature.showDesktopNumberInIconTray");
+		}
+
+
+		public void UIUpdateIconForVDDisplayNumber(string theme, uint number, string name) {
+			number++;
+			this.AppForm.notifyIconNumber.Icon = Util.Icons.GenerateNotificationIcon(number.ToString(), theme, this.AppForm.DeviceDpi, false, FontStyle.Bold);
+		}
+
+		public void UIUpdateIconForVDDisplayName(string theme, string name) {
+			{
+				var nameToShow = name;
+				if(nameToShow == null) nameToShow = "";
+				if(nameToShow.Length > 1) nameToShow = new StringInfo(nameToShow).SubstringByTextElements(0, 1);
+
+				this.AppForm.notifyIconName.Icon = Util.Icons.GenerateNotificationIcon(nameToShow, theme, this.AppForm.DeviceDpi, false);
+			}
+		}
+
+		public void UIUpdateNextPrevIconVisibility(string theme) {
+			// Prev/next
+			// Get prev char
+			// \xE100 = skip back (player style)
+			// \xE112 = previous (arrow style)
+			// \xe26c = previous (chevron style)
+			// \u02C2 = previous (chevron style)
+			// \u2039 = previous (chevron style)
+			var prevChar = "\u2039";
+			// Get next char
+			// \xE101 = skip forward (player style)
+			// \xE111 = next (arrow style)
+			// \xe26b = next (chevron style)
+			// \u02C3 = next (chevron style)
+			// \u203A = next (chevron style)
+			var nextChar = "\u203A";
+			int count = App.Instance.CurrentVDDisplayCount - 1;
+			if(Settings.GetBool("feature.showPrevNextIcons")) {
+				var hasNextDesktop = count != 0 && App.Instance.CurrentVDDisplayNumber != count;
+				var hasPrevDesktop = App.Instance.CurrentVDDisplayNumber != 0;
+				// Update prev/next icons
+				this.AppForm.notifyIconPrev.Icon = Util.Icons.GenerateNotificationIcon(prevChar, theme, this.AppForm.DeviceDpi, true, FontStyle.Regular, hasPrevDesktop ? 1.0f : 0.5f);
+				this.AppForm.notifyIconNext.Icon = Util.Icons.GenerateNotificationIcon(nextChar, theme, this.AppForm.DeviceDpi, true, FontStyle.Regular, hasNextDesktop ? 1.0f : 0.5f);
+				// Show or hide?
+				if(Settings.GetBool("feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds")) {
+					this.AppForm.notifyIconNext.Visible = hasNextDesktop;
+					this.AppForm.notifyIconPrev.Visible = hasPrevDesktop;
+				} else {
+					this.AppForm.notifyIconNext.Visible = true;
+					this.AppForm.notifyIconPrev.Visible = true;
+				}
+			} else {
+				this.AppForm.notifyIconNext.Visible = false;
+				this.AppForm.notifyIconPrev.Visible = false;
+			}
+		}
+
+		#endregion
+
+		#region Misc
+
 		public void OpenEmailContact() {
 			App.Instance.OpenURL("mailto:dan@dankrusi.com");
 		}
@@ -431,6 +513,8 @@ namespace WindowsVirtualDesktopHelper {
 		public void OpenDonatePage() {
 			App.Instance.OpenURL("https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6");
 		}
+
+		#endregion
 
 	}
 }

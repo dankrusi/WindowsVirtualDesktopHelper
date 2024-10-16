@@ -17,7 +17,7 @@ namespace WindowsVirtualDesktopHelper {
 				Application.EnableVisualStyles();
 				Application.SetCompatibleTextRenderingDefault(false);
 				var app = new App();
-				Application.Run(app.SettingsForm);
+				Application.Run(app.AppForm);
 			} catch (Exception e) {
 				// Global error handler
 				Console.Error.WriteLine(e);

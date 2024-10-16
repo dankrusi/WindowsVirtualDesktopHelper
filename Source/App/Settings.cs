@@ -13,9 +13,8 @@ namespace WindowsVirtualDesktopHelper {
 	/// ```txt
 	/// general.language: "en"
 	/// icons.automaticallyHidePrevNextOnBounds: true
+	/// feature.showSplashScreen.text: "Virtual \nDesktop Helper"
 	/// ```
-	/// 
-	/// NOTE: CURRENTLY UNUSED, BUT KEPT FOR FUTURE USE - SETTINGS WILL BE MIGRATED TO THIS SOON
 	/// </summary>
 	class Settings {
 
