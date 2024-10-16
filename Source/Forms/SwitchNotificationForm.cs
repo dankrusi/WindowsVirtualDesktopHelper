@@ -23,9 +23,9 @@ namespace WindowsVirtualDesktopHelper {
 			InitializeComponent();
 
 			this.ScreenNumber = screenNumber;
-			this.FadeIn = App.Instance.SettingsForm.OverlayAnimate();
-			this.Translucent = App.Instance.SettingsForm.OverlayTranslucent();
-			this.Position = App.Instance.SettingsForm.OverlayPosition();
+			this.FadeIn = Settings.GetBool("feature.showDesktopSwitchOverlay.animate");
+			this.Translucent = Settings.GetBool("feature.showDesktopSwitchOverlay.translucent");
+			this.Position = Settings.GetString("feature.showDesktopSwitchOverlay.position");
 
 			// Set theme
 			//TODO

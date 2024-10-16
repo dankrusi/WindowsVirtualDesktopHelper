@@ -12,6 +12,10 @@ namespace WindowsVirtualDesktopHelper {
 		public SettingsForm() {
 			IsLoading = true;
 
+			// Make sure the form is invisible on load
+			this.Visible = false;
+			this.ShowInTaskbar = false;
+
 			// Init UI
 			InitializeComponent();
 			LoadSettingsIntoUI();
@@ -33,8 +37,6 @@ namespace WindowsVirtualDesktopHelper {
 				notifyIconName.Visible = false;
 			}
 
-			//TODO: how to sync the startup setting - best would be to see if the reg key is actually there
-
 			IsLoading = false;
 		}
 
@@ -44,49 +46,12 @@ namespace WindowsVirtualDesktopHelper {
 			UpdateIconForVDDisplayName(theme, App.Instance.CurrentVDDisplayName);
 			UpdateNextPrevIconVisibility(theme);
 		}
-		public ModifierKeys HotKeysToJumpToDesktop() {
-			if (this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked) return WindowsHotKeyAPI.ModifierKeys.Alt;
-			if (this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked) return WindowsHotKeyAPI.ModifierKeys.Alt | WindowsHotKeyAPI.ModifierKeys.Shift;
-			if (this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked) return WindowsHotKeyAPI.ModifierKeys.Control;
-			if (this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked) return WindowsHotKeyAPI.ModifierKeys.Control | WindowsHotKeyAPI.ModifierKeys.Alt;
-			throw new Exception("invalid modifier");
-		}
-		public bool UseHotKeysToJumpToDesktop() {
-			return this.checkBoxUseHotKeysToJumpToDesktop.Checked;
-		}
-		public bool ShowOverlay() {
-			return this.checkBoxShowOverlay.Checked;
-		}
-		public bool OverlayAnimate() {
-			return this.checkBoxOverlayAnimate.Checked;
-		}
-		public bool OverlayTranslucent() {
-			return this.checkBoxOverlayTranslucent.Checked;
-		}
-		public bool OverlayShowOnAllMonitors() {
-			return this.checkBoxOverlayShowOnAllMonitors.Checked;
-		}
-		public int OverlayDurationMS() {
-			if (this.radioButtonOverlayLongDuration.Checked == true) return 3000;
-			else if (this.radioButtonOverlayMediumDuration.Checked == true) return 2000;
-			else if (this.radioButtonOverlayShortDuration.Checked == true) return 1000;
-			else if (this.radioButtonOverlayMicroDuration.Checked == true) return 500;
-			else return 2000;
-		}
-		public string OverlayPosition() {
-			if (this.radioButtonPositionTopLeft.Checked) return "topleft";
-			else if (this.radioButtonPositionTopCenter.Checked) return "topcenter";
-			else if (this.radioButtonPositionTopRight.Checked) return "topright";
-			else if (this.radioButtonPositionMiddleLeft.Checked) return "middleleft";
-			else if (this.radioButtonPositionMiddleCenter.Checked) return "middlecenter";
-			else if (this.radioButtonPositionMiddleRight.Checked) return "middleright";
-			else if (this.radioButtonPositionBottomLeft.Checked) return "bottomleft";
-			else if (this.radioButtonPositionBottomCenter.Checked) return "bottomcenter";
-			else if (this.radioButtonPositionBottomRight.Checked) return "bottomright";
-			else return "middlecenter";
-		}
+		
 
 		private void LoadSettingsIntoUI() {
+
+			//TODO: how to sync the startup setting - best would be to see if the reg key is actually there
+
 			this.checkBoxShowPrevNextIcons.Checked = Settings.GetBool("feature.showPrevNextIcons");
 			this.checkBoxShowDesktopNameInitial.Checked = Settings.GetBool("feature.showDesktopNameInIconTray");
 			this.checkBoxStartupWithWindows.Checked = Settings.GetBool("general.startupWithWindows");
@@ -118,33 +83,7 @@ namespace WindowsVirtualDesktopHelper {
 			checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(this, null);
 		}
 		private void SaveSettingsFromUI() {
-			Settings.SetBool("feature.showPrevNextIcons", this.checkBoxShowPrevNextIcons.Checked);
-			Settings.SetBool("feature.showDesktopNameInIconTray", this.checkBoxShowDesktopNameInitial.Checked);
-			Settings.SetBool("general.startupWithWindows", this.checkBoxStartupWithWindows.Checked);
-			Settings.SetBool("feature.showDesktopSwitchOverlay", this.checkBoxShowOverlay.Checked);
-			Settings.SetBool("feature.showDesktopSwitchOverlay.animate", this.checkBoxOverlayAnimate.Checked);
-			Settings.SetBool("feature.showDesktopSwitchOverlay.translucent", this.checkBoxOverlayTranslucent.Checked);
-			Settings.SetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors", this.checkBoxOverlayShowOnAllMonitors.Checked);
-			Settings.SetBool("feature.showDesktopNumberInIconTray.clickToOpenTaskView", this.checkBoxClickDesktopNumberTaskView.Checked);
-			Settings.SetBool("feature.useHotKeysToJumpToDesktop", this.checkBoxUseHotKeysToJumpToDesktop.Checked);
-			if(this.radioButtonOverlayLongDuration.Checked) Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 3000);
-			if(this.radioButtonOverlayMediumDuration.Checked) Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 2000);
-			if(this.radioButtonOverlayShortDuration.Checked) Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 1000);
-			if(this.radioButtonOverlayMicroDuration.Checked) Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 500);
-			if(this.radioButtonPositionTopLeft.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "topleft");
-			if(this.radioButtonPositionTopCenter.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "topcenter");
-			if(this.radioButtonPositionTopRight.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "topright");
-			if(this.radioButtonPositionMiddleLeft.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "middleleft");
-			if(this.radioButtonPositionMiddleCenter.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "middlecenter");
-			if(this.radioButtonPositionMiddleRight.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "middleright");
-			if(this.radioButtonPositionBottomLeft.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomleft");
-			if(this.radioButtonPositionBottomCenter.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomcenter");
-			if(this.radioButtonPositionBottomRight.Checked) Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomright");
-			if(this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked) Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "Alt");
-			if(this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked) Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "AltShift");
-			if(this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked) Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "Ctrl");
-			if(this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked) Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "CtrlAlt");
-			// Save user settings
+			// Save user settings to storage
 			Settings.SaveConfig();
 		}
 
@@ -197,6 +136,8 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
+		#region Form Events
+
 		private void SettingsForm_Load(object sender, EventArgs e) {
 			App.Instance.ShowSplash();
 			App.Instance.MonitorVDSwitch();
@@ -213,11 +154,33 @@ namespace WindowsVirtualDesktopHelper {
 			this.Hide();
 		}
 
+		private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) {
+
+		}
+
+		private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e) {
+			if(e.CloseReason == CloseReason.UserClosing) {
+				e.Cancel = true;
+				SaveSettingsFromUI();
+				Hide();
+			} else if(e.CloseReason == CloseReason.ApplicationExitCall || e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.TaskManagerClosing) {
+				// Remove all notif icons
+				notifyIconName.Visible = false;
+				notifyIconNumber.Visible = false;
+				notifyIconPrev.Visible = false;
+				notifyIconNext.Visible = false;
+			}
+		}
+
+		#endregion
+
+		#region Menu and Icon Tray Events
+
 		private void contextMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e) {
-			if (e.ClickedItem.Tag.ToString() == "exit") App.Instance.Exit();
-			else if (e.ClickedItem.Tag.ToString() == "settings") this.Show();
-			else if (e.ClickedItem.Tag.ToString() == "about") App.Instance.ShowAbout();
-			else if (e.ClickedItem.Tag.ToString() == "donate") App.Instance.OpenDonatePage();
+			if(e.ClickedItem.Tag.ToString() == "exit") App.Instance.Exit();
+			else if(e.ClickedItem.Tag.ToString() == "settings") App.Instance.ShowSettings();
+			else if(e.ClickedItem.Tag.ToString() == "about") App.Instance.ShowAbout();
+			else if(e.ClickedItem.Tag.ToString() == "donate") App.Instance.OpenDonatePage();
 		}
 
 		private void notifyIconPrev_Click(object sender, EventArgs e) {
@@ -228,10 +191,61 @@ namespace WindowsVirtualDesktopHelper {
 			App.Instance.SwitchDesktopForward();
 		}
 
-		private void checkBoxShowPrevNextIcons_CheckedChanged(object sender, EventArgs e) {
-			if (IsLoading) return;
+		private void notifyIconPrev_DoubleClick(object sender, EventArgs e) {
+			//TODO: got to first desktop
+		}
 
-			if (checkBoxShowPrevNextIcons.Checked) {
+		private void notifyIconNext_DoubleClick(object sender, EventArgs e) {
+			//TODO: go to last desktop
+		}
+
+		private void notifyIconName_MouseClick(object sender, MouseEventArgs e) {
+			if(e.Button == MouseButtons.Left && this.checkBoxClickDesktopNumberTaskView.Checked) {
+				// Already open?
+				if(App.Instance.FGWindowHistory.Contains("Task View")) {
+					// Do nothing
+				} else {
+					Util.OS.OpenTaskView();
+				}
+			}
+		}
+
+		private void notifyIconNumber_MouseClick(object sender, MouseEventArgs e) {
+			if(e.Button == MouseButtons.Left && this.checkBoxClickDesktopNumberTaskView.Checked) {
+				// Already open?
+				if(App.Instance.FGWindowHistory.Contains("Task View")) {
+					// Do nothing
+				} else {
+					Util.OS.OpenTaskView();
+				}
+			}
+		}
+
+		#endregion
+
+
+
+
+
+		#region Settings UI Events
+
+
+		private void checkBoxStartupWithWindows_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("general.startupWithWindows", this.checkBoxStartupWithWindows.Checked);
+
+			if(checkBoxStartupWithWindows.Checked) {
+				App.Instance.EnableStartupWithWindows();
+			} else {
+				App.Instance.DisableStartupWithWindows();
+			}
+		}
+
+		private void checkBoxShowPrevNextIcons_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.showPrevNextIcons", this.checkBoxShowPrevNextIcons.Checked);
+
+			if(checkBoxShowPrevNextIcons.Checked) {
 				UpdateNextPrevIconVisibility(App.Instance.CurrentSystemThemeName);
 			} else {
 				notifyIconPrev.Visible = false;
@@ -239,35 +253,31 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
-		private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) {
-
-		}
-
-		private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e) {
-			if (e.CloseReason == CloseReason.UserClosing) {
-				e.Cancel = true;
-				SaveSettingsFromUI();
-				Hide();
-			} else if (e.CloseReason == CloseReason.ApplicationExitCall || e.CloseReason == CloseReason.WindowsShutDown || e.CloseReason == CloseReason.TaskManagerClosing) {
-				// Remove all notif icons
-				notifyIconName.Visible = false;
-				notifyIconNumber.Visible = false;
-				notifyIconPrev.Visible = false;
-				notifyIconNext.Visible = false;
-			}
-		}
-
-		private void checkBoxStartupWithWindows_CheckedChanged(object sender, EventArgs e) {
+		private void checkBoxShowDesktopNameInitial_CheckedChanged(object sender, EventArgs e) {
 			if (IsLoading) return;
+			Settings.SetBool("feature.showDesktopNameInIconTray", this.checkBoxShowDesktopNameInitial.Checked);
 
-			if (checkBoxStartupWithWindows.Checked) {
-				App.Instance.EnableStartupWithWindows();
+			if (checkBoxShowDesktopNameInitial.Checked) {
+				notifyIconName.Visible = true;
 			} else {
-				App.Instance.DisableStartupWithWindows();
+				notifyIconName.Visible = false;
 			}
+		}
+
+		private void checkBoxClickDesktopNumberTaskView_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.showDesktopNumberInIconTray.clickToOpenTaskView", this.checkBoxClickDesktopNumberTaskView.Checked);
+		}
+
+		private void checkBoxOverlayShowOnAllMonitors_CheckedChanged(object sender, EventArgs e) {
+			if (IsLoading) return;
+			Settings.SetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors", this.checkBoxOverlayShowOnAllMonitors.Checked);
 		}
 
 		private void checkBoxShowOverlay_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.showDesktopSwitchOverlay", this.checkBoxShowOverlay.Checked);
+
 			radioButtonOverlayMicroDuration.Enabled = checkBoxShowOverlay.Checked;
 			radioButtonOverlayShortDuration.Enabled = checkBoxShowOverlay.Checked;
 			radioButtonOverlayMediumDuration.Enabled = checkBoxShowOverlay.Checked;
@@ -287,55 +297,10 @@ namespace WindowsVirtualDesktopHelper {
 
 		}
 
-		private void notifyIconPrev_DoubleClick(object sender, EventArgs e) {
-			//TODO: got to first desktop
-		}
-
-		private void notifyIconNext_DoubleClick(object sender, EventArgs e) {
-			//TODO: go to last desktop
-		}
-
-		private void checkBoxClickDesktopNumberTaskView_CheckedChanged(object sender, EventArgs e) {
-
-		}
-
-		private void notifyIconName_MouseClick(object sender, MouseEventArgs e) {
-			if (e.Button == MouseButtons.Left && this.checkBoxClickDesktopNumberTaskView.Checked) {
-				// Already open?
-				if (App.Instance.FGWindowHistory.Contains("Task View")) {
-					// Do nothing
-				} else {
-					Util.OS.OpenTaskView();
-				}
-			}
-		}
-
-		private void notifyIconNumber_MouseClick(object sender, MouseEventArgs e) {
-			if (e.Button == MouseButtons.Left && this.checkBoxClickDesktopNumberTaskView.Checked) {
-				// Already open?
-				if (App.Instance.FGWindowHistory.Contains("Task View")) {
-					// Do nothing
-				} else {
-					Util.OS.OpenTaskView();
-				}
-			}
-		}
-
-		private void checkBoxShowDesktopNameInitial_CheckedChanged(object sender, EventArgs e) {
-			if (IsLoading) return;
-
-			if (checkBoxShowDesktopNameInitial.Checked) {
-				notifyIconName.Visible = true;
-			} else {
-				notifyIconName.Visible = false;
-			}
-		}
-
-		private void checkBoxOverlayShowOnAllMonitors_CheckedChanged(object sender, EventArgs e) {
-			if (IsLoading) return;
-		}
-
 		private void checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.useHotKeysToJumpToDesktop", this.checkBoxUseHotKeysToJumpToDesktop.Checked);
+
 			radioButtonUseHotKeysToJumpToDesktopAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
 			radioButtonUseHotKeysToJumpToDesktopAltShift.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
 			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
@@ -345,19 +310,138 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		private void radioButtonUseHotKeysToJumpToDesktopAlt_CheckedChanged(object sender, EventArgs e) {
-			if (!IsLoading) App.Instance.SetupHotKeys();
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "Alt");
+				App.Instance.SetupHotKeys();
+			}
 		}
 
 		private void radioButtonUseHotKeysToJumpToDesktopCtrl_CheckedChanged(object sender, EventArgs e) {
-			if (!IsLoading) App.Instance.SetupHotKeys();
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "Ctrl");
+				App.Instance.SetupHotKeys();
+			}
 		}
 
 		private void radioButtonUseHotKeysToJumpToDesktopCtrlAlt_CheckedChanged(object sender, EventArgs e) {
-			if (!IsLoading) App.Instance.SetupHotKeys();
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "CtrlAlt");
+				App.Instance.SetupHotKeys();
+			}
 		}
 
 		private void radioButtonUseHotKeysToJumpToDesktopAltShift_CheckedChanged(object sender, EventArgs e) {
-			if (!IsLoading) App.Instance.SetupHotKeys();
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.useHotKeysToJumpToDesktop.hotkey", "AltShift");
+				App.Instance.SetupHotKeys();
+			}
 		}
+
+		private void radioButtonOverlayLongDuration_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 3000);
+			}
+		}
+
+		private void radioButtonOverlayMediumDuration_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 2000);
+			}
+		}
+
+		private void radioButtonOverlayShortDuration_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 1000);
+			}
+		}
+
+		private void radioButtonOverlayMicroDuration_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetInt("feature.showDesktopSwitchOverlay.duration", 500);
+			}
+		}
+
+		private void checkBoxOverlayAnimate_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.showDesktopSwitchOverlay.animate", this.checkBoxOverlayAnimate.Checked);
+		}
+
+		private void checkBoxOverlayTranslucent_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.showDesktopSwitchOverlay.translucent", this.checkBoxOverlayTranslucent.Checked);
+		}
+
+		private void radioButtonPositionTopLeft_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopSwitchOverlay.position", "topleft");
+			}
+		}
+
+		private void radioButtonPositionTopCenter_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopSwitchOverlay.position", "topcenter");
+			}
+		}
+
+		private void radioButtonPositionTopRight_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopSwitchOverlay.position", "topright");
+			}
+		}
+
+		private void radioButtonPositionMiddleLeft_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopSwitchOverlay.position", "middleleft");
+			}
+		}
+
+		private void radioButtonPositionMiddleCenter_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopSwitchOverlay.position", "middlecenter");
+			}
+		}
+
+		private void radioButtonPositionMiddleRight_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopSwitchOverlay.position", "middleright");
+			}
+		}
+
+		private void radioButtonPositionBottomLeft_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomleft");
+			}
+		}
+
+		private void radioButtonPositionBottomCenter_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomcenter");
+			}
+		}
+
+		private void radioButtonPositionBottomRight_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomright");
+			}
+		}
+
+		#endregion
 	}
 }

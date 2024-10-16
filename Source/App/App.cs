@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 
 using WindowsVirtualDesktopHelper.VirtualDesktopAPI;
 using WindowsVirtualDesktopHelper.WindowsHotKeyAPI;
+using System.Drawing.Text;
 
 namespace WindowsVirtualDesktopHelper {
 	class App {
@@ -119,10 +120,20 @@ namespace WindowsVirtualDesktopHelper {
 				this.KeyboardHooksJumpToDesktop = null;
 			}
 
-			if (this.SettingsForm.UseHotKeysToJumpToDesktop()) {
+			if (Settings.GetBool("feature.useHotKeysToJumpToDesktop")) {
+
+				ModifierKeys _HotKeysToJumpToDesktop() {
+					var hotKey = Settings.GetString("feature.useHotKeysToJumpToDesktop.hotKey");
+					if(hotKey == "Alt") return WindowsHotKeyAPI.ModifierKeys.Alt;
+					if(hotKey == "AltShift") return WindowsHotKeyAPI.ModifierKeys.Alt | WindowsHotKeyAPI.ModifierKeys.Shift;
+					if(hotKey == "Ctrl") return WindowsHotKeyAPI.ModifierKeys.Control;
+					if(hotKey == "CtrlAlt") return WindowsHotKeyAPI.ModifierKeys.Control | WindowsHotKeyAPI.ModifierKeys.Alt;
+					throw new Exception("invalid modifier");
+				}
+
 				this.KeyboardHooksJumpToDesktop = new KeyboardHook();
 				this.KeyboardHooksJumpToDesktop.KeyPressed += new EventHandler<KeyPressedEventArgs>(HotKeyPressed);
-				ModifierKeys modifier = this.SettingsForm.HotKeysToJumpToDesktop();
+				ModifierKeys modifier = _HotKeysToJumpToDesktop();
 				var keys = new List<Keys>() { 
 					Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, 
 					Keys.NumPad1, Keys.NumPad2, Keys.NumPad3, Keys.NumPad4, Keys.NumPad5, Keys.NumPad6, Keys.NumPad7, Keys.NumPad8, Keys.NumPad9
@@ -236,20 +247,20 @@ namespace WindowsVirtualDesktopHelper {
 				this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
 				this.SettingsForm.UpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
 				this.SettingsForm.UpdateNextPrevIconVisibility(this.CurrentSystemThemeName);
-				if (this.SettingsForm.ShowOverlay()) {
+				if (Settings.GetBool("feature.showDesktopSwitchOverlay")) {
 					this.SettingsForm.Invoke((Action)(() => {
 						SwitchNotificationForm.CloseAllNotifications(this.SettingsForm);
-						if (this.SettingsForm.OverlayShowOnAllMonitors()) {
+						if (Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors")) {
 							for (var i = 0; i < Screen.AllScreens.Length; i++) {
 								var form = new SwitchNotificationForm(i);
 								form.LabelText = this.CurrentVDDisplayName;
-								form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
+								form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
 								form.Show();
 							}
 						} else {
 							var form = new SwitchNotificationForm();
 							form.LabelText = this.CurrentVDDisplayName;
-							form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
+							form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
 							form.Show();
 						}
 					}));
@@ -261,20 +272,20 @@ namespace WindowsVirtualDesktopHelper {
 			this.SettingsForm.UpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
 			this.SettingsForm.UpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
 			// this cause flicker when switch VD from windows Task View
-			if (this.SettingsForm.ShowOverlay()) {
+			if (Settings.GetBool("feature.showDesktopSwitchOverlay")) {
 				this.SettingsForm.Invoke((Action)(() => {
 					SwitchNotificationForm.CloseAllNotifications(this.SettingsForm);
-					if (this.SettingsForm.OverlayShowOnAllMonitors()) {
+					if (Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors")) {
 						for (var i = 0; i < Screen.AllScreens.Length; i++) {
 							var form = new SwitchNotificationForm(i);
 							form.LabelText = this.CurrentVDDisplayName;
-							form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
+							form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
 							form.Show();
 						}
 					} else {
 						var form = new SwitchNotificationForm();
 						form.LabelText = this.CurrentVDDisplayName;
-						form.DisplayTimeMS = this.SettingsForm.OverlayDurationMS();
+						form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
 						form.Show();
 					}
 				}));
@@ -313,9 +324,13 @@ namespace WindowsVirtualDesktopHelper {
 			}));
 		}
 
+		public void ShowSettings() {
+			this.SettingsForm.Show();
+		}
+
 		public void ShowSplash() {
 			if(Settings.GetBool("feature.showSplashScreen")) {
-				if(this.SettingsForm.ShowOverlay()) {
+				if(Settings.GetBool("feature.showDesktopSwitchOverlay")) {
 					this.SettingsForm.Invoke((Action)(() => {
 						var form = new SwitchNotificationForm();
 						form.DisplayTimeMS = Settings.GetInt("feature.showSplashScreen.duration");
