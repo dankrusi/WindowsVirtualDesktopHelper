@@ -36,7 +36,15 @@ namespace WindowsVirtualDesktopHelper {
 			RegisterDefault("theme.icons.iconFG.dark", "white");
 			RegisterDefault("theme.icons.iconBG.light", "white");
 			RegisterDefault("theme.icons.iconFG.light", "black");
-			
+			RegisterDefault("theme.overlay.width", 900, "With width in pixels of the overlay.");
+			RegisterDefault("theme.overlay.height", 430, "With height in pixels of the overlay.");
+			RegisterDefault("theme.overlay.font", "Segoe UI Light", "Defines the font name to use for the overlay.");
+			RegisterDefault("theme.overlay.fontSize", 30, "Defines the font size to use for the overlay.");
+			RegisterDefault("theme.overlay.overlayBG.dark", "black");
+			RegisterDefault("theme.overlay.overlayFG.dark", "white");
+			RegisterDefault("theme.overlay.overlayBG.light", "black");
+			RegisterDefault("theme.overlay.overlayFG.light", "white");
+
 			// Feature: splash
 			RegisterDefault("feature.showSplashScreen", true, "If enabled, a splash screen is shown on startup of the app. Overlays must be enabled.");
 			RegisterDefault("feature.showSplashScreen.duration", 2000, "Splash duration in milliseconds.");
@@ -186,12 +194,25 @@ namespace WindowsVirtualDesktopHelper {
 			if(defaultValue != null) defaultValueStr = defaultValue.ToString();
 			var ret = _get(key, defaultValueStr);
 			if(ret is double) return (double)ret;
+			if(ret is float) return (double)ret;
+			if(ret is int) return double.Parse(ret.ToString());
 			if(ret is string) return double.Parse((string)ret);
 			throw new Exception($"Setting {key} is not a double (value is ${ret})");
 		}
 
 		public static void SetDouble(string key, int value) {
 			_set(key, value);
+		}
+
+		public static float GetFloat(string key, float? defaultValue = null) {
+			string defaultValueStr = null;
+			if(defaultValue != null) defaultValueStr = defaultValue.ToString();
+			var ret = _get(key, defaultValueStr);
+			if(ret is double) return (float)ret;
+			if(ret is float) return (float)ret;
+			if(ret is int) return float.Parse(ret.ToString());
+			if(ret is string) return float.Parse((string)ret);
+			throw new Exception($"Setting {key} is not a float (value is ${ret})");
 		}
 
 		#endregion

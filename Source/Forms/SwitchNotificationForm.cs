@@ -27,8 +27,20 @@ namespace WindowsVirtualDesktopHelper {
 			this.Translucent = Settings.GetBool("feature.showDesktopSwitchOverlay.translucent");
 			this.Position = Settings.GetString("feature.showDesktopSwitchOverlay.position");
 
-			// Set theme
-			//TODO
+			// Theme
+			var theme = App.Instance.CurrentSystemThemeName;
+			var fgColor = ColorTranslator.FromHtml(Settings.GetString("theme.overlay.overlayFG." + theme));
+			var bgColor = ColorTranslator.FromHtml(Settings.GetString("theme.overlay.overlayBG." + theme));
+			this.BackColor = bgColor;
+			this.label1.ForeColor = fgColor;
+			
+			// Size
+			this.Width = Settings.GetInt("theme.overlay.width");
+			this.Height = Settings.GetInt("theme.overlay.height");
+
+			// Font
+			var font = new Font(Settings.GetString("theme.overlay.font"), Settings.GetFloat("theme.overlay.fontSize"), FontStyle.Regular);
+			this.label1.Font = font;
 
 			// Set position
 			var positionOffset = 40;

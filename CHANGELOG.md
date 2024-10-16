@@ -1,3 +1,26 @@
+# v1.18 (not yet released)
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
+* Jump to desktop using hot keys
+* Autostart with Windows
+* Simple and lightweight
+* Fully configurable
+* Free
+
+## Fixes
+* 
+
+## Changes
+* New powerful configuration system with lots of new configuration options via the config file or command line
+* Support theming of icons (fonts, colors)
+* Support theming of overlays (fonts, colors)
+
+ 
+
 # v1.17
 
 ## Features
