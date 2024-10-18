@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32407.337
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsVirtualDesktopHelper", "Source\WindowsVirtualDesktopHelper.csproj", "{88BEA099-1D4B-4213-9197-1929FFB44901}"
 EndProject
@@ -28,6 +28,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scoop", "Scoop", "{DE7ABE25
 		Installers\Scoop\windows-virtualdesktop-helper.json.template = Installers\Scoop\windows-virtualdesktop-helper.json.template
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{43567E8A-F656-49BF-8D79-9D9703743AA9}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Actions.md = Documentation\Actions.md
+		Documentation\Hotkeys.md = Documentation\Hotkeys.md
+		Documentation\Settings.md = Documentation\Settings.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +56,7 @@ Global
 		{CCD7DB49-839B-4BD0-B28B-30B7F8A8F355} = {8D5AC9C5-CA17-450A-B63E-66BFF5261906}
 		{9FEB8DAE-5E39-495E-9BF9-5C0733033FE1} = {8D5AC9C5-CA17-450A-B63E-66BFF5261906}
 		{DE7ABE25-05E4-4A6B-BA08-A995FC608737} = {9FEB8DAE-5E39-495E-9BF9-5C0733033FE1}
+		{43567E8A-F656-49BF-8D79-9D9703743AA9} = {8D5AC9C5-CA17-450A-B63E-66BFF5261906}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4501F245-0997-4EFA-9053-549FD6135156}
