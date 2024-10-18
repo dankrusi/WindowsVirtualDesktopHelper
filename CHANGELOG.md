@@ -18,6 +18,7 @@
 * New powerful configuration system with lots of new configuration options via the config file or command line
 * Support theming of icons (fonts, colors)
 * Support theming of overlays (fonts, colors)
+* Custom hotkeys can now be defined in the configuration file to run various actions
 
 ### Note: configuration from previous versions are not migrated - sorry!
  

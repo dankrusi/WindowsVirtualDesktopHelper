@@ -433,6 +433,24 @@ namespace WindowsVirtualDesktopHelper {
 					}
 				}
 			}
+			if(Settings.GetBool("feature.useHotKeyToJumpToPreviousDesktop")) {
+				var hotKey = Settings.GetString("feature.useHotKeyToJumpToPreviousDesktop.hotkey");
+				if(hotKey != null && hotKey != "") {
+					hotkeys.Add($"{hotKey} = PreviousDesktop");
+				}
+			}
+			if(Settings.GetBool("feature.useHotKeyToSwitchDesktopForward")) {
+				var hotKey = Settings.GetString("feature.useHotKeyToSwitchDesktopForward.hotkey");
+				if(hotKey != null && hotKey != "") {
+					hotkeys.Add($"{hotKey} = DesktopForward");
+				}
+			}
+			if(Settings.GetBool("feature.useHotKeyToSwitchDesktopBackward")) {
+				var hotKey = Settings.GetString("feature.useHotKeyToSwitchDesktopBackward.hotkey");
+				if(hotKey != null && hotKey != "") {
+					hotkeys.Add($"{hotKey} = DesktopBackward");
+				}
+			}
 
 			// Parse all hotkeys to cached HotKeyAction structs
 			_keyboardHooksHotKeysAndActions = new List<HotKeyAction>();
@@ -451,7 +469,42 @@ namespace WindowsVirtualDesktopHelper {
 						ModifierKeys hookModifierKeys = 0;
 						foreach(var key in keys) {
 							var keyCleaned = key.Trim();
+							// Normalize some key names
 							if(keyCleaned.ToLower() == "ctrl") keyCleaned = "control";
+							// Support Oem keys
+							// OemSemicolon = 0xBA,
+							// Oem1 = 0xBA,
+							// Oemplus = 0xBB,
+							// Oemcomma = 0xBC,
+							// OemMinus = 0xBD,
+							// OemPeriod = 0xBE,
+							// OemQuestion = 0xBF,
+							// Oem2 = 0xBF,
+							// Oemtilde = 0xC0,
+							// Oem3 = 0xC0,
+							// OemOpenBrackets = 0xDB,
+							// Oem4 = 0xDB,
+							// OemPipe = 0xDC,
+							// Oem5 = 0xDC,
+							// OemCloseBrackets = 0xDD,
+							// Oem6 = 0xDD,
+							// OemQuotes = 0xDE,
+							// Oem7 = 0xDE,
+							// Oem8 = 0xDF,
+							// OemBackslash = 0xE2,
+							// Oem102 = 0xE2,
+							if(keyCleaned.ToLower() == "semicolon") keyCleaned = "OemSemicolon";
+							if(keyCleaned.ToLower() == "plus") keyCleaned = "Oemplus";
+							if(keyCleaned.ToLower() == "comma") keyCleaned = "Oemcomma";
+							if(keyCleaned.ToLower() == "minus") keyCleaned = "OemMinus";
+							if(keyCleaned.ToLower() == "period") keyCleaned = "OemPeriod";
+							if(keyCleaned.ToLower() == "question") keyCleaned = "OemQuestion";
+							if(keyCleaned.ToLower() == "tilde") keyCleaned = "Oemtilde";
+							if(keyCleaned.ToLower() == "openbrackets") keyCleaned = "OemOpenBrackets";
+							if(keyCleaned.ToLower() == "pipe") keyCleaned = "OemPipe";
+							if(keyCleaned.ToLower() == "closebrackets") keyCleaned = "OemCloseBrackets";
+							if(keyCleaned.ToLower() == "quotes") keyCleaned = "OemQuotes";
+							if(keyCleaned.ToLower() == "backslash") keyCleaned = "OemBackslash";
 							ModifierKeys keyModifier;
 							var keyModifierValid = Enum.TryParse<ModifierKeys>(keyCleaned, true, out keyModifier);
 							if(keyModifierValid) {

@@ -69,6 +69,18 @@ namespace WindowsVirtualDesktopHelper {
 			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber", false);
 			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber.hotkey", "Alt");
 
+			// Feature: useHotKeyToJumpToPreviousDesktop
+			RegisterDefault("feature.useHotKeyToJumpToPreviousDesktop", false);
+			RegisterDefault("feature.useHotKeyToJumpToPreviousDesktop.hotkey", "Alt + Tilde");
+
+			// Feature: useHotKeyToSwitchDesktopForward
+			RegisterDefault("feature.useHotKeyToSwitchDesktopForward", false);
+			RegisterDefault("feature.useHotKeyToSwitchDesktopForward.hotkey", "Alt + Right");
+
+			// Feature: useHotKeyToSwitchDesktopForward
+			RegisterDefault("feature.useHotKeyToSwitchDesktopBackward", false);
+			RegisterDefault("feature.useHotKeyToSwitchDesktopBackward.hotkey", "Alt + Left");
+
 			// Feature: showDesktopNumberInIconTray
 			RegisterDefault("feature.showDesktopNumberInIconTray", true);
 			RegisterDefault("feature.showDesktopNumberInIconTray.clickToOpenTaskView", true);
