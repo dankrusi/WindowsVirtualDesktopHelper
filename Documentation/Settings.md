@@ -39,8 +39,8 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | feature.showDesktopSwitchOverlay.translucent | ``true`` |  |
 | feature.showDesktopSwitchOverlay.showOnAllMonitors | ``true`` |  |
 | feature.showDesktopSwitchOverlay.position | ``"middlecenter"`` |  |
-| feature.useHotKeysToJumpToDesktop | ``false`` |  |
-| feature.useHotKeysToJumpToDesktop.hotkey | ``"Alt+H"`` |  |
+| feature.useHotKeyToJumpToDesktopNumber | ``false`` |  |
+| feature.useHotKeyToJumpToDesktopNumber.hotkey | ``"Alt"`` |  |
 | feature.showDesktopNumberInIconTray | ``true`` |  |
 | feature.showDesktopNumberInIconTray.clickToOpenTaskView | ``true`` |  |
 | feature.showDesktopNameInIconTray | ``false`` |  |

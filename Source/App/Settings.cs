@@ -65,9 +65,9 @@ namespace WindowsVirtualDesktopHelper {
 			RegisterDefault("feature.showDesktopSwitchOverlay.showOnAllMonitors", true);
 			RegisterDefault("feature.showDesktopSwitchOverlay.position", "middlecenter");
 
-			// Feature: useHotKeysToJumpToDesktop
-			RegisterDefault("feature.useHotKeysToJumpToDesktop", false);
-			RegisterDefault("feature.useHotKeysToJumpToDesktop.hotkey", "Alt+H");
+			// Feature: useHotKeyToJumpToDesktopNumber
+			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber", false);
+			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber.hotkey", "Alt");
 
 			// Feature: showDesktopNumberInIconTray
 			RegisterDefault("feature.showDesktopNumberInIconTray", true);
@@ -152,10 +152,23 @@ namespace WindowsVirtualDesktopHelper {
 					var key = arg.Substring(2);
 					if(i + 1 < args.Length) {
 						var val = args[i + 1];
-						_settingsLaunchArgs[key] = _parseValAsType(val);
+						// Support args with no val as assumed to be true, e.g. "--key" is the same as "--key true"
+						if(val.StartsWith("--")) {
+							_settingsLaunchArgs[key] = true;
+						} else {
+							_settingsLaunchArgs[key] = _parseValAsType(val);
+						}
+					} else if(i + 1 == args.Length) {
+						// Support args with no val as assumed to be true, e.g. "--key" is the same as "--key true"
+						// In this case there is no proceeding value, so we assume it is true
+						_settingsLaunchArgs[key] = true;
 					}
 				}
 			}
+		}
+
+		public static List<string> GetKeys() {
+			return _createMergedSettingsDictionary(true, true).Keys.ToList();
 		}
 
 		public static string GetString(string key, string defaultValue = null) {

@@ -11,6 +11,8 @@ using WindowsVirtualDesktopHelper.WindowsHotKeyAPI;
 using System.Drawing.Text;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
+using System.Security.Policy;
 
 namespace WindowsVirtualDesktopHelper {
 
@@ -30,9 +32,23 @@ namespace WindowsVirtualDesktopHelper {
 
 		#endregion
 
+		#region Internal Structs
+
+		internal class HotKeyAction {
+			public string HotKeyAndAction;
+			public string HotKey;
+			public string Action;
+			public Keys Keys;
+			public ModifierKeys Modifiers;
+		}
+
+		#endregion
+
 		#region Private/Internal Properties
 
 		private KeyboardHook KeyboardHooksJumpToDesktop = null;
+		private KeyboardHook _keyboardHooks = null;
+		private List<HotKeyAction> _keyboardHooksHotKeysAndActions = new List<HotKeyAction>(); // the registered hotkey actions
 		private Dictionary<int, IntPtr> VDDToLastFocusedWin = new Dictionary<int, IntPtr>();
 		public IntPtr LastForegroundhWnd = IntPtr.Zero; //TODO: this should be private
 		public List<string> FGWindowHistory = new List<string>(); //TODO: this should be private // needed to detect if Task View was open
@@ -157,7 +173,7 @@ namespace WindowsVirtualDesktopHelper {
 					if(newVDDisplayNumber != this.CurrentVDDisplayNumber) {
 						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
 						this.CurrentVDDisplayNumber = newVDDisplayNumber;
-						Util.Logging.WriteLine("Switched to " + this.CurrentVDDisplayNumber);
+						//Util.Logging.WriteLine("Switched to " + this.CurrentVDDisplayNumber);
 						VDSwitchedSafe();
 					} else {
 						//storeLastWinFocused();
@@ -337,51 +353,156 @@ namespace WindowsVirtualDesktopHelper {
 
 		#endregion
 
-		#region Hot Keys
+		#region Actions API
 
-		public void SetupHotKeys() {
-			if(this.KeyboardHooksJumpToDesktop != null) {
-				this.KeyboardHooksJumpToDesktop.Dispose();
-				this.KeyboardHooksJumpToDesktop = null;
-			}
+		//TODO: expose this API to the command line in a --noGUI mode
 
-			if (Settings.GetBool("feature.useHotKeysToJumpToDesktop")) {
+		public string RunAction(string action) {
+			// The following actions are supported:
+			// - DesktopForward
+			// - DesktopBackward
+			// - PreviousDesktop
+			// - Desktop1...Desktop99
+			try {
 
-				ModifierKeys _HotKeysToJumpToDesktop() {
-					var hotKey = Settings.GetString("feature.useHotKeysToJumpToDesktop.hotKey");
-					if(hotKey == "Alt") return WindowsHotKeyAPI.ModifierKeys.Alt;
-					if(hotKey == "AltShift") return WindowsHotKeyAPI.ModifierKeys.Alt | WindowsHotKeyAPI.ModifierKeys.Shift;
-					if(hotKey == "Ctrl") return WindowsHotKeyAPI.ModifierKeys.Control;
-					if(hotKey == "CtrlAlt") return WindowsHotKeyAPI.ModifierKeys.Control | WindowsHotKeyAPI.ModifierKeys.Alt;
-					throw new Exception("invalid modifier");
+				action = action.Trim().ToLower();
+				if(action == "desktopforward") {
+					this.SwitchDesktopForward();
+					return null;
+				} else if(action == "desktopbackward") {
+					this.SwitchDesktopBackward();
+					return null;
+				} else if(action == "previousdesktop") {
+					this.SwitchToPreviousDesktop();
+					return null;
+				} else if(action.StartsWith("desktop")) {
+					var desktopNumber = 0;
+					if(int.TryParse(action.Replace("desktop", ""), out desktopNumber)) {
+						this.SwitchToDesktop(desktopNumber - 1);
+						return null;
+					} else {
+						throw new Exception("invalid desktop number");
+					}
+				} else {
+					throw new Exception("invalid action");
 				}
 
-				this.KeyboardHooksJumpToDesktop = new KeyboardHook();
-				this.KeyboardHooksJumpToDesktop.KeyPressed += new EventHandler<KeyPressedEventArgs>(HotKeyPressed);
-				ModifierKeys modifier = _HotKeysToJumpToDesktop();
-				var keys = new List<Keys>() { 
-					Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, 
-					Keys.NumPad1, Keys.NumPad2, Keys.NumPad3, Keys.NumPad4, Keys.NumPad5, Keys.NumPad6, Keys.NumPad7, Keys.NumPad8, Keys.NumPad9
-				};
-				foreach (var key in keys) {
-					this.KeyboardHooksJumpToDesktop.RegisterHotKey(modifier, key);
-				}
+			} catch(Exception e) {
+				Util.Logging.WriteLine($"RunAction: error with action \"{action}\": {e.Message}");
+				return $"error with action \"{action}\": {e.Message}";
 			}
 		}
 
-		public void HotKeyPressed(object sender, KeyPressedEventArgs e) {
-			int? desktopNumber = null;
-			if (e.Key == Keys.D1 || e.Key == Keys.NumPad1) desktopNumber = 1;
-			else if (e.Key == Keys.D2 || e.Key == Keys.NumPad2) desktopNumber = 2;
-			else if (e.Key == Keys.D3 || e.Key == Keys.NumPad3) desktopNumber = 3;
-			else if (e.Key == Keys.D4 || e.Key == Keys.NumPad4) desktopNumber = 4;
-			else if (e.Key == Keys.D5 || e.Key == Keys.NumPad5) desktopNumber = 5;
-			else if (e.Key == Keys.D6 || e.Key == Keys.NumPad6) desktopNumber = 6;
-			else if (e.Key == Keys.D7 || e.Key == Keys.NumPad7) desktopNumber = 7;
-			else if (e.Key == Keys.D8 || e.Key == Keys.NumPad8) desktopNumber = 8;
-			else if (e.Key == Keys.D9 || e.Key == Keys.NumPad9) desktopNumber = 9;
-			if (desktopNumber != null && App.Instance.VDAPI.GetVDCount() > desktopNumber.Value -1) {
-				this.SwitchToDesktop(desktopNumber.Value - 1);
+		#endregion
+
+		#region Hot Keys
+
+		public void SetupHotKeys() {
+			// Clear old hooks
+			if(this._keyboardHooks != null) {
+				this._keyboardHooks.Dispose();
+				this._keyboardHooks = null;
+			}
+
+			// Compile a list of all hotkeys and their actions
+			// A hotkey defintion and command looks like the following samples:
+			// "Alt + I = Desktop1"
+			// "Alt + O = Desktop2"
+			// "Alt + P = Desktop3"
+			// "Ctrl + Alt + Left = DesktopLeft"
+			var hotkeys = new List<string>();
+
+			// Compile from custom configs
+			// hotkeys.myCustomKey1: "Alt + I = Desktop1"
+			// hotkeys.myCustomKey2: "Alt + O = Desktop2"
+			// hotkeys.myCustomKey3: "Alt + P = Desktop3"
+			// hotkeys.myCustomKey4: "Ctrl + Alt + Left = DesktopLeft"
+			foreach(var setting in Settings.GetKeys()) {
+				if(setting.StartsWith("hotkeys.")) {
+					hotkeys.Add(Settings.GetString(setting));
+				}
+			}
+
+			// Compile from features
+			if(Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber")) {
+				var hotKey = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey");
+				if(hotKey != null && hotKey != "") {
+					for(var i = 1; i <= 9; i++) {
+						hotkeys.Add($"{hotKey} + D{i} = Desktop{i}");
+						hotkeys.Add($"{hotKey} + NumPad{i} = Desktop{i}");
+					}
+				}
+			}
+
+			// Parse all hotkeys to cached HotKeyAction structs
+			_keyboardHooksHotKeysAndActions = new List<HotKeyAction>();
+			foreach(var hotkeyAndAction in hotkeys) {
+				 {
+					// Init HotKeyAction struct
+					var hotkeyAction = new HotKeyAction();
+					hotkeyAction.HotKeyAndAction = hotkeyAndAction;
+					hotkeyAction.HotKey = hotkeyAndAction.Split('=').First().Trim();
+					hotkeyAction.Action = hotkeyAndAction.Split('=').Last().Trim();
+					// Parse the keys to the Keys and KeyModifiers enums
+					{
+						var keys = hotkeyAction.HotKey.Split('+');
+						//TODO: explode some special keys like Number to D0..D9, NumPad0..NumPad9
+						Keys hookKeys = 0;
+						ModifierKeys hookModifierKeys = 0;
+						foreach(var key in keys) {
+							var keyCleaned = key.Trim();
+							if(keyCleaned.ToLower() == "ctrl") keyCleaned = "control";
+							ModifierKeys keyModifier;
+							var keyModifierValid = Enum.TryParse<ModifierKeys>(keyCleaned, true, out keyModifier);
+							if(keyModifierValid) {
+								// Add to hookModifierKeys enum
+								hookModifierKeys = hookModifierKeys | keyModifier; // can be multiple modifiers
+							} else {
+								Keys keyKey;
+								var keyKeyValid = Enum.TryParse<Keys>(keyCleaned, true, out keyKey);
+								if(keyKeyValid) {
+									hookKeys = keyKey; // only a single key is supported
+								}
+							}
+						}
+						hotkeyAction.Keys = hookKeys;
+						hotkeyAction.Modifiers = hookModifierKeys;
+					}
+					// Validate: must have at least one key and one modifier
+					bool isValid = true;
+					if(hotkeyAction.Modifiers == 0) {
+						Util.Logging.WriteLine($"SetupHotKeys: Invalid hotkey {hotkeyAction.HotKeyAndAction}, a hotkey must have at least one modifier (Ctrl,Alt,Shift,Win)");
+						isValid = false;
+					}
+					if(hotkeyAction.Keys == 0 || hotkeyAction.Keys == Keys.None) {
+						Util.Logging.WriteLine($"SetupHotKeys: Invalid hotkey {hotkeyAction.HotKeyAndAction}, a hotkey must have at least one key");
+						isValid = false;
+					}
+					// Register
+					if(isValid) _keyboardHooksHotKeysAndActions.Add(hotkeyAction);
+				}
+			}
+
+			// Init the keyboard hooks
+			this._keyboardHooks = new KeyboardHook();
+			this._keyboardHooks.KeyPressed += new EventHandler<KeyPressedEventArgs>(_hotKeyPressed);
+
+			// Register all the hotkeys in _keyboardHooksHotKeysAndActions
+			foreach(var hotkeyAction in _keyboardHooksHotKeysAndActions) {
+				this._keyboardHooks.RegisterHotKey(hotkeyAction.Modifiers, hotkeyAction.Keys);
+			}
+
+
+		}
+
+		private void _hotKeyPressed(object sender, KeyPressedEventArgs e) {
+			var keys = e.Key;
+			var modifiers = e.Modifier;
+			// Find matching HotKeyAction
+			foreach(var hotkeyAction in _keyboardHooksHotKeysAndActions) {
+				if(hotkeyAction.Keys == keys && hotkeyAction.Modifiers == modifiers) {
+					RunAction(hotkeyAction.Action);
+				}
 			}
 		}
 
