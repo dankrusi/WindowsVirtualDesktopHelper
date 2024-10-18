@@ -13,8 +13,12 @@ using System.Drawing;
 using System.Globalization;
 
 namespace WindowsVirtualDesktopHelper {
+
 	class App {
 
+		#region Public Properties
+
+		public static App Instance;
 		public IVirtualDesktopManager VDAPI = null;
 		public string CurrentVDDisplayName = null;
 		public uint CurrentVDDisplayNumber = 0;
@@ -22,16 +26,20 @@ namespace WindowsVirtualDesktopHelper {
 		public SettingsForm SettingsForm;
 		public AppForm AppForm;
 		public string CurrentSystemThemeName = null;
-		private Dictionary<int, IntPtr> VDDToLastFocusedWin = new Dictionary<int, IntPtr>();
-		public List<string> FGWindowHistory = new List<string>(); // needed to detect if Task View was open
-		public IntPtr LastForegroundhWnd = IntPtr.Zero;
-		KeyboardHook KeyboardHooksJumpToDesktop = null;
-
 		public static string DetectedVDImplementation = null;
 
-		public static App Instance;
+		#endregion
 
-	
+		#region Private/Internal Properties
+
+		private KeyboardHook KeyboardHooksJumpToDesktop = null;
+		private Dictionary<int, IntPtr> VDDToLastFocusedWin = new Dictionary<int, IntPtr>();
+		public IntPtr LastForegroundhWnd = IntPtr.Zero; //TODO: this should be private
+		public List<string> FGWindowHistory = new List<string>(); //TODO: this should be private // needed to detect if Task View was open
+
+		#endregion
+
+		#region Constructor
 
 		public App() {
 			// Set the app instance global
@@ -71,6 +79,9 @@ namespace WindowsVirtualDesktopHelper {
 
 		}
 
+		#endregion
+
+		#region Virtual Desktop Methods
 
 		public void LoadVDAPI() {
 			App.DetectedVDImplementation = VirtualDesktopAPI.Loader.GetImplementationForOS();
@@ -111,6 +122,187 @@ namespace WindowsVirtualDesktopHelper {
 				else return "Unknown";
 			}
 		}
+
+		public void MonitorVDisplayCount() {
+			var thread = new Thread(new ThreadStart(_MonitorVDDisplayCount));
+			thread.Start();
+		}
+		private void _MonitorVDDisplayCount() {
+			while(true) {
+				try {
+					var newCurrentVDDisplayCount = this.GetVDDisplayCount();
+					if(newCurrentVDDisplayCount != CurrentVDDisplayCount) {
+						CurrentVDDisplayCount = newCurrentVDDisplayCount;
+						//Debug.WriteLine("Update Count: " + Thread.CurrentThread.ManagedThreadId);
+					}
+					System.Threading.Thread.Sleep(100);
+				} catch(Exception e) {
+					Util.Logging.WriteLine("App: Error: MonitorVDDisplayCount: " + e.Message);
+					System.Threading.Thread.Sleep(1000);
+				}
+			}
+		}
+
+		public void MonitorVDSwitch() {
+			var thread = new Thread(new ThreadStart(_MonitorVDSwitch));
+			//var thread2 = new Thread(new ThreadStart(delegate { UpdateSettingFormSafe(); }));
+			thread.Start();
+			//thread2.Start();
+		}
+		private void _MonitorVDSwitch() {
+			while(true) {
+				try {
+					var newVDDisplayNumber = this.GetVDDisplayNumber(false);
+					if(newVDDisplayNumber != this.CurrentVDDisplayNumber) {
+						//Util.Logging.WriteLine("Switched to " + newVDDisplayName);
+						//Debug.WriteLine("Switch VD: " + Thread.CurrentThread.ManagedThreadId);
+						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
+						this.CurrentVDDisplayNumber = newVDDisplayNumber;
+						VDSwitchedSafe();
+					} else {
+						storeLastWinFocused(newVDDisplayNumber);
+					}
+					System.Threading.Thread.Sleep(100);
+				} catch(Exception e) {
+					Util.Logging.WriteLine("App: Error: MonitorVDSwitch: " + e.Message);
+					System.Threading.Thread.Sleep(1000);
+				}
+			}
+		}
+
+		public void VDSwitchedSafe() {
+			if(this.AppForm.InvokeRequired) {
+				Action safeAction = delegate { VDSwitchedSafe(); };
+				this.AppForm.Invoke(safeAction);
+			} else {
+				this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
+				this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
+				this.UIUpdateNextPrevIconVisibility(this.CurrentSystemThemeName);
+				if(Settings.GetBool("feature.showDesktopSwitchOverlay")) {
+					this.AppForm.Invoke((Action)(() => {
+						SwitchNotificationForm.CloseAllNotifications(this.AppForm);
+						if(Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors")) {
+							for(var i = 0; i < Screen.AllScreens.Length; i++) {
+								var form = new SwitchNotificationForm(i);
+								form.LabelText = this.CurrentVDDisplayName;
+								form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
+								form.Show();
+							}
+						} else {
+							var form = new SwitchNotificationForm();
+							form.LabelText = this.CurrentVDDisplayName;
+							form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
+							form.Show();
+						}
+					}));
+				}
+			}
+		}
+
+		public void VDSwitched() {
+			this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
+			this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
+			// this cause flicker when switch VD from windows Task View
+			if(Settings.GetBool("feature.showDesktopSwitchOverlay")) {
+				this.AppForm.Invoke((Action)(() => {
+					SwitchNotificationForm.CloseAllNotifications(this.AppForm);
+					if(Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors")) {
+						for(var i = 0; i < Screen.AllScreens.Length; i++) {
+							var form = new SwitchNotificationForm(i);
+							form.LabelText = this.CurrentVDDisplayName;
+							form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
+							form.Show();
+						}
+					} else {
+						var form = new SwitchNotificationForm();
+						form.LabelText = this.CurrentVDDisplayName;
+						form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
+						form.Show();
+					}
+				}));
+			}
+		}
+
+		public void SwitchDesktopBackward() {
+			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
+			try {
+				App.Instance.VDAPI.SwitchBackward();
+			} catch(Exception e) {
+				Util.OS.DesktopBackwardBySimulatingShortcutKey();
+			}
+		}
+
+		public void SwitchDesktopForward() {
+			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
+			try {
+				App.Instance.VDAPI.SwitchForward();
+			} catch(Exception e) {
+				Util.OS.DesktopForwardBySimulatingShortcutKey();
+			}
+		}
+
+		public void SwitchToDesktop(int number) {
+			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
+			try {
+				App.Instance.VDAPI.SwitchToDesktop(number);
+			} catch(Exception e) {
+				return;
+			}
+			this.restorePrevWinFocus(number);
+		}
+
+		#endregion
+
+		#region Window Methods
+
+		public void MonitorFGWindowName() {
+			var thread = new Thread(new ThreadStart(_MonitorFGWindowName));
+			thread.Start();
+		}
+
+		private void _MonitorFGWindowName() {
+			while(true) {
+				try {
+					var fgWindowName = Util.OS.GetForegroundWindowName();
+					FGWindowHistory.Add(fgWindowName);
+					var maxHistory = 20;
+					if(FGWindowHistory.Count > maxHistory) {
+						FGWindowHistory.RemoveRange(0, FGWindowHistory.Count - maxHistory);
+					}
+					if(LastForegroundhWnd == IntPtr.Zero) {
+						LastForegroundhWnd = Util.OS.GetFolderViewHandle();
+					}
+					System.Threading.Thread.Sleep(20);
+				} catch(Exception e) {
+					Util.Logging.WriteLine("App: Error: MonitorFGWindowName: " + e.Message);
+					System.Threading.Thread.Sleep(1000);
+				}
+			}
+		}
+
+		private void storeLastWinFocused(uint currVDDWinNo) {
+			IntPtr hWnd = Util.OS.GetForegroundWindow();
+			if(hWnd != IntPtr.Zero) {
+				if(VDDToLastFocusedWin.ContainsKey((int)currVDDWinNo)) {
+					VDDToLastFocusedWin[(int)currVDDWinNo] = hWnd;
+				} else {
+					VDDToLastFocusedWin.Add((int)currVDDWinNo, hWnd);
+				}
+			}
+		}
+
+		private void restorePrevWinFocus(int prevVDDWinNo) {
+			if(VDDToLastFocusedWin.ContainsKey(prevVDDWinNo)) {
+				IntPtr lastWindowHandle = VDDToLastFocusedWin[prevVDDWinNo];
+				if(Util.OS.IsWindow(lastWindowHandle)) {
+					Util.OS.SetForegroundWindow(lastWindowHandle);
+				}
+			}
+		}
+
+		#endregion
+
+		#region Hot Keys
 
 		public void SetupHotKeys() {
 			if(this.KeyboardHooksJumpToDesktop != null) {
@@ -159,136 +351,9 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
-		public void Exit() {
-			Application.Exit();
-			System.Environment.Exit(0);
-		}
+		#endregion
 
-		public void MonitorVDisplayCount() {
-			var thread = new Thread(new ThreadStart(_MonitorVDDisplayCount));
-			thread.Start();
-		}
-		private void _MonitorVDDisplayCount() {
-			while (true) {
-				try {
-					var newCurrentVDDisplayCount = this.GetVDDisplayCount();
-					if (newCurrentVDDisplayCount != CurrentVDDisplayCount) {
-						CurrentVDDisplayCount = newCurrentVDDisplayCount;
-						//Debug.WriteLine("Update Count: " + Thread.CurrentThread.ManagedThreadId);
-					}
-					System.Threading.Thread.Sleep(100);
-				} catch (Exception e) {
-					Util.Logging.WriteLine("App: Error: MonitorVDDisplayCount: " + e.Message);
-					System.Threading.Thread.Sleep(1000);
-				}
-			}
-		}
-
-		public void MonitorFGWindowName() {
-			var thread = new Thread(new ThreadStart(_MonitorFGWindowName));
-			thread.Start();
-		}
-		private void _MonitorFGWindowName() {
-			while (true) {
-				try {
-					var fgWindowName = Util.OS.GetForegroundWindowName();
-					FGWindowHistory.Add(fgWindowName);
-					var maxHistory = 20;
-					if (FGWindowHistory.Count > maxHistory) {
-						FGWindowHistory.RemoveRange(0, FGWindowHistory.Count - maxHistory);
-					}
-					if (LastForegroundhWnd == IntPtr.Zero) {
-						LastForegroundhWnd = Util.OS.GetFolderViewHandle();
-					}
-					System.Threading.Thread.Sleep(20);
-				} catch (Exception e) {
-					Util.Logging.WriteLine("App: Error: MonitorFGWindowName: " + e.Message);
-					System.Threading.Thread.Sleep(1000);
-				}
-			}
-		}
-
-		public void MonitorVDSwitch() {
-			var thread = new Thread(new ThreadStart(_MonitorVDSwitch));
-			//var thread2 = new Thread(new ThreadStart(delegate { UpdateSettingFormSafe(); }));
-			thread.Start();
-			//thread2.Start();
-		}
-
-		private void _MonitorVDSwitch() {
-			while (true) {
-				try {
-					var newVDDisplayNumber = this.GetVDDisplayNumber(false);
-					if (newVDDisplayNumber != this.CurrentVDDisplayNumber) {
-						//Util.Logging.WriteLine("Switched to " + newVDDisplayName);
-						//Debug.WriteLine("Switch VD: " + Thread.CurrentThread.ManagedThreadId);
-						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
-						this.CurrentVDDisplayNumber = newVDDisplayNumber;
-						VDSwitchedSafe();
-					}
-					else {
-						storeLastWinFocused(newVDDisplayNumber);
-					}
-					System.Threading.Thread.Sleep(100);
-				} catch (Exception e) {
-					Util.Logging.WriteLine("App: Error: MonitorVDSwitch: " + e.Message);
-					System.Threading.Thread.Sleep(1000);
-				}
-			}
-		}
-
-		public void VDSwitchedSafe() {
-			if (this.AppForm.InvokeRequired) {
-				Action safeAction = delegate { VDSwitchedSafe(); };
-				this.AppForm.Invoke(safeAction);
-			} else {
-				this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
-				this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
-				this.UIUpdateNextPrevIconVisibility(this.CurrentSystemThemeName);
-				if (Settings.GetBool("feature.showDesktopSwitchOverlay")) {
-					this.AppForm.Invoke((Action)(() => {
-						SwitchNotificationForm.CloseAllNotifications(this.AppForm);
-						if (Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors")) {
-							for (var i = 0; i < Screen.AllScreens.Length; i++) {
-								var form = new SwitchNotificationForm(i);
-								form.LabelText = this.CurrentVDDisplayName;
-								form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
-								form.Show();
-							}
-						} else {
-							var form = new SwitchNotificationForm();
-							form.LabelText = this.CurrentVDDisplayName;
-							form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
-							form.Show();
-						}
-					}));
-				}
-			}
-		}
-
-		public void VDSwitched() {
-			this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
-			this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
-			// this cause flicker when switch VD from windows Task View
-			if (Settings.GetBool("feature.showDesktopSwitchOverlay")) {
-				this.AppForm.Invoke((Action)(() => {
-					SwitchNotificationForm.CloseAllNotifications(this.AppForm);
-					if (Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors")) {
-						for (var i = 0; i < Screen.AllScreens.Length; i++) {
-							var form = new SwitchNotificationForm(i);
-							form.LabelText = this.CurrentVDDisplayName;
-							form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
-							form.Show();
-						}
-					} else {
-						var form = new SwitchNotificationForm();
-						form.LabelText = this.CurrentVDDisplayName;
-						form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
-						form.Show();
-					}
-				}));
-			}
-		}
+		#region OS/System Theme
 
 		public void MonitorSystemThemeSwitch() {
 			var thread = new Thread(new ThreadStart(_MonitorSystemThemeSwitch));
@@ -315,73 +380,6 @@ namespace WindowsVirtualDesktopHelper {
 			this.UIUpdateIcons();
 		}
 
-		public void ShowAbout() {
-			this.AppForm.Invoke((Action)(() => {
-				var form = new AboutForm();
-				form.Show();
-			}));
-		}
-
-		public void ShowSettings() {
-			this.SettingsForm.Show();
-		}
-
-		public void ShowSplash() {
-			if(Settings.GetBool("feature.showSplashScreen")) {
-				if(Settings.GetBool("feature.showDesktopSwitchOverlay")) {
-					this.AppForm.Invoke((Action)(() => {
-						var form = new SwitchNotificationForm();
-						form.DisplayTimeMS = Settings.GetInt("feature.showSplashScreen.duration");
-						form.LabelText = Settings.GetString("feature.showSplashScreen.text");
-						form.Show();
-					}));
-				}
-			}
-		}
-
-		public void SwitchDesktopBackward() {
-			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
-			try {
-				App.Instance.VDAPI.SwitchBackward();
-			} catch(Exception e) {
-				Util.OS.DesktopBackwardBySimulatingShortcutKey();
-			}
-		}
-
-		public void SwitchDesktopForward() {
-			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
-			try {
-				App.Instance.VDAPI.SwitchForward();
-			} catch (Exception e) {
-				Util.OS.DesktopForwardBySimulatingShortcutKey();
-			}
-		}
-
-		public void SwitchToDesktop(int number) {
-			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
-			try {
-				App.Instance.VDAPI.SwitchToDesktop(number);
-			} catch (Exception e) {
-				return;
-			} 
-			this.restorePrevWinFocus(number);
-		}
-
-		public void OpenURL(string url) {
-			url = url.Replace("&", "^&"); //TODO: is this really needed?
-			Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-		}
-
-		public void EnableStartupWithWindows() {
-			// https://stackoverflow.com/questions/674628/how-do-i-set-a-program-to-launch-at-startup
-			try {
-				Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-				key.SetValue(Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyTitleAttribute>().Title, Application.ExecutablePath);
-			} catch (Exception e) {
-				throw new Exception("EnableStartupWithWindows: could not set registry value: " + e.Message);
-			}
-		}
-
 		public string GetSystemThemeName() {
 			var themeSetting = Settings.GetString("general.theme");
 			if(themeSetting == "auto") {
@@ -391,9 +389,23 @@ namespace WindowsVirtualDesktopHelper {
 			} else if(themeSetting == "dark") {
 				return "dark";
 			} else {
-				throw new Exception("invalid theme setting general.theme: "+ themeSetting);
+				throw new Exception("invalid theme setting general.theme: " + themeSetting);
 			}
-			
+
+		}
+
+		#endregion
+
+		#region Startup
+
+		public void EnableStartupWithWindows() {
+			// https://stackoverflow.com/questions/674628/how-do-i-set-a-program-to-launch-at-startup
+			try {
+				Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+				key.SetValue(Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyTitleAttribute>().Title, Application.ExecutablePath);
+			} catch (Exception e) {
+				throw new Exception("EnableStartupWithWindows: could not set registry value: " + e.Message);
+			}
 		}
 
 		public void DisableStartupWithWindows() {
@@ -406,27 +418,7 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
-
-		public void storeLastWinFocused(uint currVDDWinNo) {
-			IntPtr hWnd = Util.OS.GetForegroundWindow();
-			if (hWnd != IntPtr.Zero) {
-				if (VDDToLastFocusedWin.ContainsKey((int)currVDDWinNo)) {
-					VDDToLastFocusedWin[(int)currVDDWinNo] = hWnd;
-				}
-				else {
-					VDDToLastFocusedWin.Add((int)currVDDWinNo, hWnd);
-				}
-			}	
-		}
-
-		public void restorePrevWinFocus(int prevVDDWinNo) {
-			if (VDDToLastFocusedWin.ContainsKey(prevVDDWinNo)) {
-				IntPtr lastWindowHandle = VDDToLastFocusedWin[prevVDDWinNo];
-				if (Util.OS.IsWindow(lastWindowHandle)) {
-					Util.OS.SetForegroundWindow(lastWindowHandle);
-				}
-			}
-		}
+		#endregion
 
 		#region UI
 
@@ -485,7 +477,45 @@ namespace WindowsVirtualDesktopHelper {
 
 		#endregion
 
+		#region Forms and Windows
+
+		public void ShowAbout() {
+			this.AppForm.Invoke((Action)(() => {
+				var form = new AboutForm();
+				form.Show();
+			}));
+		}
+
+		public void ShowSettings() {
+			this.SettingsForm.Show();
+		}
+
+		public void ShowSplash() {
+			if(Settings.GetBool("feature.showSplashScreen")) {
+				if(Settings.GetBool("feature.showDesktopSwitchOverlay")) {
+					this.AppForm.Invoke((Action)(() => {
+						var form = new SwitchNotificationForm();
+						form.DisplayTimeMS = Settings.GetInt("feature.showSplashScreen.duration");
+						form.LabelText = Settings.GetString("feature.showSplashScreen.text");
+						form.Show();
+					}));
+				}
+			}
+		}
+
+		#endregion
+
 		#region Misc
+
+		public void OpenURL(string url) {
+			url = url.Replace("&", "^&"); //TODO: is this really needed?
+			Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+		}
+
+		public void Exit() {
+			Application.Exit();
+			System.Environment.Exit(0);
+		}
 
 		public void OpenEmailContact() {
 			App.Instance.OpenURL("mailto:dan@dankrusi.com");
