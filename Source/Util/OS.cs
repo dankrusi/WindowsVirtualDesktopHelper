@@ -72,6 +72,22 @@ namespace WindowsVirtualDesktopHelper.Util {
 			return windowName.ToString();
 		}
 
+        public static string GetHandleWndType(IntPtr hWnd) {
+            // Implement the logic to get the window type based on the handle
+            // You can use the GetClassName function from the user32.dll to get the window class name
+            StringBuilder className = new StringBuilder(256);
+            int result = GetClassName(hWnd, className, className.Capacity);
+            if(result != 0) {
+                return className.ToString();
+            } else {
+                return string.Empty;
+            }
+        }
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+			
+
 		public static IntPtr GetFolderViewHandle() {
 			IntPtr handle = GetForegroundWindow();
 			EnumChildWindows(handle, (hWndChild, lParam) => {

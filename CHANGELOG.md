@@ -12,7 +12,7 @@
 * Free
 
 ## Fixes
-* 
+* Improvements to last focused window detection and restoration
 
 ## Changes
 * New powerful configuration system with lots of new configuration options via the config file or command line

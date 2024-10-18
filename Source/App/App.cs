@@ -154,13 +154,12 @@ namespace WindowsVirtualDesktopHelper {
 				try {
 					var newVDDisplayNumber = this.GetVDDisplayNumber(false);
 					if(newVDDisplayNumber != this.CurrentVDDisplayNumber) {
-						//Util.Logging.WriteLine("Switched to " + newVDDisplayName);
-						//Debug.WriteLine("Switch VD: " + Thread.CurrentThread.ManagedThreadId);
 						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
 						this.CurrentVDDisplayNumber = newVDDisplayNumber;
+						Util.Logging.WriteLine("Switched to " + this.CurrentVDDisplayNumber);
 						VDSwitchedSafe();
 					} else {
-						storeLastWinFocused(newVDDisplayNumber);
+						//storeLastWinFocused();
 					}
 					System.Threading.Thread.Sleep(100);
 				} catch(Exception e) {
@@ -171,13 +170,16 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		public void VDSwitchedSafe() {
+			// Make sure we run on the main thread
 			if(this.AppForm.InvokeRequired) {
 				Action safeAction = delegate { VDSwitchedSafe(); };
 				this.AppForm.Invoke(safeAction);
 			} else {
+				// Update icons
 				this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
 				this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
 				this.UIUpdateNextPrevIconVisibility(this.CurrentSystemThemeName);
+				// Show overlay
 				if(Settings.GetBool("feature.showDesktopSwitchOverlay")) {
 					this.AppForm.Invoke((Action)(() => {
 						SwitchNotificationForm.CloseAllNotifications(this.AppForm);
@@ -196,38 +198,21 @@ namespace WindowsVirtualDesktopHelper {
 						}
 					}));
 				}
-			}
-		}
-
-		public void VDSwitched() {
-			this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
-			this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
-			// this cause flicker when switch VD from windows Task View
-			if(Settings.GetBool("feature.showDesktopSwitchOverlay")) {
-				this.AppForm.Invoke((Action)(() => {
-					SwitchNotificationForm.CloseAllNotifications(this.AppForm);
-					if(Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors")) {
-						for(var i = 0; i < Screen.AllScreens.Length; i++) {
-							var form = new SwitchNotificationForm(i);
-							form.LabelText = this.CurrentVDDisplayName;
-							form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
-							form.Show();
-						}
-					} else {
-						var form = new SwitchNotificationForm();
-						form.LabelText = this.CurrentVDDisplayName;
-						form.DisplayTimeMS = Settings.GetInt("feature.showDesktopSwitchOverlay.duration");
-						form.Show();
-					}
-				}));
+				// Restore focus
+				try {
+					_restorePrevWinFocus();
+				} catch(Exception e) {
+					Util.Logging.WriteLine("App: Error: SwitchDesktopForward (restorePrevWinFocus()): " + e.Message);
+				}
 			}
 		}
 
 		public void SwitchDesktopBackward() {
 			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
 			try {
-				App.Instance.VDAPI.SwitchBackward();
+				VDAPI.SwitchBackward();
 			} catch(Exception e) {
+				Util.Logging.WriteLine("App: Error: SwitchDesktopBackward (VDAPI.SwitchBackward()): " + e.Message);
 				Util.OS.DesktopBackwardBySimulatingShortcutKey();
 			}
 		}
@@ -235,20 +220,27 @@ namespace WindowsVirtualDesktopHelper {
 		public void SwitchDesktopForward() {
 			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
 			try {
-				App.Instance.VDAPI.SwitchForward();
+				VDAPI.SwitchForward();
 			} catch(Exception e) {
+				Util.Logging.WriteLine("App: Error: SwitchDesktopForward (VDAPI.SwitchForward()): " + e.Message);
 				Util.OS.DesktopForwardBySimulatingShortcutKey();
 			}
 		}
 
 		public void SwitchToDesktop(int number) {
-			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
+			// Explicitly store the last focused window
 			try {
-				App.Instance.VDAPI.SwitchToDesktop(number);
+				_storeLastWinFocused();
 			} catch(Exception e) {
+				Util.Logging.WriteLine("App: Error: SwitchToDesktop (storeLastWinFocused()): " + e.Message);
+			}
+			// We try the virtual desktop implementation API
+			try {
+				VDAPI.SwitchToDesktop(number);
+			} catch(Exception e) {
+				Util.Logging.WriteLine("App: Error: SwitchToDesktop (VDAPI.SwitchToDesktop(number)): " + e.Message);
 				return;
 			}
-			this.restorePrevWinFocus(number);
 		}
 
 		#endregion
@@ -280,22 +272,47 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
-		private void storeLastWinFocused(uint currVDDWinNo) {
-			IntPtr hWnd = Util.OS.GetForegroundWindow();
-			if(hWnd != IntPtr.Zero) {
-				if(VDDToLastFocusedWin.ContainsKey((int)currVDDWinNo)) {
-					VDDToLastFocusedWin[(int)currVDDWinNo] = hWnd;
-				} else {
-					VDDToLastFocusedWin.Add((int)currVDDWinNo, hWnd);
+
+		public void MonitorFocusedWindow() {
+			var thread = new Thread(new ThreadStart(_monitorFocusedWindow));
+			thread.Start();
+		}
+
+		private void _monitorFocusedWindow() {
+			while(true) {
+				try {
+					_storeLastWinFocused();
+					System.Threading.Thread.Sleep(200);
+				} catch(Exception e) {
+					Util.Logging.WriteLine("App: Error: _monitorFocusedWindow: " + e.Message);
+					System.Threading.Thread.Sleep(1000);
 				}
 			}
 		}
 
-		private void restorePrevWinFocus(int prevVDDWinNo) {
-			if(VDDToLastFocusedWin.ContainsKey(prevVDDWinNo)) {
-				IntPtr lastWindowHandle = VDDToLastFocusedWin[prevVDDWinNo];
+		private void _storeLastWinFocused() {
+			IntPtr hWnd = Util.OS.GetForegroundWindow();
+			if(hWnd != IntPtr.Zero) {
+				var fgWindowName = Util.OS.GetForegroundWindowName();
+				var fgWindowType = Util.OS.GetHandleWndType(hWnd);
+				if(fgWindowType == "Shell_TrayWnd") return; // we ignore the icon tray, since this takes the focus away when we click the prev/next arrows
+				var displayNumber = (int)this.GetVDDisplayNumber(false);
+				if(VDDToLastFocusedWin.ContainsKey(displayNumber)) {
+					VDDToLastFocusedWin[displayNumber] = hWnd;
+				} else {
+					VDDToLastFocusedWin.Add(displayNumber, hWnd);
+				}
+				//Console.WriteLine($"store: display {displayNumber} hwnd {hWnd} ({fgWindowType})");
+			}
+		}
+
+		private void _restorePrevWinFocus() {
+			var displayNumber = (int)this.GetVDDisplayNumber(false);
+			if(VDDToLastFocusedWin.ContainsKey(displayNumber)) {
+				IntPtr lastWindowHandle = VDDToLastFocusedWin[displayNumber];
 				if(Util.OS.IsWindow(lastWindowHandle)) {
 					Util.OS.SetForegroundWindow(lastWindowHandle);
+					//Console.WriteLine("restore: "+ displayNumber + " "+ lastWindowHandle);
 				}
 			}
 		}
@@ -346,7 +363,6 @@ namespace WindowsVirtualDesktopHelper {
 			else if (e.Key == Keys.D8 || e.Key == Keys.NumPad8) desktopNumber = 8;
 			else if (e.Key == Keys.D9 || e.Key == Keys.NumPad9) desktopNumber = 9;
 			if (desktopNumber != null && App.Instance.VDAPI.GetVDCount() > desktopNumber.Value -1) {
-				storeLastWinFocused(CurrentVDDisplayNumber);
 				this.SwitchToDesktop(desktopNumber.Value - 1);
 			}
 		}
