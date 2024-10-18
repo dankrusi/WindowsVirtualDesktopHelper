@@ -15,6 +15,10 @@ namespace WindowsVirtualDesktopHelper.Util {
 		[DllImport("USER32.DLL")]
 		private static extern int GetWindowTextLength(HWND hWnd);
 
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool IsWindow(IntPtr hWnd);
+
 		[DllImport("USER32.DLL")]
 		private static extern bool IsWindowVisible(HWND hWnd);
 
@@ -22,10 +26,10 @@ namespace WindowsVirtualDesktopHelper.Util {
 		private static extern IntPtr GetShellWindow();
 
 		[DllImport("user32.dll")]
-		private static extern IntPtr GetForegroundWindow();
+		public static extern IntPtr GetForegroundWindow();
 
 		[DllImport("user32.dll")]
-		private static extern bool SetForegroundWindow(IntPtr hWnd);
+		public static extern bool SetForegroundWindow(IntPtr hWnd);
 
 		[DllImport("user32.dll")]
 		private static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
@@ -34,6 +38,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 
 		[DllImport("user32.dll")]
 		private static extern IntPtr FindWindowA(string lpClassName, string lpWindowName);
+
 
 		public static string GetForegroundWindowName() {
 			IntPtr handle = GetForegroundWindow();
@@ -66,6 +71,22 @@ namespace WindowsVirtualDesktopHelper.Util {
 			GetWindowText(hWnd, windowName, windowName.Capacity);
 			return windowName.ToString();
 		}
+
+        public static string GetHandleWndType(IntPtr hWnd) {
+            // Implement the logic to get the window type based on the handle
+            // You can use the GetClassName function from the user32.dll to get the window class name
+            StringBuilder className = new StringBuilder(256);
+            int result = GetClassName(hWnd, className, className.Capacity);
+            if(result != 0) {
+                return className.ToString();
+            } else {
+                return string.Empty;
+            }
+        }
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+			
 
 		public static IntPtr GetFolderViewHandle() {
 			IntPtr handle = GetForegroundWindow();

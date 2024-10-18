@@ -20,9 +20,10 @@ namespace WindowsVirtualDesktopHelper {
 		private void AppForm_Load(object sender, EventArgs e) {
 			App.Instance.ShowSplash();
 			App.Instance.MonitorVDSwitch();
-			App.Instance.MonitorFGWindowName();
 			App.Instance.MonitorSystemThemeSwitch();
 			App.Instance.MonitorVDisplayCount();
+			App.Instance.MonitorFGWindowName();
+			App.Instance.MonitorFocusedWindow();
 
 			App.Instance.UIUpdate();
 		}
