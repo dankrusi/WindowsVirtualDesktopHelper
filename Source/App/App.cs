@@ -31,17 +31,7 @@ namespace WindowsVirtualDesktopHelper {
 
 		public static App Instance;
 
-		// To enable auto refocus of lastly used windows
-		[DllImport("user32.dll")]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool SetForegroundWindow(IntPtr hWnd);
-
-		[DllImport("user32.dll")]
-		static extern IntPtr GetForegroundWindow();
-
-		[DllImport("user32.dll")]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool IsWindow(IntPtr hWnd);	
+	
 
 		public App() {
 			// Set the app instance global
@@ -418,7 +408,7 @@ namespace WindowsVirtualDesktopHelper {
 
 
 		public void storeLastWinFocused(uint currVDDWinNo) {
-			IntPtr hWnd = GetForegroundWindow();
+			IntPtr hWnd = Util.OS.GetForegroundWindow();
 			if (hWnd != IntPtr.Zero) {
 				if (VDDToLastFocusedWin.ContainsKey((int)currVDDWinNo)) {
 					VDDToLastFocusedWin[(int)currVDDWinNo] = hWnd;
@@ -432,8 +422,8 @@ namespace WindowsVirtualDesktopHelper {
 		public void restorePrevWinFocus(int prevVDDWinNo) {
 			if (VDDToLastFocusedWin.ContainsKey(prevVDDWinNo)) {
 				IntPtr lastWindowHandle = VDDToLastFocusedWin[prevVDDWinNo];
-				if (IsWindow(lastWindowHandle)) {
-					SetForegroundWindow(lastWindowHandle);
+				if (Util.OS.IsWindow(lastWindowHandle)) {
+					Util.OS.SetForegroundWindow(lastWindowHandle);
 				}
 			}
 		}
