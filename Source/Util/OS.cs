@@ -5,24 +5,23 @@ using HWND = System.IntPtr;
 
 namespace WindowsVirtualDesktopHelper.Util {
 	public class OS {
-		public static bool IsWindows11() {
-			return GetWindowsBuildVersion() >= 22000;
-		}
 
-		[DllImport("USER32.DLL")]
+		#region user32.dll Imports
+
+		[DllImport("user32.dll")]
 		private static extern int GetWindowText(HWND hWnd, StringBuilder lpString, int nMaxCount);
 
-		[DllImport("USER32.DLL")]
+		[DllImport("user32.dll")]
 		private static extern int GetWindowTextLength(HWND hWnd);
 
 		[DllImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool IsWindow(IntPtr hWnd);
 
-		[DllImport("USER32.DLL")]
+		[DllImport("user32.dll")]
 		private static extern bool IsWindowVisible(HWND hWnd);
 
-		[DllImport("USER32.DLL")]
+		[DllImport("user32.dll")]
 		private static extern IntPtr GetShellWindow();
 
 		[DllImport("user32.dll")]
@@ -31,14 +30,20 @@ namespace WindowsVirtualDesktopHelper.Util {
 		[DllImport("user32.dll")]
 		public static extern bool SetForegroundWindow(IntPtr hWnd);
 
+		private delegate bool EnumChildProc(IntPtr hWnd, IntPtr lParam);
+
 		[DllImport("user32.dll")]
 		private static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
-
-		private delegate bool EnumChildProc(IntPtr hWnd, IntPtr lParam);
 
 		[DllImport("user32.dll")]
 		private static extern IntPtr FindWindowA(string lpClassName, string lpWindowName);
 
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+		#endregion
+
+		#region Manipulating Windows
 
 		public static string GetForegroundWindowName() {
 			IntPtr handle = GetForegroundWindow();
@@ -50,6 +55,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 			IntPtr handle = GetForegroundWindow();
 			return SetForegroundWindow(handle);
 		}
+
 
 		public static void SetFocusWindowToDesktop(IntPtr hWnd) {
 			if (GetHandleWndName(hWnd) == "Folder View") {
@@ -84,10 +90,6 @@ namespace WindowsVirtualDesktopHelper.Util {
             }
         }
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-			
-
 		public static IntPtr GetFolderViewHandle() {
 			IntPtr handle = GetForegroundWindow();
 			EnumChildWindows(handle, (hWndChild, lParam) => {
@@ -108,6 +110,10 @@ namespace WindowsVirtualDesktopHelper.Util {
 			return handle;
 		}
 
+		#endregion
+
+		#region Invoking Windows Features
+
 		public static void OpenTaskView() {
 			var simu = new WindowsInput.InputSimulator();
 			simu.Keyboard.ModifiedKeyStroke(WindowsInput.Native.VirtualKeyCode.LWIN, WindowsInput.Native.VirtualKeyCode.TAB);
@@ -124,6 +130,10 @@ namespace WindowsVirtualDesktopHelper.Util {
 			simu.Keyboard.ModifiedKeyStroke(new[] { WindowsInput.Native.VirtualKeyCode.LCONTROL, WindowsInput.Native.VirtualKeyCode.LWIN }, WindowsInput.Native.VirtualKeyCode.RIGHT);
 		}
 
+		#endregion
+
+		#region Windows Settings and Modes
+
 		public static bool IsSystemLightThemeModeEnabled() {
 			// https://learn.microsoft.com/en-us/answers/questions/715081/how-to-detect-windows-dark-mode.html
 			try {
@@ -135,6 +145,14 @@ namespace WindowsVirtualDesktopHelper.Util {
 			} catch (Exception e) {
 				throw new Exception("IsDarkThemeMode: could not get dark/light theme setting: " + e.Message);
 			}
+		}
+
+		#endregion
+
+		#region Windows Versions and Builds
+
+		public static bool IsWindows11() {
+			return GetWindowsBuildVersion() >= 22000;
 		}
 
 		public static int GetWindowsBuildVersion() {
@@ -170,5 +188,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 			var retInt = int.Parse(retStr);
 			return retInt;
 		}
+
+		#endregion
 	}
 }
