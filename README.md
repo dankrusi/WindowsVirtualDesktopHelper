@@ -97,14 +97,14 @@ If you know of a working version or non-working version, please report it.
 
 While the goal of this app is to remain simple and lightweight, there are some features that will still be added:
 
-* Settings: more configuration options
+* Settings: more configuration options ✔️
 * Console-Mode: allow a console-mode which can be used by scripts
 
 Technical Roadmap:
 
-- Refactor settings from .net settings loader to own system (the .net system is so bloated and crappy)
-- Add support for setting settings via command line
-- Split out settings UI and app UI
+- Refactor settings from .net settings loader to own system (the .net system is so bloated and crappy) ✔️
+- Add support for setting settings via command line ✔️
+- Split out settings UI and app UI ✔️
 - =============
 - Make features more modular
 
@@ -149,7 +149,7 @@ The idea is to make the app as easy and lightweight to run as possible. Most sys
 
 The most common and basic settings can be configured using the GUI Settings. 
 
-For more advanced configurations and features you can use the config file or command line arguments (as of v1.18).
+For more advanced configurations and features you can use the config file or command line arguments (as of v2.0).
 
 ### Settings
 

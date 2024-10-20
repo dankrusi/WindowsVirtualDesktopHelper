@@ -1,5 +1,5 @@
 Windows Virtual Desktop Helper
-Copyright (c) 2022-2023 Dan Krusi
+Copyright (c) 2022-2024 Dan Krusi
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as

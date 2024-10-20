@@ -4,6 +4,8 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 
 ## Hotkeys Documentation
 
+(as of v2.0)
+
 You can easily define custom hotkeys by configuring custom settings.
 
 Any setting starting with ``hotkeys.`` is considered a hotkey setting.

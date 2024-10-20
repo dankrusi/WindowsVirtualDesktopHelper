@@ -4,6 +4,8 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 
 ## Settings Documentation
 
+(as of v2.0)
+
 ### Settings
 
 |Config|Default|Description|
