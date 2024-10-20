@@ -57,7 +57,6 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 			if (desktop == null) return;
 
 			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(desktop);
-			Util.OS.SetFocusWindow();
 		}
 
 		public enum VirtualDesktopSwitchType {

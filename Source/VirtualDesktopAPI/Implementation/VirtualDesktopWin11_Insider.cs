@@ -362,6 +362,7 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 			}
 
 			public static string DesktopNameFromDesktop(Desktop desktop) { // return name of desktop or "Desktop n" if it has no name
+				//TODO: This has no references
 
 				// get desktop name
 				string desktopName = null;
