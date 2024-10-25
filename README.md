@@ -4,8 +4,8 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v2.0 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Setup.v2.0.msi) | 
-[Download v2.0 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.0.zip)
+[Download v1.17 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.17/WindowsVirtualDesktopHelper.Setup.v1.17.msi) | 
+[Download v1.17 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.17/WindowsVirtualDesktopHelper.Executable.v1.17.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
@@ -45,7 +45,7 @@ Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7 or higher 
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v2.0.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Setup.v2.0.msi)
+[Download WindowsVirtualDesktopHelper Setup v1.17.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.17/WindowsVirtualDesktopHelper.Setup.v1.17.msi)
 
 Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
@@ -55,7 +55,7 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
-[Download WindowsVirtualDesktopHelper Executable v2.0.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.0.zip)
+[Download WindowsVirtualDesktopHelper Executable v1.17.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.17/WindowsVirtualDesktopHelper.Executable.v1.17.zip)
 
 ### Scoop
 
@@ -149,7 +149,7 @@ The idea is to make the app as easy and lightweight to run as possible. Most sys
 
 The most common and basic settings can be configured using the GUI Settings. 
 
-For more advanced configurations and features you can use the config file or command line arguments (as of v2.0).
+For more advanced configurations and features you can use the config file or command line arguments (as of v1.17).
 
 ### Settings
 

@@ -6,7 +6,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.0.zip",
-            "hash": "7A5BB326B476603D91DBCB810454350A66BE29C806DDB66771FF18974B1F29DD"
+            "hash": "F1B68CDE5363E140C9F91193BD40ABBF42C7F81261B1B2E9CD189C2A457DD312"
         }
     },
     "shortcuts": [
