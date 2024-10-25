@@ -1,4 +1,4 @@
-# v1.18 (not yet released)
+# v2.0 (not yet released)
 
 ## Features
 * Show desktop number in notification area
@@ -15,6 +15,7 @@
 * Improvements to last focused window detection and restoration
 
 ## Changes
+* Setup and EXE are now code-signed!
 * New powerful configuration system with lots of new configuration options via the config file or command line
 * Support theming of icons (fonts, colors)
 * Support theming of overlays (fonts, colors)

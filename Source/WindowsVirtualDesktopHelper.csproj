@@ -72,6 +72,9 @@
   <PropertyGroup>
     <SignManifests>false</SignManifests>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Forms\AboutForm.cs">
       <SubType>Form</SubType>
@@ -201,4 +204,9 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+  powershell -ExecutionPolicy Unrestricted $(SolutionDir)\Scripts\codesign-release-build.ps1
+)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

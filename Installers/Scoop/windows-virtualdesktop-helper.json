@@ -1,12 +1,12 @@
 {
-    "version": "1.17",
+    "version": "2.0",
     "description": "Simple and lightweight app to help with Virtual Desktops for Windows 10 and Windows 11.",
     "homepage": "https://github.com/dankrusi/WindowsVirtualDesktopHelper",
     "license": "AGPL-3.0-only",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v1.17/WindowsVirtualDesktopHelper.Executable.v1.17.zip",
-            "hash": "0175EFC60685DE5EA0E59BFF0CB2AFDEBD89D8C617CBD13D24DA7187100AD71C"
+            "url": "https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.0.zip",
+            "hash": "7A5BB326B476603D91DBCB810454350A66BE29C806DDB66771FF18974B1F29DD"
         }
     },
     "shortcuts": [

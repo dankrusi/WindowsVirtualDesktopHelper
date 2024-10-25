@@ -17,6 +17,7 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CCD7DB49-839B-4BD0-B28B-30B7F8A8F355}"
 	ProjectSection(SolutionItems) = preProject
+		Scripts\codesign-release-build.ps1 = Scripts\codesign-release-build.ps1
 		Scripts\create-version.ps1 = Scripts\create-version.ps1
 	EndProjectSection
 EndProject

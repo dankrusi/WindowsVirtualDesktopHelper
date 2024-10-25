@@ -45,6 +45,8 @@ $BUILD_SETUP_CMD = "& '" + $DEVENV + "' '..\Setup\Setup.vdproj' /build Release"
 $BUILD_SOLUTION_CMD = "& '" + $DEVENV + "' '..\WindowsVirtualDesktopHelper.sln' /rebuild Release"
 Invoke-Expression $BUILD_SOLUTION_CMD
 
+# Codesign Setup
+& "$PSScriptRoot\codesign-release-setup.ps1"
 
 # Create Executable ZIP
 echo "================================================================"

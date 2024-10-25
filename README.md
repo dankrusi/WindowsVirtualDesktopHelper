@@ -191,6 +191,8 @@ Install Visual Studio 2022 or later with ".NET desktop development" feature set,
 
 Note: The Setup project which creates the MSI installer will require the following extension to be installed: [Microsoft Visual Studio Installer Projects 2022](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2022InstallerProjects)
 
+Note: Building in Release mode will automatically sign the executable with the designated code-signing certificate, which will not work on your machine. If you really must build your own release, you can remove the post-build event.
+
 ### Depencencies
 
 This project doesn't have any dependencies or external libraries, and we expect it to stay this way. We want the app
