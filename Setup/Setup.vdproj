@@ -15,14 +15,20 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_3426EA7DC1BB49F08DFAB47C820C7AC4"
+        "MsmKey" = "8:_200B2AA4249B49D9A903D30C8A65D606"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AE1F8E6D4E254F138CC68001DCFA8FFE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_3426EA7DC1BB49F08DFAB47C820C7AC4"
+        "OwnerKey" = "8:_AE1F8E6D4E254F138CC68001DCFA8FFE"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -120,6 +126,57 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_200B2AA4249B49D9A903D30C8A65D606"
+            {
+            "SourcePath" = "8:..\\Source\\bin\\Release\\WindowsVirtualDesktopHelper.exe.config"
+            "TargetName" = "8:WindowsVirtualDesktopHelper.exe.config"
+            "Tag" = "8:"
+            "Folder" = "8:_9D371B01176B4DC683E623257154FCFC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_AE1F8E6D4E254F138CC68001DCFA8FFE"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:WindowsVirtualDesktopHelper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_AE1F8E6D4E254F138CC68001DCFA8FFE"
+                    {
+                    "Name" = "8:WindowsVirtualDesktopHelper.exe"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\Source\\bin\\Release\\WindowsVirtualDesktopHelper.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_9D371B01176B4DC683E623257154FCFC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -177,7 +234,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Windows Virtual Desktop Helper"
         "ProductCode" = "8:{1BE8012E-999F-45AA-883A-F6835EE8E817}"
-        "PackageCode" = "8:{1DE1D35A-6CE5-4049-B012-4E60ECE6C5AF}"
+        "PackageCode" = "8:{83BBBA99-A16E-4CEB-8051-59E7DF2F15C2}"
         "UpgradeCode" = "8:{E12EB062-7579-402D-9B7C-EF5AE3C7DCCF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -185,12 +242,12 @@
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:2.0"
-        "Manufacturer" = "8:Dan Krusi"
+        "Manufacturer" = "8:Open Source Developer, Daniel Krüsi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/dankrusi/WindowsVirtualDesktopHelper"
         "Title" = "8:Windows Virtual Desktop Helper"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:Dan Krusi"
+        "ARPCONTACT" = "8:Open Source Developer, Daniel Krüsi"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"
@@ -305,7 +362,7 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_3426EA7DC1BB49F08DFAB47C820C7AC4"
+            "Target" = "8:_AE1F8E6D4E254F138CC68001DCFA8FFE"
             "Folder" = "8:_45A3B9424E67492C9E1E8E7DDB0B4460"
             "WorkingFolder" = "8:_9D371B01176B4DC683E623257154FCFC"
             "Icon" = "8:"
@@ -710,34 +767,6 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_3426EA7DC1BB49F08DFAB47C820C7AC4"
-            {
-            "SourcePath" = "8:..\\Source\\obj\\Debug\\WindowsVirtualDesktopHelper.exe"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_9D371B01176B4DC683E623257154FCFC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{88BEA099-1D4B-4213-9197-1929FFB44901}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
         }
     }
 }
