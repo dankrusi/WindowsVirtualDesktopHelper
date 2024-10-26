@@ -1,11 +1,11 @@
-# v2.0 (not yet released)
+# v2.0
 
 ## Features
 * Show desktop number in notification area
 * Show desktop name when switching desktops
 * Show prev/next desktop by clicking icons in notification area
 * Show desktop initial in notification area
-* Jump to desktop using hot keys
+* Custom hot keys for virtual desktop actions
 * Autostart with Windows
 * Simple and lightweight
 * Fully configurable
