@@ -505,6 +505,7 @@ namespace WindowsVirtualDesktopHelper {
 							if(keyCleaned.ToLower() == "closebrackets") keyCleaned = "OemCloseBrackets";
 							if(keyCleaned.ToLower() == "quotes") keyCleaned = "OemQuotes";
 							if(keyCleaned.ToLower() == "backslash") keyCleaned = "OemBackslash";
+							if(keyCleaned.ToLower() == "clear") keyCleaned = "OemClear";
 							ModifierKeys keyModifier;
 							var keyModifierValid = Enum.TryParse<ModifierKeys>(keyCleaned, true, out keyModifier);
 							if(keyModifierValid) {
