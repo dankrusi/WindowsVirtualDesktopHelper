@@ -165,6 +165,8 @@ hotkeys.myCustomKey1: "Alt + W = DesktopForward"
 hotkeys.myCustomKey2: "Alt + Q = DesktopBackward"
 ```
 
+See [Hotkeys Documentation](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/Documentation/Hotkeys.md) for more info.
+
 ### Settings
 
 See [Settings Documentation](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/Documentation/Settings.md)
