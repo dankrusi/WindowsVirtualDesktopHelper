@@ -149,7 +149,21 @@ The idea is to make the app as easy and lightweight to run as possible. Most sys
 
 The most common and basic settings can be configured using the GUI Settings. 
 
-For more advanced configurations and features you can use the config file or command line arguments (as of v2.0).
+For more advanced configurations and features you can use the config file or command line arguments (as of v2.0):
+
+For example, one can set a hotkey to jump to a specific desktop by setting the following setting:
+
+```
+hotkeys.myCustomHotkey1 = "Ctrl + Alt + Shift + D1 = Desktop1"
+hotkeys.myCustomHotkey2 = "Ctrl + Alt + Shift + D2 = Desktop2"
+```
+
+or use a custom shortcut for prev/next desktop:
+
+```
+hotkeys.myCustomKey1: "Alt + W = DesktopForward"
+hotkeys.myCustomKey2: "Alt + Q = DesktopBackward"
+```
 
 ### Settings
 
@@ -160,6 +174,8 @@ for a full list of all settings.
 
 This is located in ``%appdata%\WindowsVirtualDesktopHelper`` (for example ``C:\Users\<USER>\AppData\Roaming\WindowsVirtualDesktopHelper``)
 as a ``.config`` file, and can be edited with any text editor.
+
+Note: configuration lines that start with ``#`` are comments and ignored by the configuration system.
 
 ### Command Line Arguments
 
