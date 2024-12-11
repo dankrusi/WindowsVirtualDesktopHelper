@@ -52,6 +52,8 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 This is located in ``%appdata%\WindowsVirtualDesktopHelper`` (for example ``C:\Users\<USER>\AppData\Roaming\WindowsVirtualDesktopHelper``)
 as a ``.config`` file, and can be edited with any text editor.
 
+Note: configuration lines that start with ``#`` are comments and ignored by the configuration system.
+
 ### Command Line Arguments
 
 The app can be run with command line arguments to specificy any configuration setting. For example, one could
