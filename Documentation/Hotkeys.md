@@ -10,7 +10,7 @@ You can easily define custom hotkeys by configuring custom settings.
 
 Any setting starting with ``hotkeys.`` is considered a hotkey setting.
 
-For example, one can set a hotkey to jump to a specific desktop by setting the following setting:
+For example, one can set a hotkey configuration to jump to a specific desktop by setting the following setting:
 
 ```
 hotkeys.myCustomHotkey1 = "Ctrl + Alt + Shift + D1 = Desktop1"
@@ -35,7 +35,10 @@ Hotkey settings always define an action:
 See [Actions Documentation](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/Documentation/Actions.md)
 for more information on actions.
 
-Note: A hotkey MUST have at least one modifier key (Ctrl, Alt, Shift, Win) and one regular key (A-Z, 0-9, etc).
+See [Settings Documentation](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/Documentation/Settings.md)
+for how to change the custom configuration.
+
+Note: A hotkey MUST have at least one modifier key (Ctrl, Alt, Shift, Win) and one regular key (A-Z, 0-9, etc). This is due to the nature of the Windows API for global key bindings (for obvious reasons it should not be possible to globally bind just the A key...).
 
 ### Hotkeys
 
