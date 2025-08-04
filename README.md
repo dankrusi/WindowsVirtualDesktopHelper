@@ -248,3 +248,11 @@ A free utility to make the Windows 11 Taskbar just a little bit more useful by a
 ![Screenshot](https://raw.githubusercontent.com/dankrusi/WindowsTaskbarHelpers/main/Images/WindowsTaskbarHelpers_Screenshots_v1.png)(https://github.com/dankrusi/WindowsTaskbarHelpers)
 
 [github.com/dankrusi/WindowsTaskbarHelpers](https://github.com/dankrusi/WindowsTaskbarHelpers)
+
+### LitePDF
+
+A free and lightweight no-BS PDF viewer. And no, it doesn't have AI.
+
+![Screenshot](https://raw.githubusercontent.com/dankrusi/LitePDF/main/Images/Screenshots/Win11/LtiePDF_Screenshot_Win11_A.png)(https://github.com/dankrusi/LitePDF)
+
+[[github.com/dankrusi/LitePDF](https://github.com/dankrusi/LitePDF)
