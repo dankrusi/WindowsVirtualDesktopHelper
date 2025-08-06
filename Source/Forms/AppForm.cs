@@ -13,9 +13,21 @@ namespace WindowsVirtualDesktopHelper {
 			InitializeComponent();
 		}
 
-		
+
 
 		#region Form Events
+
+		protected override CreateParams CreateParams {
+			get {
+				CreateParams cp = base.CreateParams;
+
+				// Remove from Alt-Tab by removing WS_EX_APPWINDOW and adding WS_EX_TOOLWINDOW
+				cp.ExStyle &= ~0x00040000; // WS_EX_APPWINDOW
+				cp.ExStyle |= 0x00000080; // WS_EX_TOOLWINDOW
+
+				return cp;
+			}
+		}
 
 		private void AppForm_Load(object sender, EventArgs e) {
 			App.Instance.ShowSplash();
