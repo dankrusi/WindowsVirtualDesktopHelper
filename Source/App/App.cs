@@ -216,10 +216,12 @@ namespace WindowsVirtualDesktopHelper {
 					}));
 				}
 				// Restore focus
-				try {
-					_restorePrevWinFocus();
-				} catch(Exception e) {
-					Util.Logging.WriteLine("App: Error: SwitchDesktopForward (restorePrevWinFocus()): " + e.Message);
+				if(Settings.GetBool("feature.restorePreviousWindowFocus")) {
+					try {
+						_restorePrevWinFocus();
+					} catch(Exception e) {
+						Util.Logging.WriteLine("App: Error: SwitchDesktopForward (restorePrevWinFocus()): " + e.Message);
+					}
 				}
 				// Log this desktop number in _desktopNumberHistory, only keeping the last 20
 				if(_desktopNumberHistory.Count == 0 || _desktopNumberHistory[_desktopNumberHistory.Count - 1] != this.CurrentVDDisplayNumber) {
