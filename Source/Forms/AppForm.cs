@@ -19,13 +19,16 @@ namespace WindowsVirtualDesktopHelper {
 
 		protected override CreateParams CreateParams {
 			get {
-				CreateParams cp = base.CreateParams;
+				CreateParams createParams = base.CreateParams;
 
-				// Remove from Alt-Tab by removing WS_EX_APPWINDOW and adding WS_EX_TOOLWINDOW
-				cp.ExStyle &= ~0x00040000; // WS_EX_APPWINDOW
-				cp.ExStyle |= 0x00000080; // WS_EX_TOOLWINDOW
+				int WS_EX_NOACTIVATE = 0x08000000;
+				int WS_EX_LAYERED = 0x80000;
+				int WS_EX_TRANSPARENT = 0x20;
+				createParams.ExStyle |= WS_EX_NOACTIVATE;
+				createParams.ExStyle |= WS_EX_LAYERED;
+				createParams.ExStyle |= WS_EX_TRANSPARENT;
 
-				return cp;
+				return createParams;
 			}
 		}
 
