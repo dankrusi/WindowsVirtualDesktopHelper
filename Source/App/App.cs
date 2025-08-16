@@ -13,6 +13,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Security.Policy;
+using System.Collections.Concurrent;
 
 namespace WindowsVirtualDesktopHelper {
 
@@ -49,7 +50,7 @@ namespace WindowsVirtualDesktopHelper {
 		private KeyboardHook KeyboardHooksJumpToDesktop = null;
 		private KeyboardHook _keyboardHooks = null;
 		private List<HotKeyAction> _keyboardHooksHotKeysAndActions = new List<HotKeyAction>(); // the registered hotkey actions
-		private Dictionary<int, IntPtr> VDDToLastFocusedWin = new Dictionary<int, IntPtr>();
+		private ConcurrentDictionary<int, IntPtr> VDDToLastFocusedWin = new ConcurrentDictionary<int, IntPtr>();
 		public IntPtr LastForegroundhWnd = IntPtr.Zero; //TODO: this should be private
 		public List<string> FGWindowHistory = new List<string>(); //TODO: this should be private // needed to detect if Task View was open
 		private List<int> _desktopNumberHistory = new List<int>(); // stores a list of most recent desktop numbers used
@@ -316,24 +317,18 @@ namespace WindowsVirtualDesktopHelper {
 				var fgWindowType = Util.OS.GetHandleWndType(hWnd);
 				if(fgWindowType == "Shell_TrayWnd") return; // we ignore the icon tray, since this takes the focus away when we click the prev/next arrows
 				var displayNumber = (int)this.GetVDDisplayNumber(false);
-				if(VDDToLastFocusedWin.ContainsKey(displayNumber)) {
-					VDDToLastFocusedWin[displayNumber] = hWnd;
-				} else {
-					VDDToLastFocusedWin.Add(displayNumber, hWnd);
-				}
+				VDDToLastFocusedWin.AddOrUpdate(displayNumber, hWnd, (key, existingValue) => hWnd);
 				//Console.WriteLine($"store: display {displayNumber} hwnd {hWnd} ({fgWindowType})");
 			}
 		}
 
 		private void _restorePrevWinFocus() {
 			var displayNumber = (int)this.GetVDDisplayNumber(false);
-			if(VDDToLastFocusedWin.ContainsKey(displayNumber)) {
-				IntPtr lastWindowHandle = VDDToLastFocusedWin[displayNumber];
-				// Add a small delay to give the desktop time to load
+			IntPtr lastWindowHandle;
+			if (VDDToLastFocusedWin.TryGetValue(displayNumber, out lastWindowHandle)) {
 				System.Threading.Thread.Sleep(50);
 				if (Util.OS.IsWindow(lastWindowHandle)) {
 					Util.OS.SetForegroundWindow(lastWindowHandle);
-					//Console.WriteLine("restore: "+ displayNumber + " "+ lastWindowHandle);
 				}
 			}
 		}
