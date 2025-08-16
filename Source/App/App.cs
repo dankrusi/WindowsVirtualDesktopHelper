@@ -97,7 +97,6 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		#endregion
-
 		#region Virtual Desktop Methods
 
 		public void LoadVDAPI() {
@@ -171,12 +170,11 @@ namespace WindowsVirtualDesktopHelper {
 				try {
 					var newVDDisplayNumber = this.GetVDDisplayNumber(false);
 					if(newVDDisplayNumber != this.CurrentVDDisplayNumber) {
-						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
-						this.CurrentVDDisplayNumber = newVDDisplayNumber;
-						//Util.Logging.WriteLine("Switched to " + this.CurrentVDDisplayNumber);
-						VDSwitchedSafe();
-					} else {
-						//storeLastWinFocused();
+						this.AppForm.BeginInvoke((Action)(() => {
+							this.CurrentVDDisplayName = this.GetVDDisplayName(false);
+							this.CurrentVDDisplayNumber = newVDDisplayNumber;
+							VDSwitchedSafe();
+						}));
 					}
 					System.Threading.Thread.Sleep(100);
 				} catch(Exception e) {
@@ -236,6 +234,7 @@ namespace WindowsVirtualDesktopHelper {
 		public void SwitchDesktopBackward() {
 			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
 			try {
+				_storeLastWinFocused();
 				VDAPI.SwitchBackward();
 			} catch(Exception e) {
 				Util.Logging.WriteLine("App: Error: SwitchDesktopBackward (VDAPI.SwitchBackward()): " + e.Message);
@@ -246,6 +245,7 @@ namespace WindowsVirtualDesktopHelper {
 		public void SwitchDesktopForward() {
 			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
 			try {
+				_storeLastWinFocused();
 				VDAPI.SwitchForward();
 			} catch(Exception e) {
 				Util.Logging.WriteLine("App: Error: SwitchDesktopForward (VDAPI.SwitchForward()): " + e.Message);
@@ -309,23 +309,6 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 
-		public void MonitorFocusedWindow() {
-			var thread = new Thread(new ThreadStart(_monitorFocusedWindow));
-			thread.Start();
-		}
-
-		private void _monitorFocusedWindow() {
-			while(true) {
-				try {
-					_storeLastWinFocused();
-					System.Threading.Thread.Sleep(200);
-				} catch(Exception e) {
-					Util.Logging.WriteLine("App: Error: _monitorFocusedWindow: " + e.Message);
-					System.Threading.Thread.Sleep(1000);
-				}
-			}
-		}
-
 		private void _storeLastWinFocused() {
 			IntPtr hWnd = Util.OS.GetForegroundWindow();
 			if(hWnd != IntPtr.Zero) {
@@ -346,7 +329,9 @@ namespace WindowsVirtualDesktopHelper {
 			var displayNumber = (int)this.GetVDDisplayNumber(false);
 			if(VDDToLastFocusedWin.ContainsKey(displayNumber)) {
 				IntPtr lastWindowHandle = VDDToLastFocusedWin[displayNumber];
-				if(Util.OS.IsWindow(lastWindowHandle)) {
+				// Add a small delay to give the desktop time to load
+				System.Threading.Thread.Sleep(50);
+				if (Util.OS.IsWindow(lastWindowHandle)) {
 					Util.OS.SetForegroundWindow(lastWindowHandle);
 					//Console.WriteLine("restore: "+ displayNumber + " "+ lastWindowHandle);
 				}
