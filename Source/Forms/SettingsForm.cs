@@ -173,7 +173,7 @@ namespace WindowsVirtualDesktopHelper {
 				if (keyModifiers == KeyModifiers.None) {
 					labelKeyModifiersAreRequired.Text = "REQUIRED";
 					labelKeyModifiersAreRequired.Visible = true;
-				} else if (keyModifiers == KeyModifiers.Shift) {
+				} else if (keyModifiers == KeyModifiers.Shift || keyModifiers == KeyModifiers.Win) {
 					labelKeyModifiersAreRequired.Text = "NOT RECOMMENDED";
 					labelKeyModifiersAreRequired.Visible = true;
 				} else labelKeyModifiersAreRequired.Visible = false;
