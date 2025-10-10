@@ -42,6 +42,9 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | feature.showDesktopSwitchOverlay.showOnAllMonitors | ``true`` |  |
 | feature.showDesktopSwitchOverlay.position | ``"middlecenter"`` |  |
 | feature.useHotKeyToJumpToDesktopNumber | ``false`` |  |
+| feature.useHotKeyToJumpToDesktopNumber.useDigits | ``true`` | If enabled, the Jump To Desktop feature registers the Keyboard digits |
+| feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits | ``true`` | If enabled, the Jump To Desktop feature registers the Numpad digits |
+| feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys | ``false`` | If enabled, the Jump To Desktop feature registers the corresponding Function keys |
 | feature.useHotKeyToJumpToDesktopNumber.hotkey | ``"Alt"`` |  |
 | feature.showDesktopNumberInIconTray | ``true`` |  |
 | feature.showDesktopNumberInIconTray.clickToOpenTaskView | ``true`` |  |

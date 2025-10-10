@@ -68,6 +68,9 @@ namespace WindowsVirtualDesktopHelper {
 			// Feature: useHotKeyToJumpToDesktopNumber
 			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber", false);
 			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber.hotkey", "Alt");
+			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber.useDigits", true, "If enabled, the Jump To Desktop feature registers the Keyboard digits");
+			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits", true, "If enabled, the Jump To Desktop feature registers the Numpad digits");
+			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys", false, "If enabled, the Jump To Desktop feature registers the corresponding Function keys");
 
 			// Feature: useHotKeyToJumpToPreviousDesktop
 			RegisterDefault("feature.useHotKeyToJumpToPreviousDesktop", false);
