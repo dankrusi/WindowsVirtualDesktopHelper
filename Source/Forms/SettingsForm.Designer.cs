@@ -60,6 +60,7 @@ namespace WindowsVirtualDesktopHelper {
 			this.checkBoxUseDigitsForJump = new System.Windows.Forms.CheckBox();
 			this.checkBoxUseNumpadDigitsForJump = new System.Windows.Forms.CheckBox();
 			this.checkBoxUseFunctionKeysForJump = new System.Windows.Forms.CheckBox();
+			this.labelJumpToDesktopKeysRequired = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.panel3.SuspendLayout();
 			this.panel2.SuspendLayout();
@@ -99,7 +100,7 @@ namespace WindowsVirtualDesktopHelper {
 			this.groupBox1.Controls.Add(this.checkBoxShowPrevNextIcons);
 			this.groupBox1.Location = new System.Drawing.Point(12, 12);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(413, 344);
+			this.groupBox1.Size = new System.Drawing.Size(422, 333);
 			this.groupBox1.TabIndex = 2;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Features";
@@ -112,7 +113,7 @@ namespace WindowsVirtualDesktopHelper {
 			this.panel3.Controls.Add(this.radioButtonUseHotKeysToJumpToDesktopCtrl);
 			this.panel3.Location = new System.Drawing.Point(40, 276);
 			this.panel3.Name = "panel3";
-			this.panel3.Size = new System.Drawing.Size(360, 28);
+			this.panel3.Size = new System.Drawing.Size(379, 28);
 			this.panel3.TabIndex = 20;
 			// 
 			// radioButtonUseHotKeysToJumpToDesktopAlt
@@ -425,11 +426,12 @@ namespace WindowsVirtualDesktopHelper {
 			// 
 			// groupBox2
 			// 
-			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.checkBoxStartupWithWindows);
-			this.groupBox2.Location = new System.Drawing.Point(12, 362);
+			this.groupBox2.Location = new System.Drawing.Point(12, 351);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(413, 48);
+			this.groupBox2.Size = new System.Drawing.Size(422, 48);
 			this.groupBox2.TabIndex = 3;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Settings";
@@ -447,12 +449,13 @@ namespace WindowsVirtualDesktopHelper {
 			// 
 			// panel4
 			// 
+			this.panel4.Controls.Add(this.labelJumpToDesktopKeysRequired);
 			this.panel4.Controls.Add(this.checkBoxUseFunctionKeysForJump);
 			this.panel4.Controls.Add(this.checkBoxUseNumpadDigitsForJump);
 			this.panel4.Controls.Add(this.checkBoxUseDigitsForJump);
 			this.panel4.Location = new System.Drawing.Point(45, 303);
 			this.panel4.Name = "panel4";
-			this.panel4.Size = new System.Drawing.Size(360, 28);
+			this.panel4.Size = new System.Drawing.Size(377, 28);
 			this.panel4.TabIndex = 24;
 			// 
 			// checkBoxUseDigitsForJump
@@ -491,11 +494,23 @@ namespace WindowsVirtualDesktopHelper {
 			this.checkBoxUseFunctionKeysForJump.UseVisualStyleBackColor = true;
 			this.checkBoxUseFunctionKeysForJump.CheckedChanged += new System.EventHandler(this.checkBoxUseFunctionKeysForJump_CheckedChanged);
 			// 
+			// labelJumpToDesktopKeysRequired
+			// 
+			this.labelJumpToDesktopKeysRequired.Dock = System.Windows.Forms.DockStyle.Right;
+			this.labelJumpToDesktopKeysRequired.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelJumpToDesktopKeysRequired.ForeColor = System.Drawing.Color.Red;
+			this.labelJumpToDesktopKeysRequired.Location = new System.Drawing.Point(305, 0);
+			this.labelJumpToDesktopKeysRequired.Name = "labelJumpToDesktopKeysRequired";
+			this.labelJumpToDesktopKeysRequired.Size = new System.Drawing.Size(72, 28);
+			this.labelJumpToDesktopKeysRequired.TabIndex = 3;
+			this.labelJumpToDesktopKeysRequired.Text = "REQUIRED";
+			this.labelJumpToDesktopKeysRequired.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// SettingsForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(439, 422);
+			this.ClientSize = new System.Drawing.Size(448, 411);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -560,5 +575,6 @@ namespace WindowsVirtualDesktopHelper {
 		private System.Windows.Forms.CheckBox checkBoxUseFunctionKeysForJump;
 		private System.Windows.Forms.CheckBox checkBoxUseNumpadDigitsForJump;
 		private System.Windows.Forms.CheckBox checkBoxUseDigitsForJump;
+		private System.Windows.Forms.Label labelJumpToDesktopKeysRequired;
 	}
 }

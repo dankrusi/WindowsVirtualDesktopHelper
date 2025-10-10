@@ -427,9 +427,9 @@ namespace WindowsVirtualDesktopHelper {
 			// Compile from features
 			if(Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber")) {
 				var hotKey = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey");
-				var jumpUsingDigits = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useDigits", true);
-				var jumpUsingNumpadDigits = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits", true);
-				var jumpUsingFunctionKeys = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys", false);
+				var jumpUsingDigits = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useDigits");
+				var jumpUsingNumpadDigits = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits");
+				var jumpUsingFunctionKeys = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys");
 				if (hotKey != null && hotKey != "") {
 					for(var i = 1; i <= 9; i++) {
 						if (jumpUsingDigits) hotkeys.Add($"{hotKey} + D{i} = Desktop{i}");
