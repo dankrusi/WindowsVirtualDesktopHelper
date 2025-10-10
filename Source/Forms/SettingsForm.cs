@@ -162,6 +162,8 @@ namespace WindowsVirtualDesktopHelper {
 			checkBoxUseNumpadDigitsForJump.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
 			checkBoxUseFunctionKeysForJump.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
 
+			ValidateJumpToDesktopKeys();
+
 			App.Instance.SetupHotKeys();
 		}
 
