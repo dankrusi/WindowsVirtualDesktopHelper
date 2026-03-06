@@ -24,10 +24,13 @@ namespace WindowsVirtualDesktopHelper {
 		public static void LoadDefaults() {
 			// Register any known default settings here
 
+			// Debug
+			RegisterDefault("debug.singleInstance", true, "true - only allow a single instance of the application to run (default); false - allow multiple instances (expect errors registering hotkeys)");
+
 			// General
 			RegisterDefault("general.startupWithWindows", false, "If true, the app will register itself with Windows to startup when Windows starts (via the registry).");
 			RegisterDefault("general.theme", "auto", "Can be either auto, dark or light. If set to auto, the theme is derived from the current windows theme (dark or light).");
-			
+
 			// Theme
 			RegisterDefault("theme.icons.disabledOpacity", 0.5, "Defines the opacity to use for icons which are disabled.");
 			RegisterDefault("theme.icons.font", "Segoe UI", "Defines the font name to use for the icons (for regular numbers, characters).");

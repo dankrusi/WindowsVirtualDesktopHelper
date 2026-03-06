@@ -10,6 +10,7 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 
 |Config|Default|Description|
 | --- | --- | --- |
+| debug.singleInstance | ``true`` | If true, the app will prevent multiple instances of the app from starting.  Most users won't need to change this option. |
 | general.startupWithWindows | ``false`` | If true, the app will register itself with Windows to startup when Windows starts (via the registry). |
 | general.theme | ``"auto"`` | Can be either auto, dark or light. If set to auto, the theme is derived from the current windows theme (dark or light). |
 | theme.icons.disabledOpacity | ``"0.5"`` | Defines the opacity to use for icons which are disabled. |
