@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -60,23 +60,20 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>2875C0BE50AD708706744FD85AA634A2F6C48E96</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>6B67E0DE81A5331BD67945B72DB7F4C8B90FE74E</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>
     </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
+    <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetZone>LocalIntranet</TargetZone>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Forms\AboutForm.cs">
@@ -123,6 +120,7 @@
     <Compile Include="Util\Icons.cs" />
     <Compile Include="Util\Logging.cs" />
     <Compile Include="Util\OS.cs" />
+    <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopServer2022.cs" />
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin10.cs" />
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_Insider25314.cs" />
     <Compile Include="VirtualDesktopAPI\Implementation\VirtualDesktopWin11_Insider22631.cs" />
