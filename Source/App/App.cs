@@ -308,7 +308,6 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
-
 		public void MonitorFocusedWindow() {
 			var thread = new Thread(new ThreadStart(_monitorFocusedWindow));
 			thread.Start();
@@ -544,11 +543,24 @@ namespace WindowsVirtualDesktopHelper {
 			this._keyboardHooks.KeyPressed += new EventHandler<KeyPressedEventArgs>(_hotKeyPressed);
 
 			// Register all the hotkeys in _keyboardHooksHotKeysAndActions
+			List<string> hotkeyRegistrationErrors = new List<string>();
 			foreach(var hotkeyAction in _keyboardHooksHotKeysAndActions) {
-				this._keyboardHooks.RegisterHotKey(hotkeyAction.Modifiers, hotkeyAction.Keys);
+				try {
+					this._keyboardHooks.RegisterHotKey(hotkeyAction.Modifiers, hotkeyAction.Keys);
+				} catch (InvalidOperationException) {
+					hotkeyRegistrationErrors.Add($"{hotkeyAction.HotKeyAndAction}");
+				}
 			}
 
-
+			if (hotkeyRegistrationErrors.Any()) {
+				List<string> message = new List<string>();
+				message.Add("Could not register hotkeys:");
+				message.Add(Environment.NewLine);
+				message.AddRange(hotkeyRegistrationErrors);
+				message.Add(Environment.NewLine);
+				message.Add("Maybe this hotkey is already registered in another application??");
+				MessageBox.Show(string.Join(Environment.NewLine, message), "Hotkey Registration Error", MessageBoxButtons.OK);
+			}
 		}
 
 		private void _hotKeyPressed(object sender, KeyPressedEventArgs e) {
@@ -648,7 +660,6 @@ namespace WindowsVirtualDesktopHelper {
 			this.AppForm.notifyIconName.Visible = Settings.GetBool("feature.showDesktopNameInIconTray");
 			this.AppForm.notifyIconNumber.Visible = Settings.GetBool("feature.showDesktopNumberInIconTray");
 		}
-
 
 		public void UIUpdateIconForVDDisplayNumber(string theme, uint number, string name) {
 			number++;
