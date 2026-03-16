@@ -13,6 +13,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Security.Policy;
+using System.Collections.Concurrent;
 
 namespace WindowsVirtualDesktopHelper {
 
@@ -49,7 +50,7 @@ namespace WindowsVirtualDesktopHelper {
 		private KeyboardHook KeyboardHooksJumpToDesktop = null;
 		private KeyboardHook _keyboardHooks = null;
 		private List<HotKeyAction> _keyboardHooksHotKeysAndActions = new List<HotKeyAction>(); // the registered hotkey actions
-		private Dictionary<int, IntPtr> VDDToLastFocusedWin = new Dictionary<int, IntPtr>();
+		private ConcurrentDictionary<int, IntPtr> VDDToLastFocusedWin = new ConcurrentDictionary<int, IntPtr>();
 		public IntPtr LastForegroundhWnd = IntPtr.Zero; //TODO: this should be private
 		public List<string> FGWindowHistory = new List<string>(); //TODO: this should be private // needed to detect if Task View was open
 		private List<int> _desktopNumberHistory = new List<int>(); // stores a list of most recent desktop numbers used
@@ -97,7 +98,6 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		#endregion
-
 		#region Virtual Desktop Methods
 
 		public void LoadVDAPI() {
@@ -171,12 +171,11 @@ namespace WindowsVirtualDesktopHelper {
 				try {
 					var newVDDisplayNumber = this.GetVDDisplayNumber(false);
 					if(newVDDisplayNumber != this.CurrentVDDisplayNumber) {
-						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
-						this.CurrentVDDisplayNumber = newVDDisplayNumber;
-						//Util.Logging.WriteLine("Switched to " + this.CurrentVDDisplayNumber);
-						VDSwitchedSafe();
-					} else {
-						//storeLastWinFocused();
+						this.AppForm.BeginInvoke((Action)(() => {
+							this.CurrentVDDisplayName = this.GetVDDisplayName(false);
+							this.CurrentVDDisplayNumber = newVDDisplayNumber;
+							VDSwitchedSafe();
+						}));
 					}
 					System.Threading.Thread.Sleep(100);
 				} catch(Exception e) {
@@ -236,6 +235,7 @@ namespace WindowsVirtualDesktopHelper {
 		public void SwitchDesktopBackward() {
 			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
 			try {
+				_storeLastWinFocused();
 				VDAPI.SwitchBackward();
 			} catch(Exception e) {
 				Util.Logging.WriteLine("App: Error: SwitchDesktopBackward (VDAPI.SwitchBackward()): " + e.Message);
@@ -246,6 +246,7 @@ namespace WindowsVirtualDesktopHelper {
 		public void SwitchDesktopForward() {
 			// We try the virtual desktop implementation API, but fallback to shortcut keys if it fails...
 			try {
+				_storeLastWinFocused();
 				VDAPI.SwitchForward();
 			} catch(Exception e) {
 				Util.Logging.WriteLine("App: Error: SwitchDesktopForward (VDAPI.SwitchForward()): " + e.Message);
@@ -309,23 +310,6 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 
-		public void MonitorFocusedWindow() {
-			var thread = new Thread(new ThreadStart(_monitorFocusedWindow));
-			thread.Start();
-		}
-
-		private void _monitorFocusedWindow() {
-			while(true) {
-				try {
-					_storeLastWinFocused();
-					System.Threading.Thread.Sleep(200);
-				} catch(Exception e) {
-					Util.Logging.WriteLine("App: Error: _monitorFocusedWindow: " + e.Message);
-					System.Threading.Thread.Sleep(1000);
-				}
-			}
-		}
-
 		private void _storeLastWinFocused() {
 			IntPtr hWnd = Util.OS.GetForegroundWindow();
 			if(hWnd != IntPtr.Zero) {
@@ -333,22 +317,18 @@ namespace WindowsVirtualDesktopHelper {
 				var fgWindowType = Util.OS.GetHandleWndType(hWnd);
 				if(fgWindowType == "Shell_TrayWnd") return; // we ignore the icon tray, since this takes the focus away when we click the prev/next arrows
 				var displayNumber = (int)this.GetVDDisplayNumber(false);
-				if(VDDToLastFocusedWin.ContainsKey(displayNumber)) {
-					VDDToLastFocusedWin[displayNumber] = hWnd;
-				} else {
-					VDDToLastFocusedWin.Add(displayNumber, hWnd);
-				}
+				VDDToLastFocusedWin.AddOrUpdate(displayNumber, hWnd, (key, existingValue) => hWnd);
 				//Console.WriteLine($"store: display {displayNumber} hwnd {hWnd} ({fgWindowType})");
 			}
 		}
 
 		private void _restorePrevWinFocus() {
 			var displayNumber = (int)this.GetVDDisplayNumber(false);
-			if(VDDToLastFocusedWin.ContainsKey(displayNumber)) {
-				IntPtr lastWindowHandle = VDDToLastFocusedWin[displayNumber];
-				if(Util.OS.IsWindow(lastWindowHandle)) {
+			IntPtr lastWindowHandle;
+			if (VDDToLastFocusedWin.TryGetValue(displayNumber, out lastWindowHandle)) {
+				System.Threading.Thread.Sleep(50);
+				if (Util.OS.IsWindow(lastWindowHandle)) {
 					Util.OS.SetForegroundWindow(lastWindowHandle);
-					//Console.WriteLine("restore: "+ displayNumber + " "+ lastWindowHandle);
 				}
 			}
 		}
