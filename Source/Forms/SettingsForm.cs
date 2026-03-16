@@ -16,11 +16,8 @@ namespace WindowsVirtualDesktopHelper {
 			InitializeComponent();
 			LoadSettingsIntoUI();
 
-
 			IsLoading = false;
 		}
-
-		
 
 		private void LoadSettingsIntoUI() {
 
@@ -35,6 +32,9 @@ namespace WindowsVirtualDesktopHelper {
 			this.checkBoxOverlayShowOnAllMonitors.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors");
 			this.checkBoxClickDesktopNumberTaskView.Checked = Settings.GetBool("feature.showDesktopNumberInIconTray.clickToOpenTaskView");
 			this.checkBoxUseHotKeysToJumpToDesktop.Checked = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber");
+			this.checkBoxUseDigitsForJump.Checked = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useDigits");
+			this.checkBoxUseNumpadDigitsForJump.Checked = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits");
+			this.checkBoxUseFunctionKeysForJump.Checked = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys");
 			this.radioButtonOverlayLongDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 3000;
 			this.radioButtonOverlayMediumDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 2000;
 			this.radioButtonOverlayShortDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 1000;
@@ -53,6 +53,8 @@ namespace WindowsVirtualDesktopHelper {
 			this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Ctrl";
 			this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Ctrl + Alt";
 
+			ValidateJumpToDesktopKeys();
+
 			checkBoxShowOverlay_CheckedChanged(this, null);
 			checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(this, null);
 		}
@@ -61,7 +63,6 @@ namespace WindowsVirtualDesktopHelper {
 			// Save user settings to storage
 			Settings.SaveConfig();
 		}
-
 
 		#region Form Events
 
@@ -84,17 +85,12 @@ namespace WindowsVirtualDesktopHelper {
 				SaveSettingsFromUI();
 				Hide();
 			}
-			
-				
+
 		}
 
 		#endregion
 
-
-
-
 		#region Settings UI Events
-
 
 		private void checkBoxStartupWithWindows_CheckedChanged(object sender, EventArgs e) {
 			if(IsLoading) return;
@@ -162,6 +158,11 @@ namespace WindowsVirtualDesktopHelper {
 			radioButtonUseHotKeysToJumpToDesktopAltShift.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
 			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
 			radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
+			checkBoxUseDigitsForJump.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
+			checkBoxUseNumpadDigitsForJump.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
+			checkBoxUseFunctionKeysForJump.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
+
+			ValidateJumpToDesktopKeys();
 
 			App.Instance.SetupHotKeys();
 		}
@@ -297,6 +298,39 @@ namespace WindowsVirtualDesktopHelper {
 			if((sender as RadioButton).Checked == true) {
 				Settings.SetString("feature.showDesktopSwitchOverlay.position", "bottomright");
 			}
+		}
+
+		private bool ValidateJumpToDesktopKeys() {
+			if (checkBoxUseHotKeysToJumpToDesktop.Checked) {
+				bool valid = checkBoxUseDigitsForJump.Checked
+				             || checkBoxUseNumpadDigitsForJump.Checked
+				             || checkBoxUseFunctionKeysForJump.Checked;
+				labelJumpToDesktopKeysRequired.Visible = !valid;
+				return valid;
+			}
+
+			labelJumpToDesktopKeysRequired.Visible = false;
+			return true;
+		}
+		private void checkBoxUseDigitsForJump_CheckedChanged(object sender, EventArgs e) {
+			if (IsLoading) return;
+			Settings.SetBool("feature.useHotKeyToJumpToDesktopNumber.useDigits", checkBoxUseDigitsForJump.Checked);
+			ValidateJumpToDesktopKeys();
+			App.Instance.SetupHotKeys();
+		}
+
+		private void checkBoxUseNumpadDigitsForJump_CheckedChanged(object sender, EventArgs e) {
+			if (IsLoading) return;
+			Settings.SetBool("feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits", checkBoxUseNumpadDigitsForJump.Checked);
+			ValidateJumpToDesktopKeys();
+			App.Instance.SetupHotKeys();
+		}
+
+		private void checkBoxUseFunctionKeysForJump_CheckedChanged(object sender, EventArgs e) {
+			if (IsLoading) return;
+			Settings.SetBool("feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys", checkBoxUseFunctionKeysForJump.Checked);
+			ValidateJumpToDesktopKeys();
+			App.Instance.SetupHotKeys();
 		}
 
 		#endregion
