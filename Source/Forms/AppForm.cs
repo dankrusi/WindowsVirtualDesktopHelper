@@ -7,6 +7,7 @@ using WindowsVirtualDesktopHelper.WindowsHotKeyAPI;
 namespace WindowsVirtualDesktopHelper {
 	public partial class AppForm : Form {
 
+		private bool _startupDone = false;
 
 		public AppForm() {
 			// Init UI
@@ -32,7 +33,28 @@ namespace WindowsVirtualDesktopHelper {
 			}
 		}
 
-		private void AppForm_Load(object sender, EventArgs e) {
+		// This form is only a host for the tray icons and the UI message pump; it must
+		// NEVER be visible. The previous approach (WindowState=Minimized + layered styles)
+		// did not actually prevent display: Windows could restore and repaint it on events
+		// like session unlock, DPI/display changes, or an Explorer/taskbar restart, leaving a
+		// stray "Windows Virtual Desktop Manager" dialog with no close button (ControlBox=false).
+		// Overriding SetVisibleCore guarantees the window can never be shown, while still
+		// creating its handle so Invoke(), the message pump, and the NotifyIcons keep working.
+		protected override void SetVisibleCore(bool value) {
+			if (!this.IsHandleCreated) this.CreateHandle(); // ensure handle for Invoke/pump/tray
+			base.SetVisibleCore(false);                     // but never actually show it
+		}
+
+		// Because the form is never shown, the Load event no longer fires, so the startup
+		// wiring that used to live in AppForm_Load now runs here, once the handle exists.
+		protected override void OnHandleCreated(EventArgs e) {
+			base.OnHandleCreated(e);
+			if (_startupDone) return;
+			_startupDone = true;
+			StartUp();
+		}
+
+		private void StartUp() {
 			App.Instance.ShowSplash();
 			App.Instance.MonitorVDSwitch();
 			App.Instance.MonitorSystemThemeSwitch();
@@ -41,6 +63,10 @@ namespace WindowsVirtualDesktopHelper {
 			App.Instance.MonitorFocusedWindow();
 
 			App.Instance.UIUpdate();
+		}
+
+		private void AppForm_Load(object sender, EventArgs e) {
+			// Intentionally empty: startup now runs from OnHandleCreated (see SetVisibleCore).
 		}
 
 		private void AppForm_Shown(object sender, EventArgs e) {
