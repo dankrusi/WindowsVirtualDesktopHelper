@@ -289,6 +289,14 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		private void _MonitorFGWindowName() {
+			// Bug fix: 20ms polling caused a race with the Windows shell during
+			// Win+Ctrl+Arrow desktop transitions (synchronous GetWindowText calls
+			// hammered the foreground window's message pump 50 times per second,
+			// intermittently swallowing the shell's own hotkey handling).
+			// Poll rate is now driven by whether anything actually needs sub-second
+			// foreground-name resolution. The history feeds:
+			//   (a) feature.restorePreviousWindowFocus (default false) — needs ~200ms
+			//   (b) tray-click "is Task View already open" heuristic — 1s is fine
 			while(true) {
 				try {
 					var fgWindowName = Util.OS.GetForegroundWindowName();
@@ -300,7 +308,8 @@ namespace WindowsVirtualDesktopHelper {
 					if(LastForegroundhWnd == IntPtr.Zero) {
 						LastForegroundhWnd = Util.OS.GetFolderViewHandle();
 					}
-					System.Threading.Thread.Sleep(20);
+					var pollIntervalMs = Settings.GetBool("feature.restorePreviousWindowFocus") ? 200 : 1000;
+					System.Threading.Thread.Sleep(pollIntervalMs);
 				} catch(Exception e) {
 					Util.Logging.WriteLine("App: Error: MonitorFGWindowName: " + e.Message);
 					System.Threading.Thread.Sleep(1000);
@@ -315,10 +324,18 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		private void _monitorFocusedWindow() {
+			// Bug fix: this thread only exists to support feature.restorePreviousWindowFocus.
+			// When that feature is disabled (default), polling here is pure waste and
+			// contributes to the same desktop-switch race as _MonitorFGWindowName.
+			// Idle out at 5s when the feature is off; keep 200ms when it's on.
 			while(true) {
 				try {
-					_storeLastWinFocused();
-					System.Threading.Thread.Sleep(200);
+					if(Settings.GetBool("feature.restorePreviousWindowFocus")) {
+						_storeLastWinFocused();
+						System.Threading.Thread.Sleep(200);
+					} else {
+						System.Threading.Thread.Sleep(5000);
+					}
 				} catch(Exception e) {
 					Util.Logging.WriteLine("App: Error: _monitorFocusedWindow: " + e.Message);
 					System.Threading.Thread.Sleep(1000);
