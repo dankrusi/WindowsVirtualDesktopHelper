@@ -7,11 +7,11 @@ namespace WindowsVirtualDesktopHelper {
 
 		[STAThread]
 		public static void Main(string[] args) {
-			// Settings
-			Settings.LoadDefaults();
-			Settings.RegisterLaunchArgs(args);
 			// Catch all exceptions in global exception handler
 			try {
+				// Settings
+				Settings.LoadDefaults();
+				Settings.RegisterLaunchArgs(args);
 				// Load config
 				Settings.LoadConfig();
 				// Start app
