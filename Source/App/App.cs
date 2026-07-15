@@ -329,9 +329,12 @@ namespace WindowsVirtualDesktopHelper {
 		private void _storeLastWinFocused() {
 			IntPtr hWnd = Util.OS.GetForegroundWindow();
 			if(hWnd != IntPtr.Zero) {
-				var fgWindowName = Util.OS.GetForegroundWindowName();
 				var fgWindowType = Util.OS.GetHandleWndType(hWnd);
 				if(fgWindowType == "Shell_TrayWnd") return; // we ignore the icon tray, since this takes the focus away when we click the prev/next arrows
+				// Only remember this window for the desktop it actually lives on. A native desktop
+				// switch mid-poll can otherwise file a window under the wrong desktop number, and
+				// restoring it later yanks focus back to that other desktop (see issue #166).
+				if(!Util.OS.IsWindowOnCurrentVirtualDesktop(hWnd)) return;
 				var displayNumber = (int)this.GetVDDisplayNumber(false);
 				if(VDDToLastFocusedWin.ContainsKey(displayNumber)) {
 					VDDToLastFocusedWin[displayNumber] = hWnd;
@@ -346,7 +349,9 @@ namespace WindowsVirtualDesktopHelper {
 			var displayNumber = (int)this.GetVDDisplayNumber(false);
 			if(VDDToLastFocusedWin.ContainsKey(displayNumber)) {
 				IntPtr lastWindowHandle = VDDToLastFocusedWin[displayNumber];
-				if(Util.OS.IsWindow(lastWindowHandle)) {
+				// Never yank focus to a window that isn't on the desktop we just landed on:
+				// doing so makes Windows jump back to that window's desktop (see issue #166).
+				if(Util.OS.IsWindow(lastWindowHandle) && Util.OS.IsWindowOnCurrentVirtualDesktop(lastWindowHandle)) {
 					Util.OS.SetForegroundWindow(lastWindowHandle);
 					//Console.WriteLine("restore: "+ displayNumber + " "+ lastWindowHandle);
 				}
