@@ -95,6 +95,13 @@ namespace WindowsVirtualDesktopHelper {
 			this.Close();
 		}
 
+		protected override void OnFormClosed(FormClosedEventArgs e) {
+			// Unsubscribe from the static event, otherwise every overlay form ever shown stays
+			// rooted by the event handler list and can never be garbage collected
+			WillShowNotificationFormEvent -= this.OnWillShowNotificationForm;
+			base.OnFormClosed(e);
+		}
+
 		// Preven from from being focusable
 		// via https://stackoverflow.com/questions/2423234/make-a-form-not-focusable-in-c-sharp
 		// via https://stackoverflow.com/questions/2798245/click-through-in-c-sharp-form
