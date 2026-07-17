@@ -57,6 +57,12 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | feature.showDesktopStatusOverlay.position | ``"topcenter"`` |  |
 | feature.useHotKeyToJumpToDesktopNumber | ``false`` |  |
 | feature.useHotKeyToJumpToDesktopNumber.hotkey | ``"Alt"`` |  |
+| feature.useHotKeyToJumpToPreviousDesktop | ``false`` |  |
+| feature.useHotKeyToJumpToPreviousDesktop.hotkey | ``"Alt + Tilde"`` |  |
+| feature.useHotKeyToSwitchDesktopForward | ``false`` |  |
+| feature.useHotKeyToSwitchDesktopForward.hotkey | ``"Alt + Right"`` |  |
+| feature.useHotKeyToSwitchDesktopBackward | ``false`` |  |
+| feature.useHotKeyToSwitchDesktopBackward.hotkey | ``"Alt + Left"`` |  |
 | feature.showDesktopNumberInIconTray | ``true`` |  |
 | feature.showDesktopNumberInIconTray.clickToOpenTaskView | ``true`` |  |
 | feature.showDesktopNameInIconTray | ``false`` |  |
