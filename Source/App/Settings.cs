@@ -38,14 +38,23 @@ namespace WindowsVirtualDesktopHelper {
 			RegisterDefault("theme.icons.iconFG.dark", "white");
 			RegisterDefault("theme.icons.iconBG.light", "white");
 			RegisterDefault("theme.icons.iconFG.light", "black");
-			RegisterDefault("theme.overlay.width", 900, "With width in pixels of the overlay.");
-			RegisterDefault("theme.overlay.height", 430, "With height in pixels of the overlay.");
-			RegisterDefault("theme.overlay.font", "Segoe UI Light", "Defines the font name to use for the overlay.");
-			RegisterDefault("theme.overlay.fontSize", 30, "Defines the font size to use for the overlay.");
+			RegisterDefault("theme.overlay.width", 900, "With width in pixels of the switch overlay.");
+			RegisterDefault("theme.overlay.height", 430, "With height in pixels of the switch overlay.");
+			RegisterDefault("theme.overlay.font", "Segoe UI Light", "Defines the font name to use for the switch overlay.");
+			RegisterDefault("theme.overlay.fontSize", 30, "Defines the font size to use for the switch overlay.");
 			RegisterDefault("theme.overlay.overlayBG.dark", "black");
 			RegisterDefault("theme.overlay.overlayFG.dark", "white");
 			RegisterDefault("theme.overlay.overlayBG.light", "black");
 			RegisterDefault("theme.overlay.overlayFG.light", "white");
+			RegisterDefault("theme.status.width", 250, "With width in pixels of the status overlay.");
+			RegisterDefault("theme.status.height", 40, "With height in pixels of the status overlay.");
+			RegisterDefault("theme.status.offset", 0, "With height in pixels of the status overlay.");
+			RegisterDefault("theme.status.font", "Segoe UI Light", "Defines the font name to use for the status overlay.");
+			RegisterDefault("theme.status.fontSize", 12, "Defines the font size to use for the status overlay.");
+			RegisterDefault("theme.status.overlayBG.dark", "black");
+			RegisterDefault("theme.status.overlayFG.dark", "white");
+			RegisterDefault("theme.status.overlayBG.light", "black");
+			RegisterDefault("theme.status.overlayFG.light", "white");
 
 			// Feature: splash
 			RegisterDefault("feature.showSplashScreen", true, "If enabled, a splash screen is shown on startup of the app. Overlays must be enabled.");
@@ -65,6 +74,13 @@ namespace WindowsVirtualDesktopHelper {
 			RegisterDefault("feature.showDesktopSwitchOverlay.translucent", true);
 			RegisterDefault("feature.showDesktopSwitchOverlay.showOnAllMonitors", true);
 			RegisterDefault("feature.showDesktopSwitchOverlay.position", "middlecenter");
+
+			// Feature: showDesktopStatusOverlay
+			RegisterDefault("feature.showDesktopStatusOverlay", false);
+			RegisterDefault("feature.showDesktopStatusOverlay.animate", true);
+			RegisterDefault("feature.showDesktopStatusOverlay.translucent", true);
+			RegisterDefault("feature.showDesktopStatusOverlay.showOnAllMonitors", true);
+			RegisterDefault("feature.showDesktopStatusOverlay.position", "topcenter");
 
 			// Feature: useHotKeyToJumpToDesktopNumber
 			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber", false);

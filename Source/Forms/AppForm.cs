@@ -25,6 +25,9 @@ namespace WindowsVirtualDesktopHelper {
 			App.Instance.MonitorFGWindowName();
 			App.Instance.MonitorFocusedWindow();
 
+			// Update permanent overlay
+			App.Instance.UpdateStatusOverlayWindows();
+
 			App.Instance.UIUpdate();
 		}
 

@@ -196,7 +196,7 @@ namespace WindowsVirtualDesktopHelper {
 				this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
 				this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
 				this.UIUpdateNextPrevIconVisibility(this.CurrentSystemThemeName);
-				// Show overlay
+				// Show notification overlay
 				if(Settings.GetBool("feature.showDesktopSwitchOverlay")) {
 					this.AppForm.Invoke((Action)(() => {
 						SwitchNotificationForm.CloseAllNotifications(this.AppForm);
@@ -215,6 +215,8 @@ namespace WindowsVirtualDesktopHelper {
 						}
 					}));
 				}
+				// Update permanent overlay
+				UpdateStatusOverlayWindows();
 				// Restore focus
 				try {
 					_restorePrevWinFocus();
@@ -274,6 +276,27 @@ namespace WindowsVirtualDesktopHelper {
 					this.SwitchToDesktop(_desktopNumberHistory[i]);
 					return;
 				}
+			}
+		}
+
+		public void UpdateStatusOverlayWindows() {
+			if(Settings.GetBool("feature.showDesktopStatusOverlay")) {
+				this.AppForm.Invoke((Action)(() => {
+					OverlayForm.CloseAllNotifications(this.AppForm);
+					if(Settings.GetBool("feature.showDesktopStatusOverlay.showOnAllMonitors")) {
+						for(var i = 0; i < Screen.AllScreens.Length; i++) {
+							var form = new OverlayForm(i);
+							form.LabelText = this.CurrentVDDisplayName;
+							form.Show();
+						}
+					} else {
+						var form = new OverlayForm();
+						form.LabelText = this.CurrentVDDisplayName;
+						form.Show();
+					}
+				}));
+			} else {
+				OverlayForm.CloseAllNotifications(this.AppForm);
 			}
 		}
 

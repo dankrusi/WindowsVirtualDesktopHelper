@@ -29,12 +29,11 @@ namespace WindowsVirtualDesktopHelper {
 			this.checkBoxShowPrevNextIcons.Checked = Settings.GetBool("feature.showPrevNextIcons");
 			this.checkBoxShowDesktopNameInitial.Checked = Settings.GetBool("feature.showDesktopNameInIconTray");
 			this.checkBoxStartupWithWindows.Checked = Settings.GetBool("general.startupWithWindows");
+
 			this.checkBoxShowOverlay.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay");
 			this.checkBoxOverlayAnimate.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay.animate");
 			this.checkBoxOverlayTranslucent.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay.translucent");
 			this.checkBoxOverlayShowOnAllMonitors.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay.showOnAllMonitors");
-			this.checkBoxClickDesktopNumberTaskView.Checked = Settings.GetBool("feature.showDesktopNumberInIconTray.clickToOpenTaskView");
-			this.checkBoxUseHotKeysToJumpToDesktop.Checked = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber");
 			this.radioButtonOverlayLongDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 3000;
 			this.radioButtonOverlayMediumDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 2000;
 			this.radioButtonOverlayShortDuration.Checked = Settings.GetInt("feature.showDesktopSwitchOverlay.duration") == 1000;
@@ -48,12 +47,32 @@ namespace WindowsVirtualDesktopHelper {
 			this.radioButtonPositionBottomLeft.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "bottomleft";
 			this.radioButtonPositionBottomCenter.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "bottomcenter";
 			this.radioButtonPositionBottomRight.Checked = Settings.GetString("feature.showDesktopSwitchOverlay.position") == "bottomright";
+			
+			this.checkBoxClickDesktopNumberTaskView.Checked = Settings.GetBool("feature.showDesktopNumberInIconTray.clickToOpenTaskView");
+			this.checkBoxUseHotKeysToJumpToDesktop.Checked = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber");
+
 			this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Alt";
 			this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Alt + Shift";
 			this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Ctrl";
 			this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Ctrl + Alt";
 
+			this.checkBoxShowStatusOverlay.Checked = Settings.GetBool("feature.showDesktopStatusOverlay");
+			this.checkBoxStatusOverlayAnimate.Checked = Settings.GetBool("feature.showDesktopStatusOverlay.animate");
+			this.checkBoxStatusOverlayTranslucent.Checked = Settings.GetBool("feature.showDesktopStatusOverlay.translucent");
+			this.checkBoxStatusOverlayShowOnAllMonitors.Checked = Settings.GetBool("feature.showDesktopStatusOverlay.showOnAllMonitors");
+			this.radioButtonStatusOverlayPositionTopLeft.Checked = Settings.GetString("feature.showDesktopStatusOverlay.position") == "topleft";
+			this.radioButtonStatusOverlayPositionTopCenter.Checked = Settings.GetString("feature.showDesktopStatusOverlay.position") == "topcenter";
+			this.radioButtonStatusOverlayPositionTopRight.Checked = Settings.GetString("feature.showDesktopStatusOverlay.position") == "topright";
+			this.radioButtonStatusOverlayPositionMiddleLeft.Checked = Settings.GetString("feature.showDesktopStatusOverlay.position") == "middleleft";
+			this.radioButtonStatusOverlayPositionMiddleCenter.Checked = Settings.GetString("feature.showDesktopStatusOverlay.position") == "middlecenter";
+			this.radioButtonStatusOverlayPositionMiddleRight.Checked = Settings.GetString("feature.showDesktopStatusOverlay.position") == "middleright";
+			this.radioButtonStatusOverlayPositionBottomLeft.Checked = Settings.GetString("feature.showDesktopStatusOverlay.position") == "bottomleft";
+			this.radioButtonStatusOverlayPositionBottomCenter.Checked = Settings.GetString("feature.showDesktopStatusOverlay.position") == "bottomcenter";
+			this.radioButtonStatusOverlayPositionBottomRight.Checked = Settings.GetString("feature.showDesktopStatusOverlay.position") == "bottomright";
+
+
 			checkBoxShowOverlay_CheckedChanged(this, null);
+			checkBoxShowStatusOverlay_CheckedChanged(this, null);
 			checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(this, null);
 		}
 		
@@ -300,5 +319,101 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		#endregion
+
+		private void checkBoxShowStatusOverlay_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.showDesktopStatusOverlay", this.checkBoxShowStatusOverlay.Checked);
+
+			checkBoxStatusOverlayAnimate.Enabled = checkBoxShowStatusOverlay.Checked;
+			checkBoxStatusOverlayTranslucent.Enabled = checkBoxShowStatusOverlay.Checked;
+			checkBoxStatusOverlayShowOnAllMonitors.Enabled = checkBoxShowStatusOverlay.Checked;
+			radioButtonStatusOverlayPositionTopLeft.Enabled = checkBoxShowStatusOverlay.Checked;
+			radioButtonStatusOverlayPositionTopCenter.Enabled = checkBoxShowStatusOverlay.Checked;
+			radioButtonStatusOverlayPositionTopRight.Enabled = checkBoxShowStatusOverlay.Checked;
+			radioButtonStatusOverlayPositionMiddleLeft.Enabled = checkBoxShowStatusOverlay.Checked;
+			radioButtonStatusOverlayPositionMiddleCenter.Enabled = checkBoxShowStatusOverlay.Checked;
+			radioButtonStatusOverlayPositionMiddleRight.Enabled = checkBoxShowStatusOverlay.Checked;
+			radioButtonStatusOverlayPositionBottomLeft.Enabled = checkBoxShowStatusOverlay.Checked;
+			radioButtonStatusOverlayPositionBottomCenter.Enabled = checkBoxShowStatusOverlay.Checked;
+			radioButtonStatusOverlayPositionBottomRight.Enabled = checkBoxShowStatusOverlay.Checked;
+		}
+
+		private void checkBoxStatusOverlayAnimate_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.showDesktopStatusOverlay.animate", this.checkBoxStatusOverlayAnimate.Checked);
+		}
+
+		private void checkBoxStatusOverlayTranslucent_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.showDesktopStatusOverlay.translucent", this.checkBoxStatusOverlayTranslucent.Checked);
+		}
+
+		private void checkBoxStatusOverlayShowOnAllMonitors_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.showDesktopStatusOverlay.showOnAllMonitors", this.checkBoxStatusOverlayShowOnAllMonitors.Checked);
+		}
+
+		private void radioButtonStatusOverlayPositionTopLeft_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopStatusOverlay.position", "topleft");
+			}
+		}
+
+		private void radioButtonStatusOverlayPositionTopCenter_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopStatusOverlay.position", "topcenter");
+			}
+		}
+
+		private void radioButtonStatusOverlayPositionTopRight_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopStatusOverlay.position", "topright");
+			}
+		}
+
+		private void radioButtonStatusOverlayPositionMiddleLeft_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopStatusOverlay.position", "middleleft");
+			}
+		}
+
+		private void radioButtonStatusOverlayPositionMiddleCenter_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopStatusOverlay.position", "middlecenter");
+			}
+		}
+
+		private void radioButtonStatusOverlayPositionMiddleRight_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopStatusOverlay.position", "middleright");
+			}
+		}
+
+		private void radioButtonStatusOverlayPositionBottomLeft_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopStatusOverlay.position", "bottomleft");
+			}
+		}
+
+		private void radioButtonStatusOverlayPositionBottomCenter_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopStatusOverlay.position", "bottomcenter");
+			}
+		}
+
+		private void radioButtonStatusOverlayPositionBottomRight_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if((sender as RadioButton).Checked == true) {
+				Settings.SetString("feature.showDesktopStatusOverlay.position", "bottomright");
+			}
+		}
 	}
 }

@@ -20,14 +20,23 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | theme.icons.iconFG.dark | ``"white"`` |  |
 | theme.icons.iconBG.light | ``"white"`` |  |
 | theme.icons.iconFG.light | ``"black"`` |  |
-| theme.overlay.width | ``900`` | With width in pixels of the overlay. |
-| theme.overlay.height | ``430`` | With height in pixels of the overlay. |
-| theme.overlay.font | ``"Segoe UI Light"`` | Defines the font name to use for the overlay. |
-| theme.overlay.fontSize | ``30`` | Defines the font size to use for the overlay. |
+| theme.overlay.width | ``900`` | With width in pixels of the switch overlay. |
+| theme.overlay.height | ``430`` | With height in pixels of the switch overlay. |
+| theme.overlay.font | ``"Segoe UI Light"`` | Defines the font name to use for the switch overlay. |
+| theme.overlay.fontSize | ``30`` | Defines the font size to use for the switch overlay. |
 | theme.overlay.overlayBG.dark | ``"black"`` |  |
 | theme.overlay.overlayFG.dark | ``"white"`` |  |
 | theme.overlay.overlayBG.light | ``"black"`` |  |
 | theme.overlay.overlayFG.light | ``"white"`` |  |
+| theme.status.width | ``250`` | With width in pixels of the status overlay. |
+| theme.status.height | ``40`` | With height in pixels of the status overlay. |
+| theme.status.offset | ``0`` | With height in pixels of the status overlay. |
+| theme.status.font | ``"Segoe UI Light"`` | Defines the font name to use for the status overlay. |
+| theme.status.fontSize | ``12`` | Defines the font size to use for the status overlay. |
+| theme.status.overlayBG.dark | ``"black"`` |  |
+| theme.status.overlayFG.dark | ``"white"`` |  |
+| theme.status.overlayBG.light | ``"black"`` |  |
+| theme.status.overlayFG.light | ``"white"`` |  |
 | feature.showSplashScreen | ``true`` | If enabled, a splash screen is shown on startup of the app. Overlays must be enabled. |
 | feature.showSplashScreen.duration | ``2000`` | Splash duration in milliseconds. |
 | feature.showSplashScreen.text | ``"Virtual Desktop Helper"`` | The splash text to show. |
@@ -41,6 +50,11 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | feature.showDesktopSwitchOverlay.translucent | ``true`` |  |
 | feature.showDesktopSwitchOverlay.showOnAllMonitors | ``true`` |  |
 | feature.showDesktopSwitchOverlay.position | ``"middlecenter"`` |  |
+| feature.showDesktopStatusOverlay | ``false`` |  |
+| feature.showDesktopStatusOverlay.animate | ``true`` |  |
+| feature.showDesktopStatusOverlay.translucent | ``true`` |  |
+| feature.showDesktopStatusOverlay.showOnAllMonitors | ``true`` |  |
+| feature.showDesktopStatusOverlay.position | ``"topcenter"`` |  |
 | feature.useHotKeyToJumpToDesktopNumber | ``false`` |  |
 | feature.useHotKeyToJumpToDesktopNumber.hotkey | ``"Alt"`` |  |
 | feature.showDesktopNumberInIconTray | ``true`` |  |
