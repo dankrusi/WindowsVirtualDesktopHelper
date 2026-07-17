@@ -169,7 +169,10 @@ namespace WindowsVirtualDesktopHelper {
 		private void _MonitorVDSwitch() {
 			while(true) {
 				try {
-					var newVDDisplayNumber = this.GetVDDisplayNumber(false);
+					// Throw on error, so that a failure is not mistaken for desktop number 0 and
+					// so that a stale API connection can be detected and recovered in the catch below
+					var newVDDisplayNumber = this.GetVDDisplayNumber(true);
+					_vdApiFailureCount = 0;
 					if(newVDDisplayNumber != this.CurrentVDDisplayNumber) {
 						this.CurrentVDDisplayName = this.GetVDDisplayName(false);
 						this.CurrentVDDisplayNumber = newVDDisplayNumber;
@@ -181,8 +184,29 @@ namespace WindowsVirtualDesktopHelper {
 					System.Threading.Thread.Sleep(100);
 				} catch(Exception e) {
 					Util.Logging.WriteLine("App: Error: MonitorVDSwitch: " + e.Message);
+					_tryReconnectVDAPI();
 					System.Threading.Thread.Sleep(1000);
 				}
+			}
+		}
+
+		private int _vdApiFailureCount = 0;
+
+		private void _tryReconnectVDAPI() {
+			// The virtual desktop API lives in the explorer.exe process; when explorer crashes or
+			// restarts, the cached COM objects become stale and every call fails from then on.
+			// After a few consecutive failures we reconnect, otherwise the app stays broken until
+			// it is manually restarted.
+			_vdApiFailureCount++;
+			if(_vdApiFailureCount < 5) return;
+			_vdApiFailureCount = 0;
+			try {
+				Util.Logging.WriteLine("App: MonitorVDSwitch: reconnecting to the virtual desktop API...");
+				this.VDAPI.Reconnect();
+				this.VDAPI.Current(); // test the connection
+				Util.Logging.WriteLine("App: MonitorVDSwitch: reconnect successful");
+			} catch(Exception e) {
+				Util.Logging.WriteLine("App: MonitorVDSwitch: could not reconnect to the virtual desktop API: " + e.Message);
 			}
 		}
 
@@ -567,8 +591,15 @@ namespace WindowsVirtualDesktopHelper {
 			this._keyboardHooks.KeyPressed += new EventHandler<KeyPressedEventArgs>(_hotKeyPressed);
 
 			// Register all the hotkeys in _keyboardHooksHotKeysAndActions
+			// Note: registration can fail, for example when another application already owns the
+			// hotkey or when a combination is listed twice - this must not crash the app, so we
+			// log the failure and keep the remaining hotkeys working
 			foreach(var hotkeyAction in _keyboardHooksHotKeysAndActions) {
-				this._keyboardHooks.RegisterHotKey(hotkeyAction.Modifiers, hotkeyAction.Keys);
+				try {
+					this._keyboardHooks.RegisterHotKey(hotkeyAction.Modifiers, hotkeyAction.Keys);
+				} catch(Exception e) {
+					Util.Logging.WriteLine($"SetupHotKeys: could not register hotkey {hotkeyAction.HotKeyAndAction}: {e.Message}");
+				}
 			}
 
 

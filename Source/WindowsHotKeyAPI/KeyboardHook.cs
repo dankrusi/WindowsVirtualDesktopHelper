@@ -84,7 +84,7 @@ namespace WindowsVirtualDesktopHelper.WindowsHotKeyAPI {
 
 			// register the hot key.
 			if (!RegisterHotKey(_window.Handle, _currentId, (uint)modifier, (uint)key))
-				throw new InvalidOperationException("Couldn’t register the hot key.");
+				throw new InvalidOperationException($"Couldn’t register the hot key {modifier} + {key}.");
 		}
 
 		/// <summary>
