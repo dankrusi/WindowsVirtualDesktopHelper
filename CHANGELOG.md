@@ -1,3 +1,23 @@
+# v2.1
+
+## Features
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show desktop name as permanent overlay
+* Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
+* Custom hot keys for virtual desktop actions
+* Autostart with Windows
+* Simple and lightweight
+* Fully configurable
+* Free
+
+## Changes
+* New permanent status overlay feature
+* Font configurations can have styles
+
+
+
 # v2.0
 
 ## Features

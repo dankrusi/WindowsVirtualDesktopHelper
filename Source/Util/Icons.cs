@@ -17,7 +17,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 		[DllImport("user32.dll", SetLastError = true)]
 		private static extern bool DestroyIcon(IntPtr hIcon);
 
-		public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol, FontStyle textStyle = FontStyle.Regular, double opacity = 1.0) {
+		public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol, double opacity = 1.0) {
 			// Init
 			var size = 16;
 			if (dpi > 96) size = 64;
@@ -31,14 +31,19 @@ namespace WindowsVirtualDesktopHelper.Util {
 			if (textToRenderInfo.LengthInTextElements == 2) textToRenderSizeRatio = 0.5f;
 			if (textToRenderInfo.LengthInTextElements == 2) {
 				textToRenderSizeRatio = 0.75f;
-				textStyle = FontStyle.Regular;
+				//textStyle = FontStyle.Regular;
 			}
 			var automaticFontSizeFitTolerance = 0.2f;
 			var offsetY = 0.0f;
-			var fontFamily = Settings.GetString("theme.icons.font");
-			if (Util.Emoji.HasEmoji(textToRender)) fontFamily = Settings.GetString("theme.icons.emojiFont");
+			var fontFamily = Settings.GetFontName("theme.icons.font");
+			var fontStyle = Settings.GetFontStyle("theme.icons.font");
+			if(Util.Emoji.HasEmoji(textToRender)) {
+				fontFamily = Settings.GetFontName("theme.icons.emojiFont");
+				fontStyle = Settings.GetFontStyle("theme.icons.emojiFont");
+			}
 			if (drawAsSymbol) {
-				fontFamily = Settings.GetString("theme.icons.symbolsFont");
+				fontFamily = Settings.GetFontName("theme.icons.symbolsFont");
+				fontStyle = Settings.GetFontStyle("theme.icons.symbolsFont");
 				textToRenderSizeRatio = 1.8f;
 				if (dpi > 96) textToRenderSizeRatio = 1.0f;
 				automaticFontSizeFitTolerance = 2.0f;
@@ -47,7 +52,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 			var textSize = renderSize * textToRenderSizeRatio;
 
 			// Cache hit?
-			var cacheKey = textToRender + "_" + textSize + "_" + size + "_" + theme + "_" + textStyle + "_" + opacity;
+			var cacheKey = textToRender + "_" + textSize + "_" + size + "_" + theme + "_" + fontStyle + "_" + opacity;
 			Icon cachedIcon;
 			if (_cache.TryGetValue(cacheKey, out cachedIcon)) {
 				return cachedIcon;
@@ -78,7 +83,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 						renderSize * 2, // w (note: we oversize the drawing area so that we never clip text to new lines...
 						renderSize + (int)(-1 * renderSize * offsetY)); // h
 
-					var font = new Font(fontFamily, textSize, textStyle);
+					var font = new Font(fontFamily, textSize, fontStyle);
 					try {
 						// Automatic text fit
 						var fontScaleDownFactor = 1.0f;
@@ -89,7 +94,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 							var measure = g.MeasureString(textToRender, font);
 							if (measure.Width > renderSize * (1.0f + automaticFontSizeFitTolerance)) {
 								font.Dispose();
-								font = new Font(fontFamily, textSize * fontScaleDownFactor, FontStyle.Bold);
+								font = new Font(fontFamily, textSize * fontScaleDownFactor, fontStyle);
 							} else {
 								break;
 							}
