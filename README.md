@@ -149,7 +149,23 @@ The idea is to make the app as easy and lightweight to run as possible. Most sys
 
 The most common and basic settings can be configured using the GUI Settings. 
 
-For more advanced configurations and features you can use the config file or command line arguments (as of v2.0).
+For more advanced configurations and features you can use the config file or command line arguments (as of v2.0):
+
+For example, one can set a hotkey to jump to a specific desktop by setting the following setting:
+
+```
+hotkeys.myCustomHotkey1 = "Ctrl + Alt + Shift + D1 = Desktop1"
+hotkeys.myCustomHotkey2 = "Ctrl + Alt + Shift + D2 = Desktop2"
+```
+
+or use a custom shortcut for prev/next desktop:
+
+```
+hotkeys.myCustomKey1: "Alt + W = DesktopForward"
+hotkeys.myCustomKey2: "Alt + Q = DesktopBackward"
+```
+
+See [Hotkeys Documentation](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/Documentation/Hotkeys.md) for more info.
 
 ### Settings
 
@@ -160,6 +176,8 @@ for a full list of all settings.
 
 This is located in ``%appdata%\WindowsVirtualDesktopHelper`` (for example ``C:\Users\<USER>\AppData\Roaming\WindowsVirtualDesktopHelper``)
 as a ``.config`` file, and can be edited with any text editor.
+
+Note: configuration lines that start with ``#`` are comments and ignored by the configuration system.
 
 ### Command Line Arguments
 
@@ -227,6 +245,14 @@ Thanks to the following contributors:
 
 A free utility to make the Windows 11 Taskbar just a little bit more useful by allowing you to pin quick launchers that always open a new folder, app or anything.
 
-![Screenshot](https://raw.githubusercontent.com/dankrusi/WindowsTaskbarHelpers/main/Images/WindowsTaskbarHelpers_Screenshots_v1.png)(https://github.com/dankrusi/WindowsTaskbarHelpers)
+[![Screenshot](https://raw.githubusercontent.com/dankrusi/WindowsTaskbarHelpers/main/Images/WindowsTaskbarHelpers_Screenshots_v1.png)](https://github.com/dankrusi/WindowsTaskbarHelpers)
 
 [github.com/dankrusi/WindowsTaskbarHelpers](https://github.com/dankrusi/WindowsTaskbarHelpers)
+
+### LitePDF
+
+A free and lightweight no-BS PDF viewer. And no, it doesn't have AI.
+
+[![Screenshot](https://raw.githubusercontent.com/dankrusi/LitePDF/main/Images/Screenshots/Win11/LtiePDF_Screenshot_Win11_A.png)](https://github.com/dankrusi/LitePDF)
+
+[github.com/dankrusi/LitePDF](https://github.com/dankrusi/LitePDF)

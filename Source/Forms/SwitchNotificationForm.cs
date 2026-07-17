@@ -96,7 +96,7 @@ namespace WindowsVirtualDesktopHelper {
 			this.Close();
 		}
 
-		// Preven from from being focusable
+		// Prevent from from being focusable
 		// via https://stackoverflow.com/questions/2423234/make-a-form-not-focusable-in-c-sharp
 		// via https://stackoverflow.com/questions/2798245/click-through-in-c-sharp-form
 		private const int WS_EX_NOACTIVATE = 0x08000000;

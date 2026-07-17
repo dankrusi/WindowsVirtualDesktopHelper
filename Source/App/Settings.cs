@@ -25,10 +25,13 @@ namespace WindowsVirtualDesktopHelper {
 		public static void LoadDefaults() {
 			// Register any known default settings here
 
+			// Debug
+			RegisterDefault("debug.singleInstance", true, "true - only allow a single instance of the application to run (default); false - allow multiple instances (expect errors registering hotkeys)");
+
 			// General
 			RegisterDefault("general.startupWithWindows", false, "If true, the app will register itself with Windows to startup when Windows starts (via the registry).");
 			RegisterDefault("general.theme", "auto", "Can be either auto, dark or light. If set to auto, the theme is derived from the current windows theme (dark or light).");
-			
+
 			// Theme
 			RegisterDefault("theme.icons.disabledOpacity", 0.5, "Defines the opacity to use for icons which are disabled.");
 			RegisterDefault("theme.icons.font", "Segoe UI", "Defines the font name to use for the icons (for regular numbers, characters). If a specific style is to be used, then one can append 'Bold', 'Italic', 'Regular' after a comma and the font name - for example 'Arial, Bold'.");
@@ -105,6 +108,9 @@ namespace WindowsVirtualDesktopHelper {
 			// Feature: showDesktopNameInIconTray
 			RegisterDefault("feature.showDesktopNameInIconTray", false);
 
+			// Feature: restorePreviousWindowFocus
+			RegisterDefault("feature.restorePreviousWindowFocus", false, "If enabled, when switching desktop the previously focused window on that desktop will be refocused", "v2.1");
+
 		}
 
 		#endregion
@@ -127,9 +133,10 @@ namespace WindowsVirtualDesktopHelper {
 			return _compileSettingsDocumentation(_settingsDefaults, true, true);
 		}
 
-		public static void RegisterDefault(string key, object value, string documentation = null) {
+		public static void RegisterDefault(string key, object value, string documentation = null, string version = null) {
 			_settingsDefaults[key] = value;
 			if(documentation != null) _settingsDocumentations[key] = documentation;
+			if(version != null) _settingsVersions[key] = version;
 		}
 
 		public static void LoadConfig() {
@@ -295,6 +302,7 @@ namespace WindowsVirtualDesktopHelper {
 
 		// The launch arguments 
 		static private Dictionary<string, string> _settingsDocumentations = new Dictionary<string, string>();
+		static private Dictionary<string, string> _settingsVersions = new Dictionary<string, string>();
 		static private Dictionary<string, object> _settingsLaunchArgs = new Dictionary<string, object>();
 		static private Dictionary<string, object> _settingsConfig = new Dictionary<string, object>();
 		static private Dictionary<string, object> _settingsDefaults = new Dictionary<string, object>();
@@ -327,8 +335,8 @@ namespace WindowsVirtualDesktopHelper {
 		private static string _compileSettingsDocumentation(Dictionary<string, object> settingsToUse, bool includeDocumentation, bool asMarkdown) {
 			// Compile the defaults and documentation into a string
 			var lines = new List<string>();
-			if(asMarkdown) lines.Add(includeDocumentation ? "|Config|Default|Description|" : "|Config|Default|");
-			if(asMarkdown) lines.Add(includeDocumentation ? "| --- | --- | --- |" : "| --- | --- |");
+			if(asMarkdown) lines.Add(includeDocumentation ? "|Config|Default|Description|Version|" : "|Config|Default|");
+			if(asMarkdown) lines.Add(includeDocumentation ? "| --- | --- | --- | --- |" : "| --- | --- |");
 			foreach(var kvp in settingsToUse) {
 				var key = kvp.Key;
 				var val = _serializeValAsType(kvp.Value);
@@ -336,6 +344,8 @@ namespace WindowsVirtualDesktopHelper {
 				if(includeDocumentation) {
 					var doc = _settingsDocumentations.ContainsKey(key) ? _settingsDocumentations[key] : null;
 					if(doc != null || asMarkdown) line += asMarkdown ? $" {doc} |" : $", {doc}";
+					var ver = _settingsVersions.ContainsKey(key) ? _settingsVersions[key] : null;
+					if(ver != null || asMarkdown) line += asMarkdown ? $" {ver} |" : $", {ver}";
 				}
 				lines.Add(line);
 			}
