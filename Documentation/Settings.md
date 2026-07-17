@@ -13,7 +13,7 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | general.startupWithWindows | ``false`` | If true, the app will register itself with Windows to startup when Windows starts (via the registry). |
 | general.theme | ``"auto"`` | Can be either auto, dark or light. If set to auto, the theme is derived from the current windows theme (dark or light). |
 | theme.icons.disabledOpacity | ``"0.5"`` | Defines the opacity to use for icons which are disabled. |
-| theme.icons.font | ``"Segoe UI"`` | Defines the font name to use for the icons (for regular numbers, characters). |
+| theme.icons.font | ``"Segoe UI"`` | Defines the font name to use for the icons (for regular numbers, characters). If a specific style is to be used, then one can append 'Bold', 'Italic', 'Regular' after a comma and the font name - for example 'Arial, Bold'. |
 | theme.icons.emojiFont | ``"Segoe UI Symbol"`` | Defines the font name to use for emoji icons. |
 | theme.icons.symbolsFont | ``"Segoe UI Symbol"`` | Defines the font name to use for symbol icons. |
 | theme.icons.iconBG.dark | ``"black"`` |  |

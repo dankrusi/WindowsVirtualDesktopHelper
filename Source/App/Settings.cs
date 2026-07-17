@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using WindowsInput.Native;
@@ -30,7 +31,7 @@ namespace WindowsVirtualDesktopHelper {
 			
 			// Theme
 			RegisterDefault("theme.icons.disabledOpacity", 0.5, "Defines the opacity to use for icons which are disabled.");
-			RegisterDefault("theme.icons.font", "Segoe UI", "Defines the font name to use for the icons (for regular numbers, characters).");
+			RegisterDefault("theme.icons.font", "Segoe UI", "Defines the font name to use for the icons (for regular numbers, characters). If a specific style is to be used, then one can append 'Bold', 'Italic', 'Regular' after a comma and the font name - for example 'Arial, Bold'.");
 			RegisterDefault("theme.icons.emojiFont", "Segoe UI Symbol", "Defines the font name to use for emoji icons.");
 			RegisterDefault("theme.icons.symbolsFont", "Segoe UI Symbol", "Defines the font name to use for symbol icons.");
 			RegisterDefault("theme.icons.iconBG.dark", "black");
@@ -187,6 +188,33 @@ namespace WindowsVirtualDesktopHelper {
 			var ret = _get(key, defaultValue);
 			if(ret == null) return null;
 			return ret as string;
+		}
+
+		public static string GetFontName(string key, string defaultValue = null) {
+			var val = GetString(key, defaultValue); // can include style, like "Segoe UI, Bold"
+			if(val == null) return defaultValue;
+			if(val.Contains(",")) {
+				var segs = val.Split(',');
+				return segs.First().Trim(); // Return the first segment as the font name
+			} else {
+				return val.Trim();
+			}
+		}
+
+		public static FontStyle GetFontStyle(string key, FontStyle defaultValue = FontStyle.Regular) {
+			var val = GetString(key); // can include style, like "Segoe UI, Bold"
+			if(val == null) return defaultValue;
+			if(val.Contains(",")) {
+				var segs = val.Split(',');
+				var styleStr = segs.Last().Trim().ToLower();
+				if(styleStr == "bold") return FontStyle.Bold;
+				else if(styleStr == "italic") return FontStyle.Italic;
+				else if(styleStr == "underline") return FontStyle.Underline;
+				else if(styleStr == "strikeout") return FontStyle.Strikeout;
+				else return FontStyle.Regular; // Default case
+			} else {
+				return defaultValue;
+			}
 		}
 
 		public static void SetString(string key, string value) {

@@ -10,7 +10,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 
         private static ConcurrentDictionary<string, Bitmap> _cache = new ConcurrentDictionary<string,Bitmap>();
 
-		public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol, FontStyle textStyle = FontStyle.Regular, double opacity = 1.0) {
+		public static Icon GenerateNotificationIcon(string text, string theme, int dpi, bool drawAsSymbol, double opacity = 1.0) {
 			// Init
 			var size = 16;
 			if (dpi > 96) size = 64;
@@ -25,14 +25,19 @@ namespace WindowsVirtualDesktopHelper.Util {
 			if (textToRenderInfo.LengthInTextElements == 2) textToRenderSizeRatio = 0.5f;
 			if (textToRenderInfo.LengthInTextElements == 2) {
 				textToRenderSizeRatio = 0.75f;
-				textStyle = FontStyle.Regular;
+				//textStyle = FontStyle.Regular;
 			}
 			var automaticFontSizeFitTolerance = 0.2f;
 			var offsetY = 0.0f;
-			var fontFamily = Settings.GetString("theme.icons.font");
-			if (Util.Emoji.HasEmoji(textToRender)) fontFamily = Settings.GetString("theme.icons.emojiFont");
+			var fontFamily = Settings.GetFontName("theme.icons.font");
+			var fontStyle = Settings.GetFontStyle("theme.icons.font");
+			if(Util.Emoji.HasEmoji(textToRender)) {
+				fontFamily = Settings.GetFontName("theme.icons.emojiFont");
+				fontStyle = Settings.GetFontStyle("theme.icons.emojiFont");
+			}
 			if (drawAsSymbol) {
-				fontFamily = Settings.GetString("theme.icons.symbolsFont");
+				fontFamily = Settings.GetFontName("theme.icons.symbolsFont");
+				fontStyle = Settings.GetFontStyle("theme.icons.symbolsFont");
 				textToRenderSizeRatio = 1.8f;
 				if (dpi > 96) textToRenderSizeRatio = 1.0f;
 				automaticFontSizeFitTolerance = 2.0f;
@@ -41,7 +46,7 @@ namespace WindowsVirtualDesktopHelper.Util {
 			var textSize = renderSize * textToRenderSizeRatio;
 
 			// Cache hit?
-			var cacheKey = textToRender + "_" + textSize + "_" + theme + "_" + textStyle + "_" + opacity;
+			var cacheKey = textToRender + "_" + textSize + "_" + theme + "_" + fontStyle + "_" + opacity;
 			if (_cache.ContainsKey(cacheKey)) {
 				var cachedBitmap = _cache[cacheKey];
 				return Icon.FromHandle(cachedBitmap.GetHicon());
@@ -65,7 +70,7 @@ namespace WindowsVirtualDesktopHelper.Util {
                 g.Clear(Color.Transparent);
 
 
-                var font = new Font(fontFamily, textSize, textStyle);
+                var font = new Font(fontFamily, textSize, fontStyle);
 
                 var format = new StringFormat();
                 format.Alignment = StringAlignment.Center;

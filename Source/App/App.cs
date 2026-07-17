@@ -650,7 +650,7 @@ namespace WindowsVirtualDesktopHelper {
 
 		public void UIUpdateIconForVDDisplayNumber(string theme, uint number, string name) {
 			number++;
-			this.AppForm.notifyIconNumber.Icon = Util.Icons.GenerateNotificationIcon(number.ToString(), theme, this.AppForm.DeviceDpi, false, FontStyle.Bold);
+			this.AppForm.notifyIconNumber.Icon = Util.Icons.GenerateNotificationIcon(number.ToString(), theme, this.AppForm.DeviceDpi, false);
 		}
 
 		public void UIUpdateIconForVDDisplayName(string theme, string name) {
@@ -668,8 +668,8 @@ namespace WindowsVirtualDesktopHelper {
 				var hasNextDesktop = count != 0 && App.Instance.CurrentVDDisplayNumber != count;
 				var hasPrevDesktop = App.Instance.CurrentVDDisplayNumber != 0;
 				// Update prev/next icons
-				this.AppForm.notifyIconPrev.Icon = Util.Icons.GenerateNotificationIcon(prevChar, theme, this.AppForm.DeviceDpi, true, FontStyle.Regular, hasPrevDesktop ? 1.0f : Settings.GetDouble("theme.icons.disabledOpacity"));
-				this.AppForm.notifyIconNext.Icon = Util.Icons.GenerateNotificationIcon(nextChar, theme, this.AppForm.DeviceDpi, true, FontStyle.Regular, hasNextDesktop ? 1.0f : Settings.GetDouble("theme.icons.disabledOpacity"));
+				this.AppForm.notifyIconPrev.Icon = Util.Icons.GenerateNotificationIcon(prevChar, theme, this.AppForm.DeviceDpi, true, hasPrevDesktop ? 1.0f : Settings.GetDouble("theme.icons.disabledOpacity"));
+				this.AppForm.notifyIconNext.Icon = Util.Icons.GenerateNotificationIcon(nextChar, theme, this.AppForm.DeviceDpi, true, hasNextDesktop ? 1.0f : Settings.GetDouble("theme.icons.disabledOpacity"));
 				// Show or hide?
 				if(Settings.GetBool("feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds")) {
 					this.AppForm.notifyIconNext.Visible = hasNextDesktop;
