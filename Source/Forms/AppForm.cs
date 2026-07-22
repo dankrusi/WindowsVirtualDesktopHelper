@@ -60,7 +60,6 @@ namespace WindowsVirtualDesktopHelper {
 			App.Instance.MonitorSystemThemeSwitch();
 			App.Instance.MonitorVDisplayCount();
 			App.Instance.MonitorFGWindowName();
-			App.Instance.MonitorFocusedWindow();
 
 			// Update permanent overlay
 			App.Instance.UpdateStatusOverlayWindows();
