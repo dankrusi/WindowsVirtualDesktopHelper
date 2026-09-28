@@ -112,6 +112,42 @@ namespace WindowsVirtualDesktopHelper.Util {
 
 		#endregion
 
+		#region Virtual Desktop (public shell API, version-independent)
+
+		// The public IVirtualDesktopManager shell COM interface is stable across all
+		// Windows 10 (1607+) and Windows 11 builds, unlike the private per-version
+		// interfaces the app uses for switching. We only need it to answer "is this
+		// window on the currently-displayed desktop?" so we never force-focus a window
+		// that lives elsewhere (which would drag the user to that desktop, issue #166).
+		private static readonly Guid CLSID_VirtualDesktopManager = new Guid("AA509086-5CA9-4C25-8F95-589D3C07B48A");
+
+		[ComImport]
+		[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+		[Guid("A5CD92FF-29BE-454C-8D04-D82879FB3F1B")]
+		private interface IVirtualDesktopManager {
+			bool IsWindowOnCurrentVirtualDesktop(IntPtr topLevelWindow);
+			Guid GetWindowDesktopId(IntPtr topLevelWindow);
+			void MoveWindowToDesktop(IntPtr topLevelWindow, ref Guid desktopId);
+		}
+
+		private static IVirtualDesktopManager _vdManager;
+
+		// True only if hWnd is on the currently-displayed virtual desktop. Fail-closed:
+		// on any COM/handle error we return false, so callers never force-focus a window
+		// we cannot confirm lives on the current desktop (see issue #166).
+		public static bool IsWindowOnCurrentVirtualDesktop(IntPtr hWnd) {
+			try {
+				if (_vdManager == null) {
+					_vdManager = (IVirtualDesktopManager)Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_VirtualDesktopManager));
+				}
+				return _vdManager.IsWindowOnCurrentVirtualDesktop(hWnd);
+			} catch {
+				return false;
+			}
+		}
+
+		#endregion
+
 		#region Invoking Windows Features
 
 		public static void OpenTaskView() {
