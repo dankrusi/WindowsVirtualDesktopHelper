@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using WindowsInput.Native;
@@ -33,21 +35,30 @@ namespace WindowsVirtualDesktopHelper {
 
 			// Theme
 			RegisterDefault("theme.icons.disabledOpacity", 0.5, "Defines the opacity to use for icons which are disabled.");
-			RegisterDefault("theme.icons.font", "Segoe UI", "Defines the font name to use for the icons (for regular numbers, characters).");
+			RegisterDefault("theme.icons.font", "Segoe UI", "Defines the font name to use for the icons (for regular numbers, characters). If a specific style is to be used, then one can append 'Bold', 'Italic', 'Regular' after a comma and the font name - for example 'Arial, Bold'.");
 			RegisterDefault("theme.icons.emojiFont", "Segoe UI Symbol", "Defines the font name to use for emoji icons.");
 			RegisterDefault("theme.icons.symbolsFont", "Segoe UI Symbol", "Defines the font name to use for symbol icons.");
 			RegisterDefault("theme.icons.iconBG.dark", "black");
 			RegisterDefault("theme.icons.iconFG.dark", "white");
 			RegisterDefault("theme.icons.iconBG.light", "white");
 			RegisterDefault("theme.icons.iconFG.light", "black");
-			RegisterDefault("theme.overlay.width", 900, "With width in pixels of the overlay.");
-			RegisterDefault("theme.overlay.height", 430, "With height in pixels of the overlay.");
-			RegisterDefault("theme.overlay.font", "Segoe UI Light", "Defines the font name to use for the overlay.");
-			RegisterDefault("theme.overlay.fontSize", 30, "Defines the font size to use for the overlay.");
+			RegisterDefault("theme.overlay.width", 900, "With width in pixels of the switch overlay.");
+			RegisterDefault("theme.overlay.height", 430, "With height in pixels of the switch overlay.");
+			RegisterDefault("theme.overlay.font", "Segoe UI Light", "Defines the font name to use for the switch overlay.");
+			RegisterDefault("theme.overlay.fontSize", 30, "Defines the font size to use for the switch overlay.");
 			RegisterDefault("theme.overlay.overlayBG.dark", "black");
 			RegisterDefault("theme.overlay.overlayFG.dark", "white");
 			RegisterDefault("theme.overlay.overlayBG.light", "black");
 			RegisterDefault("theme.overlay.overlayFG.light", "white");
+			RegisterDefault("theme.status.width", 250, "With width in pixels of the status overlay.");
+			RegisterDefault("theme.status.height", 40, "With height in pixels of the status overlay.");
+			RegisterDefault("theme.status.offset", 0, "With height in pixels of the status overlay.");
+			RegisterDefault("theme.status.font", "Segoe UI Light", "Defines the font name to use for the status overlay.");
+			RegisterDefault("theme.status.fontSize", 12, "Defines the font size to use for the status overlay.");
+			RegisterDefault("theme.status.overlayBG.dark", "black");
+			RegisterDefault("theme.status.overlayFG.dark", "white");
+			RegisterDefault("theme.status.overlayBG.light", "black");
+			RegisterDefault("theme.status.overlayFG.light", "white");
 
 			// Feature: splash
 			RegisterDefault("feature.showSplashScreen", true, "If enabled, a splash screen is shown on startup of the app. Overlays must be enabled.");
@@ -67,6 +78,13 @@ namespace WindowsVirtualDesktopHelper {
 			RegisterDefault("feature.showDesktopSwitchOverlay.translucent", true);
 			RegisterDefault("feature.showDesktopSwitchOverlay.showOnAllMonitors", true);
 			RegisterDefault("feature.showDesktopSwitchOverlay.position", "middlecenter");
+
+			// Feature: showDesktopStatusOverlay
+			RegisterDefault("feature.showDesktopStatusOverlay", false);
+			RegisterDefault("feature.showDesktopStatusOverlay.animate", true);
+			RegisterDefault("feature.showDesktopStatusOverlay.translucent", true);
+			RegisterDefault("feature.showDesktopStatusOverlay.showOnAllMonitors", true);
+			RegisterDefault("feature.showDesktopStatusOverlay.position", "topcenter");
 
 			// Feature: useHotKeyToJumpToDesktopNumber
 			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber", false);
@@ -196,6 +214,33 @@ namespace WindowsVirtualDesktopHelper {
 			return ret as string;
 		}
 
+		public static string GetFontName(string key, string defaultValue = null) {
+			var val = GetString(key, defaultValue); // can include style, like "Segoe UI, Bold"
+			if(val == null) return defaultValue;
+			if(val.Contains(",")) {
+				var segs = val.Split(',');
+				return segs.First().Trim(); // Return the first segment as the font name
+			} else {
+				return val.Trim();
+			}
+		}
+
+		public static FontStyle GetFontStyle(string key, FontStyle defaultValue = FontStyle.Regular) {
+			var val = GetString(key); // can include style, like "Segoe UI, Bold"
+			if(val == null) return defaultValue;
+			if(val.Contains(",")) {
+				var segs = val.Split(',');
+				var styleStr = segs.Last().Trim().ToLower();
+				if(styleStr == "bold") return FontStyle.Bold;
+				else if(styleStr == "italic") return FontStyle.Italic;
+				else if(styleStr == "underline") return FontStyle.Underline;
+				else if(styleStr == "strikeout") return FontStyle.Strikeout;
+				else return FontStyle.Regular; // Default case
+			} else {
+				return defaultValue;
+			}
+		}
+
 		public static void SetString(string key, string value) {
 			_set(key, value);
 		}
@@ -206,7 +251,7 @@ namespace WindowsVirtualDesktopHelper {
 			var ret = _get(key, defaultValueStr);
 			if(ret is bool) return (bool)ret;
 			if(ret is string) return bool.Parse((string)ret);
-			throw new Exception($"Setting {key} is not a bool (value is ${ret})");
+			throw new Exception($"Setting {key} is not a bool (value is {ret})");
 		}
 
 		public static void SetBool(string key, bool value) {
@@ -215,11 +260,11 @@ namespace WindowsVirtualDesktopHelper {
 
 		public static int GetInt(string key, int? defaultValue = null) {
 			string defaultValueStr = null;
-			if(defaultValue != null) defaultValueStr = defaultValue.ToString();
+			if(defaultValue != null) defaultValueStr = defaultValue.Value.ToString(CultureInfo.InvariantCulture);
 			var ret = _get(key, defaultValueStr);
 			if(ret is int) return (int)ret;
-			if(ret is string) return int.Parse((string)ret);
-			throw new Exception($"Setting {key} is not a int (value is ${ret})");
+			if(ret is string) return int.Parse((string)ret, CultureInfo.InvariantCulture);
+			throw new Exception($"Setting {key} is not a int (value is {ret})");
 		}
 
 		public static void SetInt(string key, int value) {
@@ -228,13 +273,13 @@ namespace WindowsVirtualDesktopHelper {
 
 		public static double GetDouble(string key, double? defaultValue = null) {
 			string defaultValueStr = null;
-			if(defaultValue != null) defaultValueStr = defaultValue.ToString();
+			if(defaultValue != null) defaultValueStr = defaultValue.Value.ToString(CultureInfo.InvariantCulture);
 			var ret = _get(key, defaultValueStr);
 			if(ret is double) return (double)ret;
-			if(ret is float) return (double)ret;
-			if(ret is int) return double.Parse(ret.ToString());
-			if(ret is string) return double.Parse((string)ret);
-			throw new Exception($"Setting {key} is not a double (value is ${ret})");
+			if(ret is float) return (float)ret; // note: must unbox as float first, unboxing directly to double throws
+			if(ret is int) return (int)ret;
+			if(ret is string) return double.Parse((string)ret, NumberStyles.Float, CultureInfo.InvariantCulture);
+			throw new Exception($"Setting {key} is not a double (value is {ret})");
 		}
 
 		public static void SetDouble(string key, int value) {
@@ -243,13 +288,13 @@ namespace WindowsVirtualDesktopHelper {
 
 		public static float GetFloat(string key, float? defaultValue = null) {
 			string defaultValueStr = null;
-			if(defaultValue != null) defaultValueStr = defaultValue.ToString();
+			if(defaultValue != null) defaultValueStr = defaultValue.Value.ToString(CultureInfo.InvariantCulture);
 			var ret = _get(key, defaultValueStr);
-			if(ret is double) return (float)ret;
+			if(ret is double) return (float)(double)ret; // note: must unbox as double first, unboxing directly to float throws
 			if(ret is float) return (float)ret;
-			if(ret is int) return float.Parse(ret.ToString());
-			if(ret is string) return float.Parse((string)ret);
-			throw new Exception($"Setting {key} is not a float (value is ${ret})");
+			if(ret is int) return (int)ret;
+			if(ret is string) return float.Parse((string)ret, NumberStyles.Float, CultureInfo.InvariantCulture);
+			throw new Exception($"Setting {key} is not a float (value is {ret})");
 		}
 
 		#endregion
@@ -355,12 +400,35 @@ namespace WindowsVirtualDesktopHelper {
 			// Strings are stored using the " character, and can contain the following:
 			//  - \n for new line
 			//  - \" for quote
+			//  - \\ for backslash
 			//  - \u2039 for unicode characters (for example)
+			// Note: we intentionally do not use Regex.Unescape here: it throws on values with
+			// plain backslashes such as "C:\Users", while we want to be lenient and keep any
+			// unknown escape sequence as-is
 			if(str == null) return null;
-			str = str.Trim('"');
-			//str = str.Replace("\\n", "\n");
-			//str = str.Replace("\\\"", "\"");
-			return System.Text.RegularExpressions.Regex.Unescape(str);
+			// Strip exactly one leading and one trailing quote (a value may legitimately end with an escaped quote)
+			if(str.Length >= 2 && str.StartsWith("\"") && str.EndsWith("\"")) str = str.Substring(1, str.Length - 2);
+			var unescaped = new System.Text.StringBuilder(str.Length);
+			for(int i = 0; i < str.Length; i++) {
+				var c = str[i];
+				if(c != '\\' || i + 1 >= str.Length) {
+					unescaped.Append(c);
+					continue;
+				}
+				var next = str[i + 1];
+				if(next == 'n') { unescaped.Append('\n'); i++; }
+				else if(next == 'r') { unescaped.Append('\r'); i++; }
+				else if(next == 't') { unescaped.Append('\t'); i++; }
+				else if(next == '"') { unescaped.Append('"'); i++; }
+				else if(next == '\\') { unescaped.Append('\\'); i++; }
+				else if(next == 'u' && i + 5 < str.Length && int.TryParse(str.Substring(i + 2, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var code)) {
+					unescaped.Append((char)code);
+					i += 5;
+				} else {
+					unescaped.Append(c); // unknown escape: keep the backslash as-is
+				}
+			}
+			return unescaped.ToString();
 		}
 
 		private static string _escapeString(string str) {
@@ -378,26 +446,30 @@ namespace WindowsVirtualDesktopHelper {
 
 		private static object _parseValAsType(string value) {
 			// Try to parse val as int, float, bool, or string, returning the appropriate type
+			// Note: numbers are always parsed with the invariant culture, so that a config file
+			// reads the same regardless of the system locale (e.g. "0.5" must never parse as 5
+			// on locales which use . as a group separator)
 			if(value.StartsWith("\"") && value.EndsWith("\"")) {
 				return _unescapeString(value);
 			}
-			if(int.TryParse(value, out int intValue)) {
+			if(int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intValue)) {
 				return intValue;
 			}
 			if(bool.TryParse(value, out bool boolValue)) {
 				return boolValue;
 			}
-			if(float.TryParse(value, out float floatValue)) {
+			if(float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out float floatValue)) {
 				return floatValue;
 			}
 			return value; // Return as string if no other type matches
 		}
 
 		private static string _serializeValAsType(object val) {
-			// Serialize val as string
+			// Serialize val as string (numbers always with the invariant culture, see _parseValAsType)
 			if(val is bool) return (bool)val ? "true" : "false";
-			if(val is int) return ((int)val).ToString();
-			if(val is float) return ((float)val).ToString();
+			if(val is int) return ((int)val).ToString(CultureInfo.InvariantCulture);
+			if(val is float) return ((float)val).ToString(CultureInfo.InvariantCulture);
+			if(val is double) return ((double)val).ToString(CultureInfo.InvariantCulture);
 			return _escapeString(val?.ToString()); // string default
 		}
 
@@ -410,7 +482,7 @@ namespace WindowsVirtualDesktopHelper {
 				// Parse the lines, split by colon, adding each to the _settingsConfig
 				foreach(var line in lines) {
 					if(line.Trim().StartsWith("#")) continue; // Skip comments (lines starting with #)
-					var parts = line.Split(':');
+					var parts = line.Split(new[] { ':' }, 2); // Split on the first colon only, values may contain colons
 					if(parts.Length >= 2) {
 						var key = parts[0].Trim();
 						var val = parts[1].Trim();

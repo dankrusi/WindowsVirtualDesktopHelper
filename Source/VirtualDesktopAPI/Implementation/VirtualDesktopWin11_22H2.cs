@@ -27,6 +27,10 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 			return (uint)currentDesktopIndex;
 		}
 
+		public void Reconnect() {
+			DesktopManager.Reconnect();
+		}
+
 		public void SwitchForward() {
 			var current = DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop(IntPtr.Zero);
 
@@ -240,6 +244,12 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI.Implementation {
 			internal static IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
 
 			static DesktopManager() {
+				Reconnect();
+			}
+
+			// (Re)creates the COM objects: the virtual desktop API lives in the explorer.exe
+			// process, so the objects become stale when explorer restarts and must be recreated
+			internal static void Reconnect() {
 				var shell = (IServiceProvider10)Activator.CreateInstance(Type.GetTypeFromCLSID(Guids.CLSID_ImmersiveShell));
 				VirtualDesktopManagerInternal = (IVirtualDesktopManagerInternal)shell.QueryService(Guids.CLSID_VirtualDesktopManagerInternal, typeof(IVirtualDesktopManagerInternal).GUID);
 			}

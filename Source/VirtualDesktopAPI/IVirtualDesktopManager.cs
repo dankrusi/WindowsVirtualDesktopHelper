@@ -17,5 +17,8 @@ namespace WindowsVirtualDesktopHelper.VirtualDesktopAPI {
 		string CurrentDisplayName();
 
 		uint GetVDCount();
+
+		// Re-establishes the connection to the underlying COM API, needed after explorer.exe restarts
+		void Reconnect();
 	}
 }

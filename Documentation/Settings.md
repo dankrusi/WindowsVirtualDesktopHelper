@@ -14,21 +14,30 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | general.startupWithWindows | ``false`` | If true, the app will register itself with Windows to startup when Windows starts (via the registry). |
 | general.theme | ``"auto"`` | Can be either auto, dark or light. If set to auto, the theme is derived from the current windows theme (dark or light). |
 | theme.icons.disabledOpacity | ``"0.5"`` | Defines the opacity to use for icons which are disabled. |
-| theme.icons.font | ``"Segoe UI"`` | Defines the font name to use for the icons (for regular numbers, characters). |
+| theme.icons.font | ``"Segoe UI"`` | Defines the font name to use for the icons (for regular numbers, characters). If a specific style is to be used, then one can append 'Bold', 'Italic', 'Regular' after a comma and the font name - for example 'Arial, Bold'. |
 | theme.icons.emojiFont | ``"Segoe UI Symbol"`` | Defines the font name to use for emoji icons. |
 | theme.icons.symbolsFont | ``"Segoe UI Symbol"`` | Defines the font name to use for symbol icons. |
 | theme.icons.iconBG.dark | ``"black"`` |  |
 | theme.icons.iconFG.dark | ``"white"`` |  |
 | theme.icons.iconBG.light | ``"white"`` |  |
 | theme.icons.iconFG.light | ``"black"`` |  |
-| theme.overlay.width | ``900`` | With width in pixels of the overlay. |
-| theme.overlay.height | ``430`` | With height in pixels of the overlay. |
-| theme.overlay.font | ``"Segoe UI Light"`` | Defines the font name to use for the overlay. |
-| theme.overlay.fontSize | ``30`` | Defines the font size to use for the overlay. |
+| theme.overlay.width | ``900`` | With width in pixels of the switch overlay. |
+| theme.overlay.height | ``430`` | With height in pixels of the switch overlay. |
+| theme.overlay.font | ``"Segoe UI Light"`` | Defines the font name to use for the switch overlay. |
+| theme.overlay.fontSize | ``30`` | Defines the font size to use for the switch overlay. |
 | theme.overlay.overlayBG.dark | ``"black"`` |  |
 | theme.overlay.overlayFG.dark | ``"white"`` |  |
 | theme.overlay.overlayBG.light | ``"black"`` |  |
 | theme.overlay.overlayFG.light | ``"white"`` |  |
+| theme.status.width | ``250`` | With width in pixels of the status overlay. |
+| theme.status.height | ``40`` | With height in pixels of the status overlay. |
+| theme.status.offset | ``0`` | With height in pixels of the status overlay. |
+| theme.status.font | ``"Segoe UI Light"`` | Defines the font name to use for the status overlay. |
+| theme.status.fontSize | ``12`` | Defines the font size to use for the status overlay. |
+| theme.status.overlayBG.dark | ``"black"`` |  |
+| theme.status.overlayFG.dark | ``"white"`` |  |
+| theme.status.overlayBG.light | ``"black"`` |  |
+| theme.status.overlayFG.light | ``"white"`` |  |
 | feature.showSplashScreen | ``true`` | If enabled, a splash screen is shown on startup of the app. Overlays must be enabled. |
 | feature.showSplashScreen.duration | ``2000`` | Splash duration in milliseconds. |
 | feature.showSplashScreen.text | ``"Virtual Desktop Helper"`` | The splash text to show. |
@@ -42,8 +51,19 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | feature.showDesktopSwitchOverlay.translucent | ``true`` |  |
 | feature.showDesktopSwitchOverlay.showOnAllMonitors | ``true`` |  |
 | feature.showDesktopSwitchOverlay.position | ``"middlecenter"`` |  |
+| feature.showDesktopStatusOverlay | ``false`` |  |
+| feature.showDesktopStatusOverlay.animate | ``true`` |  |
+| feature.showDesktopStatusOverlay.translucent | ``true`` |  |
+| feature.showDesktopStatusOverlay.showOnAllMonitors | ``true`` |  |
+| feature.showDesktopStatusOverlay.position | ``"topcenter"`` |  |
 | feature.useHotKeyToJumpToDesktopNumber | ``false`` |  |
 | feature.useHotKeyToJumpToDesktopNumber.hotkey | ``"Alt"`` |  |
+| feature.useHotKeyToJumpToPreviousDesktop | ``false`` |  |
+| feature.useHotKeyToJumpToPreviousDesktop.hotkey | ``"Alt + Tilde"`` |  |
+| feature.useHotKeyToSwitchDesktopForward | ``false`` |  |
+| feature.useHotKeyToSwitchDesktopForward.hotkey | ``"Alt + Right"`` |  |
+| feature.useHotKeyToSwitchDesktopBackward | ``false`` |  |
+| feature.useHotKeyToSwitchDesktopBackward.hotkey | ``"Alt + Left"`` |  |
 | feature.showDesktopNumberInIconTray | ``true`` |  |
 | feature.showDesktopNumberInIconTray.clickToOpenTaskView | ``true`` |  |
 | feature.showDesktopNameInIconTray | ``false`` |  |
