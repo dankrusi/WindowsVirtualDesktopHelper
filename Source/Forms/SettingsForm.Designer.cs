@@ -27,10 +27,11 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxShowPrevNextIcons = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.radioButtonUseHotKeysToJumpToDesktopAlt = new System.Windows.Forms.RadioButton();
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift = new System.Windows.Forms.RadioButton();
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt = new System.Windows.Forms.RadioButton();
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl = new System.Windows.Forms.RadioButton();
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl = new System.Windows.Forms.CheckBox();
+            this.checkBoxUseHotKeysToJumpToDesktopAlt = new System.Windows.Forms.CheckBox();
+            this.checkBoxUseHotKeysToJumpToDesktopShift = new System.Windows.Forms.CheckBox();
+            this.checkBoxUseHotKeysToJumpToDesktopWin = new System.Windows.Forms.CheckBox();
+            this.labelKeyModifiersAreRequired = new System.Windows.Forms.Label();
             this.checkBoxUseHotKeysToJumpToDesktop = new System.Windows.Forms.CheckBox();
             this.checkBoxOverlayShowOnAllMonitors = new System.Windows.Forms.CheckBox();
             this.checkBoxShowDesktopNameInitial = new System.Windows.Forms.CheckBox();
@@ -122,67 +123,76 @@ namespace WindowsVirtualDesktopHelper {
             // 
             // panel3
             // 
-            this.panel3.Controls.Add(this.radioButtonUseHotKeysToJumpToDesktopAlt);
-            this.panel3.Controls.Add(this.radioButtonUseHotKeysToJumpToDesktopAltShift);
-            this.panel3.Controls.Add(this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt);
-            this.panel3.Controls.Add(this.radioButtonUseHotKeysToJumpToDesktopCtrl);
+            this.panel3.Controls.Add(this.labelKeyModifiersAreRequired);
+            this.panel3.Controls.Add(this.checkBoxUseHotKeysToJumpToDesktopWin);
+            this.panel3.Controls.Add(this.checkBoxUseHotKeysToJumpToDesktopShift);
+            this.panel3.Controls.Add(this.checkBoxUseHotKeysToJumpToDesktopAlt);
+            this.panel3.Controls.Add(this.checkBoxUseHotKeysToJumpToDesktopCtrl);
             this.panel3.Location = new System.Drawing.Point(73, 567);
             this.panel3.Margin = new System.Windows.Forms.Padding(6);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(660, 46);
             this.panel3.TabIndex = 20;
             // 
-            // radioButtonUseHotKeysToJumpToDesktopAlt
-            // 
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.AutoSize = true;
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.Location = new System.Drawing.Point(9, 9);
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.Margin = new System.Windows.Forms.Padding(6);
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.Name = "radioButtonUseHotKeysToJumpToDesktopAlt";
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.Size = new System.Drawing.Size(83, 29);
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.TabIndex = 9;
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.TabStop = true;
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.Text = "Alt+#";
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.UseVisualStyleBackColor = true;
-            this.radioButtonUseHotKeysToJumpToDesktopAlt.CheckedChanged += new System.EventHandler(this.radioButtonUseHotKeysToJumpToDesktopAlt_CheckedChanged);
-            // 
-            // radioButtonUseHotKeysToJumpToDesktopAltShift
-            // 
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.AutoSize = true;
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.Location = new System.Drawing.Point(343, 9);
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.Margin = new System.Windows.Forms.Padding(6);
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.Name = "radioButtonUseHotKeysToJumpToDesktopAltShift";
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.Size = new System.Drawing.Size(134, 29);
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.TabIndex = 8;
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.TabStop = true;
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.Text = "Alt+Shift+#";
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.UseVisualStyleBackColor = true;
-            this.radioButtonUseHotKeysToJumpToDesktopAltShift.CheckedChanged += new System.EventHandler(this.radioButtonUseHotKeysToJumpToDesktopAltShift_CheckedChanged);
-            // 
-            // radioButtonUseHotKeysToJumpToDesktopCtrlAlt
-            // 
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.AutoSize = true;
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Location = new System.Drawing.Point(205, 9);
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Margin = new System.Windows.Forms.Padding(6);
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Name = "radioButtonUseHotKeysToJumpToDesktopCtrlAlt";
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Size = new System.Drawing.Size(125, 29);
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.TabIndex = 7;
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.TabStop = true;
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Text = "Ctrl+Alt+#";
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.UseVisualStyleBackColor = true;
-            this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.CheckedChanged += new System.EventHandler(this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt_CheckedChanged);
-            // 
-            // radioButtonUseHotKeysToJumpToDesktopCtrl
-            // 
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.AutoSize = true;
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.Location = new System.Drawing.Point(104, 9);
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.Margin = new System.Windows.Forms.Padding(6);
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.Name = "radioButtonUseHotKeysToJumpToDesktopCtrl";
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.Size = new System.Drawing.Size(90, 29);
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.TabIndex = 6;
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.TabStop = true;
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.Text = "Ctrl+#";
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.UseVisualStyleBackColor = true;
-            this.radioButtonUseHotKeysToJumpToDesktopCtrl.CheckedChanged += new System.EventHandler(this.radioButtonUseHotKeysToJumpToDesktopCtrl_CheckedChanged);
+            // checkBoxUseHotKeysToJumpToDesktopCtrl
+            //
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.AutoSize = true;
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.Dock = System.Windows.Forms.DockStyle.Left;
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.Location = new System.Drawing.Point(0, 0);
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.Name = "checkBoxUseHotKeysToJumpToDesktopCtrl";
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.Size = new System.Drawing.Size(75, 46);
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.TabIndex = 24;
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.Text = "Ctrl";
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.UseVisualStyleBackColor = true;
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.CheckedChanged += new System.EventHandler(this.checkBoxUseHotKeysToJumpToDesktopModifier_CheckedChanged);
+            //
+            // checkBoxUseHotKeysToJumpToDesktopAlt
+            //
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.AutoSize = true;
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.Dock = System.Windows.Forms.DockStyle.Left;
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.Location = new System.Drawing.Point(75, 0);
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.Name = "checkBoxUseHotKeysToJumpToDesktopAlt";
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.Size = new System.Drawing.Size(70, 46);
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.TabIndex = 25;
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.Text = "Alt";
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.UseVisualStyleBackColor = true;
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.CheckedChanged += new System.EventHandler(this.checkBoxUseHotKeysToJumpToDesktopModifier_CheckedChanged);
+            //
+            // checkBoxUseHotKeysToJumpToDesktopShift
+            //
+            this.checkBoxUseHotKeysToJumpToDesktopShift.AutoSize = true;
+            this.checkBoxUseHotKeysToJumpToDesktopShift.Dock = System.Windows.Forms.DockStyle.Left;
+            this.checkBoxUseHotKeysToJumpToDesktopShift.Location = new System.Drawing.Point(145, 0);
+            this.checkBoxUseHotKeysToJumpToDesktopShift.Name = "checkBoxUseHotKeysToJumpToDesktopShift";
+            this.checkBoxUseHotKeysToJumpToDesktopShift.Size = new System.Drawing.Size(86, 46);
+            this.checkBoxUseHotKeysToJumpToDesktopShift.TabIndex = 26;
+            this.checkBoxUseHotKeysToJumpToDesktopShift.Text = "Shift";
+            this.checkBoxUseHotKeysToJumpToDesktopShift.UseVisualStyleBackColor = true;
+            this.checkBoxUseHotKeysToJumpToDesktopShift.CheckedChanged += new System.EventHandler(this.checkBoxUseHotKeysToJumpToDesktopModifier_CheckedChanged);
+            //
+            // checkBoxUseHotKeysToJumpToDesktopWin
+            //
+            this.checkBoxUseHotKeysToJumpToDesktopWin.AutoSize = true;
+            this.checkBoxUseHotKeysToJumpToDesktopWin.Dock = System.Windows.Forms.DockStyle.Left;
+            this.checkBoxUseHotKeysToJumpToDesktopWin.Location = new System.Drawing.Point(231, 0);
+            this.checkBoxUseHotKeysToJumpToDesktopWin.Name = "checkBoxUseHotKeysToJumpToDesktopWin";
+            this.checkBoxUseHotKeysToJumpToDesktopWin.Size = new System.Drawing.Size(82, 46);
+            this.checkBoxUseHotKeysToJumpToDesktopWin.TabIndex = 27;
+            this.checkBoxUseHotKeysToJumpToDesktopWin.Text = "Win";
+            this.checkBoxUseHotKeysToJumpToDesktopWin.UseVisualStyleBackColor = true;
+            this.checkBoxUseHotKeysToJumpToDesktopWin.CheckedChanged += new System.EventHandler(this.checkBoxUseHotKeysToJumpToDesktopModifier_CheckedChanged);
+            //
+            // labelKeyModifiersAreRequired
+            //
+            this.labelKeyModifiersAreRequired.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelKeyModifiersAreRequired.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelKeyModifiersAreRequired.ForeColor = System.Drawing.Color.Red;
+            this.labelKeyModifiersAreRequired.Location = new System.Drawing.Point(314, 0);
+            this.labelKeyModifiersAreRequired.Name = "labelKeyModifiersAreRequired";
+            this.labelKeyModifiersAreRequired.Size = new System.Drawing.Size(346, 46);
+            this.labelKeyModifiersAreRequired.TabIndex = 28;
+            this.labelKeyModifiersAreRequired.Text = "REQUIRED";
+            this.labelKeyModifiersAreRequired.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // checkBoxUseHotKeysToJumpToDesktop
             // 
@@ -734,11 +744,12 @@ namespace WindowsVirtualDesktopHelper {
 		private System.Windows.Forms.CheckBox checkBoxShowDesktopNameInitial;
 		private System.Windows.Forms.CheckBox checkBoxOverlayShowOnAllMonitors;
 		private System.Windows.Forms.Panel panel3;
-		private System.Windows.Forms.RadioButton radioButtonUseHotKeysToJumpToDesktopAlt;
-		private System.Windows.Forms.RadioButton radioButtonUseHotKeysToJumpToDesktopAltShift;
-		private System.Windows.Forms.RadioButton radioButtonUseHotKeysToJumpToDesktopCtrlAlt;
-		private System.Windows.Forms.RadioButton radioButtonUseHotKeysToJumpToDesktopCtrl;
 		private System.Windows.Forms.CheckBox checkBoxUseHotKeysToJumpToDesktop;
+		private System.Windows.Forms.CheckBox checkBoxUseHotKeysToJumpToDesktopCtrl;
+		private System.Windows.Forms.CheckBox checkBoxUseHotKeysToJumpToDesktopAlt;
+		private System.Windows.Forms.CheckBox checkBoxUseHotKeysToJumpToDesktopShift;
+		private System.Windows.Forms.CheckBox checkBoxUseHotKeysToJumpToDesktopWin;
+		private System.Windows.Forms.Label labelKeyModifiersAreRequired;
 		private System.Windows.Forms.CheckBox checkBoxStatusOverlayShowOnAllMonitors;
 		private System.Windows.Forms.Panel panel4;
 		private System.Windows.Forms.RadioButton radioButtonStatusOverlayPositionBottomRight;

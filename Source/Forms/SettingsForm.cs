@@ -16,11 +16,8 @@ namespace WindowsVirtualDesktopHelper {
 			InitializeComponent();
 			LoadSettingsIntoUI();
 
-
 			IsLoading = false;
 		}
-
-		
 
 		private void LoadSettingsIntoUI() {
 
@@ -51,10 +48,13 @@ namespace WindowsVirtualDesktopHelper {
 			this.checkBoxClickDesktopNumberTaskView.Checked = Settings.GetBool("feature.showDesktopNumberInIconTray.clickToOpenTaskView");
 			this.checkBoxUseHotKeysToJumpToDesktop.Checked = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber");
 
-			this.radioButtonUseHotKeysToJumpToDesktopAlt.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Alt";
-			this.radioButtonUseHotKeysToJumpToDesktopAltShift.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Alt + Shift";
-			this.radioButtonUseHotKeysToJumpToDesktopCtrl.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Ctrl";
-			this.radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Checked = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey") == "Ctrl + Alt";
+			string keyModifierSetting = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey").Replace("+", ",");
+			if (Enum.TryParse(keyModifierSetting, true, out KeyModifiers keyModifiers)) {
+				this.checkBoxUseHotKeysToJumpToDesktopCtrl.Checked = keyModifiers.HasFlag(KeyModifiers.Ctrl);
+				this.checkBoxUseHotKeysToJumpToDesktopAlt.Checked = keyModifiers.HasFlag(KeyModifiers.Alt);
+				this.checkBoxUseHotKeysToJumpToDesktopShift.Checked = keyModifiers.HasFlag(KeyModifiers.Shift);
+				this.checkBoxUseHotKeysToJumpToDesktopWin.Checked = keyModifiers.HasFlag(KeyModifiers.Win);
+			}
 
 			this.checkBoxShowStatusOverlay.Checked = Settings.GetBool("feature.showDesktopStatusOverlay");
 			this.checkBoxStatusOverlayAnimate.Checked = Settings.GetBool("feature.showDesktopStatusOverlay.animate");
@@ -73,14 +73,14 @@ namespace WindowsVirtualDesktopHelper {
 
 			checkBoxShowOverlay_CheckedChanged(this, null);
 			checkBoxShowStatusOverlay_CheckedChanged(this, null);
-			checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(this, null);
+			EnableDisableModifierCheckboxes(checkBoxUseHotKeysToJumpToDesktop.Checked);
+			ValidateHotkeys();
 		}
-		
+
 		private void SaveSettingsFromUI() {
 			// Save user settings to storage
 			Settings.SaveConfig();
 		}
-
 
 		#region Form Events
 
@@ -97,23 +97,21 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e) {
-
 			if(e.CloseReason == CloseReason.UserClosing) {
 				e.Cancel = true;
+
+				var useHotkeys = this.checkBoxUseHotKeysToJumpToDesktop.Checked && ValidateHotkeys();
+				Settings.SetBool("feature.useHotKeyToJumpToDesktopNumber", useHotkeys);
 				SaveSettingsFromUI();
+				App.Instance.SetupHotKeys();
+
 				Hide();
 			}
-			
-				
 		}
 
 		#endregion
 
-
-
-
 		#region Settings UI Events
-
 
 		private void checkBoxStartupWithWindows_CheckedChanged(object sender, EventArgs e) {
 			if(IsLoading) return;
@@ -170,51 +168,57 @@ namespace WindowsVirtualDesktopHelper {
 			radioButtonPositionBottomLeft.Enabled = checkBoxShowOverlay.Checked;
 			radioButtonPositionBottomCenter.Enabled = checkBoxShowOverlay.Checked;
 			radioButtonPositionBottomRight.Enabled = checkBoxShowOverlay.Checked;
+		}
 
+		private void EnableDisableModifierCheckboxes(bool enable) {
+			checkBoxUseHotKeysToJumpToDesktopCtrl.Enabled = enable;
+			checkBoxUseHotKeysToJumpToDesktopAlt.Enabled = enable;
+			checkBoxUseHotKeysToJumpToDesktopShift.Enabled = enable;
+			checkBoxUseHotKeysToJumpToDesktopWin.Enabled = enable;
+		}
+
+		private bool ValidateHotkeys() {
+			if (checkBoxUseHotKeysToJumpToDesktop.Checked) {
+				KeyModifiers keyModifiers = GetHotkeys();
+
+				if (keyModifiers == KeyModifiers.None) {
+					labelKeyModifiersAreRequired.Text = "REQUIRED";
+					labelKeyModifiersAreRequired.Visible = true;
+				} else if (keyModifiers == KeyModifiers.Shift || keyModifiers == KeyModifiers.Win) {
+					labelKeyModifiersAreRequired.Text = "NOT RECOMMENDED";
+					labelKeyModifiersAreRequired.Visible = true;
+				} else labelKeyModifiersAreRequired.Visible = false;
+
+				return keyModifiers != KeyModifiers.None;
+			}
+
+			labelKeyModifiersAreRequired.Visible = false;
+			return true;
+		}
+
+		private KeyModifiers GetHotkeys() {
+			KeyModifiers keyModifiers = KeyModifiers.None;
+			if (checkBoxUseHotKeysToJumpToDesktopCtrl.Checked) keyModifiers |= KeyModifiers.Ctrl;
+			if (checkBoxUseHotKeysToJumpToDesktopAlt.Checked) keyModifiers |= KeyModifiers.Alt;
+			if (checkBoxUseHotKeysToJumpToDesktopShift.Checked) keyModifiers |= KeyModifiers.Shift;
+			if (checkBoxUseHotKeysToJumpToDesktopWin.Checked) keyModifiers |= KeyModifiers.Win;
+			return keyModifiers;
 		}
 
 		private void checkBoxUseHotKeysToJumpToDesktop_CheckedChanged(object sender, EventArgs e) {
 			if(IsLoading) return;
 			Settings.SetBool("feature.useHotKeyToJumpToDesktopNumber", this.checkBoxUseHotKeysToJumpToDesktop.Checked);
+			EnableDisableModifierCheckboxes(checkBoxUseHotKeysToJumpToDesktop.Checked);
 
-			radioButtonUseHotKeysToJumpToDesktopAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
-			radioButtonUseHotKeysToJumpToDesktopAltShift.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
-			radioButtonUseHotKeysToJumpToDesktopCtrl.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
-			radioButtonUseHotKeysToJumpToDesktopCtrlAlt.Enabled = checkBoxUseHotKeysToJumpToDesktop.Checked;
-
-			App.Instance.SetupHotKeys();
+			ValidateHotkeys();
 		}
 
-		private void radioButtonUseHotKeysToJumpToDesktopAlt_CheckedChanged(object sender, EventArgs e) {
-			if(IsLoading) return;
-			if((sender as RadioButton).Checked == true) {
-				Settings.SetString("feature.useHotKeyToJumpToDesktopNumber.hotkey", "Alt");
-				App.Instance.SetupHotKeys();
-			}
-		}
+		private void checkBoxUseHotKeysToJumpToDesktopModifier_CheckedChanged(object sender, EventArgs e) {
+			if (IsLoading) return;
 
-		private void radioButtonUseHotKeysToJumpToDesktopCtrl_CheckedChanged(object sender, EventArgs e) {
-			if(IsLoading) return;
-			if((sender as RadioButton).Checked == true) {
-				Settings.SetString("feature.useHotKeyToJumpToDesktopNumber.hotkey", "Ctrl");
-				App.Instance.SetupHotKeys();
-			}
-		}
-
-		private void radioButtonUseHotKeysToJumpToDesktopCtrlAlt_CheckedChanged(object sender, EventArgs e) {
-			if(IsLoading) return;
-			if((sender as RadioButton).Checked == true) {
-				Settings.SetString("feature.useHotKeyToJumpToDesktopNumber.hotkey", "Ctrl + Alt");
-				App.Instance.SetupHotKeys();
-			}
-		}
-
-		private void radioButtonUseHotKeysToJumpToDesktopAltShift_CheckedChanged(object sender, EventArgs e) {
-			if(IsLoading) return;
-			if((sender as RadioButton).Checked == true) {
-				Settings.SetString("feature.useHotKeyToJumpToDesktopNumber.hotkey", "Alt + Shift");
-				App.Instance.SetupHotKeys();
-			}
+			ValidateHotkeys();
+			KeyModifiers keyModifiers = GetHotkeys();
+			Settings.SetString("feature.useHotKeyToJumpToDesktopNumber.hotkey", keyModifiers.ToString().Replace(", ", " + "));
 		}
 
 		private void radioButtonOverlayLongDuration_CheckedChanged(object sender, EventArgs e) {
@@ -414,6 +418,18 @@ namespace WindowsVirtualDesktopHelper {
 			if((sender as RadioButton).Checked == true) {
 				Settings.SetString("feature.showDesktopStatusOverlay.position", "bottomright");
 			}
+		}
+
+		// Define a new KeyModifiers - don't use ModifierKeys in KeyboardHook.cs because:
+		// 1. It conflicts with the WinForms ModifierKeys property
+		// 2. This enum defines the keys in a different order that are IMHO more natural, and are used in this order when writing out to the config file
+		[Flags]
+		enum KeyModifiers {
+			None = 0,
+			Ctrl = 1,
+			Alt = 2,
+			Shift = 4,
+			Win = 8
 		}
 	}
 }
