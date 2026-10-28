@@ -1,3 +1,11 @@
+# Unreleased
+
+## Changes
+
+* Add unsigned x64/x86 APPX packaging, Store upload archives, build/validation scripts, and a GitHub Actions pipeline.
+* Use the manifest startup task and Windows startup settings in packaged builds.
+
+
 # v2.1 - 2026-10-28
 
 The v2.1 executable and MSI installer are unsigned. Windows may display an untrusted publisher warning.

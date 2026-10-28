@@ -209,6 +209,8 @@ Note: The Setup project which creates the MSI installer will require the followi
 
 Release builds are unsigned by default. Code signing is opt-in with the MSBuild property `/p:SignReleaseBuild=true` and requires the certificate and tools configured in `Scripts/codesign-release-build.ps1`. The v2.1 official release is unsigned.
 
+For unsigned APPX packages and Microsoft Store upload archives, see [APPX packaging](Documentation/AppxPackaging.md). The included GitHub Actions workflow builds and validates x64 and x86 packages.
+
 ### Depencencies
 
 This project doesn't have any dependencies or external libraries, and we expect it to stay this way. We want the app

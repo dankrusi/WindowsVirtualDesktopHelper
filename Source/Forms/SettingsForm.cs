@@ -27,6 +27,19 @@ namespace WindowsVirtualDesktopHelper {
 			this.checkBoxShowPrevNextIcons.Checked = Settings.GetBool("feature.showPrevNextIcons");
 			this.checkBoxShowDesktopNameInitial.Checked = Settings.GetBool("feature.showDesktopNameInIconTray");
 			this.checkBoxStartupWithWindows.Checked = Settings.GetBool("general.startupWithWindows");
+#if APPX_PACKAGE
+			// Packaged apps use the manifest startup task, not a virtualized Run registry key.
+			this.checkBoxStartupWithWindows.Visible = false;
+			this.checkBoxStartupWithWindows.Enabled = false;
+			var startupSettingsLink = new LinkLabel {
+				AutoSize = true,
+				Location = this.checkBoxStartupWithWindows.Location,
+				Text = "Manage startup in Windows Settings",
+				TabIndex = this.checkBoxStartupWithWindows.TabIndex
+			};
+			startupSettingsLink.LinkClicked += (sender, args) => App.Instance.OpenURL("ms-settings:startupapps");
+			this.groupBox2.Controls.Add(startupSettingsLink);
+#endif
 
 			this.checkBoxShowOverlay.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay");
 			this.checkBoxOverlayAnimate.Checked = Settings.GetBool("feature.showDesktopSwitchOverlay.animate");

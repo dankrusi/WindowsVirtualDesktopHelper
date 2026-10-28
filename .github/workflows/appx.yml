@@ -1,0 +1,70 @@
+name: APPX packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Source/**'
+      - 'Images/WindowsVirtualDeskopHelper Logo.png'
+      - 'Packaging/Appx/**'
+      - 'Scripts/*appx.ps1'
+      - '.github/workflows/appx.yml'
+  pull_request:
+    paths:
+      - 'Source/**'
+      - 'Images/WindowsVirtualDeskopHelper Logo.png'
+      - 'Packaging/Appx/**'
+      - 'Scripts/*appx.ps1'
+      - '.github/workflows/appx.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      store:
+        description: 'Require the Partner Center identity and build for Store submission'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: APPX (${{ matrix.architecture }})
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [x64, x86]
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
+      - name: Build and validate unsigned APPX
+        env:
+          APPX_ARCHITECTURE: ${{ matrix.architecture }}
+          BUILD_EVENT: ${{ github.event_name }}
+          REQUIRE_STORE_IDENTITY: ${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.store) }}
+        run: |
+          $parameters = @{
+            Architecture = $env:APPX_ARCHITECTURE
+            OutputDirectory = Join-Path $env:GITHUB_WORKSPACE "artifacts\appx\$env:APPX_ARCHITECTURE"
+          }
+          if ($env:REQUIRE_STORE_IDENTITY -eq 'true' -or ($env:BUILD_EVENT -ne 'workflow_dispatch' -and (Test-Path -LiteralPath 'Packaging\Appx\StoreIdentity.json'))) {
+            $parameters.Store = $true
+          }
+          .\Scripts\build-appx.ps1 @parameters
+      - name: Upload package, Store archive, and checksums
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: WindowsVirtualDesktopHelper-APPX-${{ matrix.architecture }}
+          path: |
+            artifacts/appx/${{ matrix.architecture }}/*.appx
+            artifacts/appx/${{ matrix.architecture }}/*.appxupload
+            artifacts/appx/${{ matrix.architecture }}/*.sha256
+          if-no-files-found: error
+          retention-days: 30
