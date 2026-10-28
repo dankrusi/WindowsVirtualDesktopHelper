@@ -474,10 +474,14 @@ namespace WindowsVirtualDesktopHelper {
 			// Compile from features
 			if(Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber")) {
 				var hotKey = Settings.GetString("feature.useHotKeyToJumpToDesktopNumber.hotkey");
-				if(hotKey != null && hotKey != "") {
+				var jumpUsingDigits = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useDigits");
+				var jumpUsingNumpadDigits = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits");
+				var jumpUsingFunctionKeys = Settings.GetBool("feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys");
+				if (hotKey != null && hotKey != "") {
 					for(var i = 1; i <= 9; i++) {
-						hotkeys.Add($"{hotKey} + D{i} = Desktop{i}");
-						hotkeys.Add($"{hotKey} + NumPad{i} = Desktop{i}");
+						if (jumpUsingDigits) hotkeys.Add($"{hotKey} + D{i} = Desktop{i}");
+						if (jumpUsingNumpadDigits) hotkeys.Add($"{hotKey} + NumPad{i} = Desktop{i}");
+						if (jumpUsingFunctionKeys) hotkeys.Add($"{hotKey} + F{i} = Desktop{i}");
 					}
 				}
 			}

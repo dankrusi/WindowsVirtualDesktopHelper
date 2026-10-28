@@ -1,3 +1,15 @@
+# Unreleased
+
+## Changes
+* Choose any combination of Ctrl, Alt, Shift, and Win for Jump to Desktop hotkeys (#192).
+* Restore the `+#` suffix on each hotkey modifier label.
+* Choose keyboard digits, numpad digits, and/or F1-F9 for Jump to Desktop hotkeys (#193). Keyboard and numpad digits remain enabled by default.
+
+## Fixes
+* Display hotkey registration errors while keeping other shortcuts working.
+* Preserve saved hotkey modifiers while the feature is disabled and clear old hotkeys when no modifier or key group is selected.
+
+
 # v2.1
 
 ## Features
