@@ -1,4 +1,5 @@
 use crate::{platform::desktop::Snapshot, platform::wide, settings::Settings};
+use windows_sys::core::GUID;
 use windows_sys::Win32::{
     Foundation::*,
     Graphics::Gdi::*,
@@ -8,21 +9,24 @@ pub const MESSAGE: u32 = 0x8003;
 pub struct Tray {
     hwnd: HWND,
     icons: Vec<(u32, HICON)>,
+    identity_scope: String,
 }
 impl Tray {
     pub fn new(hwnd: HWND) -> Self {
         Self {
             hwnd,
             icons: Vec::new(),
+            identity_scope: std::env::current_exe()
+                .expect("the running executable has a path")
+                .to_string_lossy()
+                .replace('/', "\\")
+                .to_lowercase(),
         }
     }
     pub fn clear(&mut self) {
         for (id, icon) in self.icons.drain(..) {
             unsafe {
-                let mut data: NOTIFYICONDATAW = std::mem::zeroed();
-                data.cbSize = std::mem::size_of_val(&data) as u32;
-                data.hWnd = self.hwnd;
-                data.uID = id;
+                let data = identity(self.hwnd, &self.identity_scope, id);
                 Shell_NotifyIconW(NIM_DELETE, &data);
                 DestroyIcon(icon);
             }
@@ -35,49 +39,102 @@ impl Tray {
         for (id, label, enabled) in icons {
             unsafe {
                 let icon = icon(&label, s, enabled, id >= 3, metrics);
-                let mut data: NOTIFYICONDATAW = std::mem::zeroed();
-                data.cbSize = std::mem::size_of_val(&data) as u32;
-                data.hWnd = self.hwnd;
-                data.uID = id;
-                data.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+                let mut data = identity(self.hwnd, &self.identity_scope, id);
+                data.uFlags |= NIF_ICON | NIF_MESSAGE | NIF_TIP;
                 data.uCallbackMessage = MESSAGE;
                 data.hIcon = icon;
-                let tip = wide(&format!(
-                    "{} · {} of {}",
-                    snap.active().name,
-                    snap.current + 1,
-                    snap.desktops.len()
-                ));
-                let mut tooltip = [0u16; 128];
-                for (a, b) in tooltip.iter_mut().take(127).zip(tip) {
-                    *a = b;
-                }
-                data.szTip = tooltip;
+                data.szTip = tooltip(id, snap);
                 let old = previous
                     .iter()
                     .position(|(old_id, _)| *old_id == id)
                     .map(|i| previous.remove(i).1);
-                let updated = old.is_some() && Shell_NotifyIconW(NIM_MODIFY, &data) != 0;
-                if !updated && Shell_NotifyIconW(NIM_ADD, &data) == 0 {
-                    crate::platform::log("Could not add notification icon");
-                }
+                // Also replace an orphaned icon after an unclean shutdown.
+                let updated = Shell_NotifyIconW(NIM_MODIFY, &data) != 0
+                    || Shell_NotifyIconW(NIM_ADD, &data) != 0;
                 if let Some(old) = old {
                     DestroyIcon(old);
                 }
-                self.icons.push((id, icon));
+                if updated {
+                    self.icons.push((id, icon));
+                } else {
+                    crate::platform::log(&format!(
+                        "Could not add notification icon: {}",
+                        icon_name(id)
+                    ));
+                    DestroyIcon(icon);
+                }
             }
         }
         for (id, icon) in previous {
             unsafe {
-                let mut data: NOTIFYICONDATAW = std::mem::zeroed();
-                data.cbSize = std::mem::size_of_val(&data) as u32;
-                data.hWnd = self.hwnd;
-                data.uID = id;
+                let data = identity(self.hwnd, &self.identity_scope, id);
                 Shell_NotifyIconW(NIM_DELETE, &data);
                 DestroyIcon(icon);
             }
         }
     }
+    pub fn notify(&self, title: &str, message: &str) -> bool {
+        let Some((id, _)) = self.icons.first() else {
+            return false;
+        };
+        let mut data = identity(self.hwnd, &self.identity_scope, *id);
+        data.uFlags |= NIF_INFO;
+        data.szInfoTitle = shell_text(title);
+        data.szInfo = shell_text(message);
+        data.dwInfoFlags = NIIF_INFO;
+        unsafe { Shell_NotifyIconW(NIM_MODIFY, &data) != 0 }
+    }
+}
+
+/// Stable UUIDs per executable location and icon role. Windows binds a tray
+/// GUID to its binary path; scoping avoids collisions between portable copies,
+/// development builds and installed packages. Never change the namespace.
+fn icon_guid(scope: &str, id: u32) -> GUID {
+    const NAMESPACE: uuid::Uuid = uuid::Uuid::from_u128(0x8333b54dad424e31ba7c2145ab2df461);
+    GUID::from_u128(uuid::Uuid::new_v5(&NAMESPACE, format!("{scope}\0{id}").as_bytes()).as_u128())
+}
+fn identity(hwnd: HWND, scope: &str, id: u32) -> NOTIFYICONDATAW {
+    NOTIFYICONDATAW {
+        cbSize: std::mem::size_of::<NOTIFYICONDATAW>() as u32,
+        hWnd: hwnd,
+        uID: id,
+        uFlags: NIF_GUID,
+        guidItem: icon_guid(scope, id),
+        ..unsafe { std::mem::zeroed() }
+    }
+}
+fn icon_name(id: u32) -> &'static str {
+    match id {
+        1 => "Desktop number",
+        2 => "Desktop initial",
+        3 => "Previous desktop",
+        4 => "Next desktop",
+        _ => "Desktop controls",
+    }
+}
+fn tooltip(id: u32, snap: &Snapshot) -> [u16; 128] {
+    shell_text(&format!(
+        "{} · Virtual Desktop Helper\n{} · {} of {}",
+        icon_name(id),
+        snap.active().name,
+        snap.current + 1,
+        snap.desktops.len()
+    ))
+}
+/// NUL-terminate Shell strings without cutting a UTF-16 surrogate pair.
+fn shell_text<const N: usize>(text: &str) -> [u16; N] {
+    let mut buffer = [0; N];
+    let mut offset = 0;
+    for ch in text.chars().take_while(|ch| *ch != '\0') {
+        let mut units = [0; 2];
+        let units = ch.encode_utf16(&mut units);
+        if offset + units.len() >= N {
+            break;
+        }
+        buffer[offset..offset + units.len()].copy_from_slice(units);
+        offset += units.len();
+    }
+    buffer
 }
 impl Drop for Tray {
     fn drop(&mut self) {
@@ -379,6 +436,61 @@ fn rasterize(
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn guid_value(guid: GUID) -> u128 {
+        ((guid.data1 as u128) << 96)
+            | ((guid.data2 as u128) << 80)
+            | ((guid.data3 as u128) << 64)
+            | u64::from_be_bytes(guid.data4) as u128
+    }
+    #[test]
+    fn tray_identity_survives_window_changes_and_is_unique_per_role_and_install() {
+        let scope = r"c:\tools\helper.exe";
+        // Freeze this UUID: changing it would discard Explorer's saved preferences.
+        assert_eq!(
+            guid_value(icon_guid(scope, 1)),
+            0x991ccb07d8d55709acb09ba112a80ec5
+        );
+        let first = identity(1usize as HWND, scope, 1);
+        let restart = identity(2usize as HWND, scope, 1);
+        let first_guid = first.guidItem;
+        let restarted_guid = restart.guidItem;
+        assert_eq!(guid_value(first_guid), guid_value(restarted_guid));
+        let first_window = first.hWnd;
+        let restarted_window = restart.hWnd;
+        assert_ne!(first_window, restarted_window);
+        assert_eq!(first.uFlags & NIF_GUID, NIF_GUID);
+        for id in 1..=5 {
+            for other in 1..=5 {
+                assert_eq!(
+                    guid_value(icon_guid(scope, id)) == guid_value(icon_guid(scope, other)),
+                    id == other
+                );
+            }
+            assert_ne!(
+                guid_value(icon_guid(scope, id)),
+                guid_value(icon_guid(r"c:\other\helper.exe", id))
+            );
+        }
+    }
+    #[test]
+    fn tooltip_names_stay_unique_with_long_unicode_desktop_names() {
+        let snap = Snapshot {
+            current: 0,
+            desktops: vec![crate::platform::desktop::Desktop {
+                id: 1,
+                name: "\u{1f4bb}".repeat(200),
+            }],
+        };
+        let tips: Vec<_> = (1..=5).map(|id| tooltip(id, &snap)).collect();
+        for (index, tip) in tips.iter().enumerate() {
+            let end = tip.iter().position(|ch| *ch == 0).unwrap();
+            assert!(end <= 127);
+            let text = String::from_utf16(&tip[..end]).expect("no split surrogate pair");
+            assert!(text.starts_with(icon_name(index as u32 + 1)));
+            assert_eq!(tips.iter().filter(|other| *other == tip).count(), 1);
+        }
+        assert_eq!(shell_text::<4>("ab\u{1f4bb}"), [97, 98, 0, 0]);
+    }
     #[test]
     fn arrows_and_digits_fill_the_icon_by_visible_bounds() {
         for size in [16, 20, 24, 32, 40, 48] {

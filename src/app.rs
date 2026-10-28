@@ -179,10 +179,17 @@ impl App {
         }
     }
     fn open_settings(&mut self) {
-        if self.settings_process.as_mut().is_some_and(|p| p.activate()) {
+        self.open_settings_page(false);
+    }
+    fn open_settings_page(&mut self, about: bool) {
+        if self
+            .settings_process
+            .as_mut()
+            .is_some_and(|p| p.activate(about))
+        {
             return;
         }
-        match ui::settings_process::SettingsProcess::open(self.hwnd, &self.settings) {
+        match ui::settings_process::SettingsProcess::open(self.hwnd, &self.settings, about) {
             Ok(child) => self.settings_process = Some(child),
             Err(e) => platform::report(&e),
         }
@@ -275,9 +282,7 @@ impl App {
                     ui::open_url(self.hwnd, &p.to_string_lossy());
                 }
             }
-            7 => {
-                MessageBoxW(self.hwnd,wide(&format!("Windows Virtual Desktop Helper {}\nNative Rust / Win32\n{}\n\nDan Krusi and contributors\nGPL-3.0 · VirtualDesktopAPI: MIT",env!("CARGO_PKG_VERSION"),self.manager.as_ref().map(|m|m.profile()).unwrap_or("Disconnected"))).as_ptr(),wide("About").as_ptr(),MB_OK);
-            }
+            7 => self.open_settings_page(true),
             8 => ui::open_url(
                 self.hwnd,
                 "https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6",
@@ -412,6 +417,16 @@ pub fn run() -> Result<(), String> {
         if app_state.settings.bool("settings") {
             app_state.open_settings();
         }
+        if let Some(message) = app_state.settings.arguments.get("notify") {
+            if app_state
+                .tray
+                .notify("Virtual Desktop Helper updated", message)
+            {
+                platform::log("Completion notification sent to Windows");
+            } else {
+                platform::log("Could not send completion notification");
+            }
+        }
         drop(app_ref);
         let mut message: MSG = std::mem::zeroed();
         loop {
@@ -528,7 +543,11 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
                 return 0;
             }
             let data = &*(l as *const COPYDATASTRUCT);
-            if data.dwData != ui::settings_process::SETTINGS_MESSAGE
+            if ![
+                ui::settings_process::SETTINGS_MESSAGE,
+                ui::settings_process::RESET_MESSAGE,
+            ]
+            .contains(&data.dwData)
                 || data.cbData > 1_048_576
                 || (data.cbData != 0 && data.lpData.is_null())
             {
@@ -542,11 +561,17 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
             let Ok(text) = std::str::from_utf8(bytes) else {
                 return 0;
             };
-            let Ok(config) = crate::settings::parse(text) else {
-                return 0;
-            };
             let mut candidate = app.settings.clone();
-            candidate.config = config;
+            if data.dwData == ui::settings_process::RESET_MESSAGE {
+                if candidate.reset(text.lines()).is_err() {
+                    return 0;
+                }
+            } else {
+                let Ok(config) = crate::settings::parse(text) else {
+                    return 0;
+                };
+                candidate.config = config;
+            }
             match app.apply(candidate) {
                 Ok(()) => 1,
                 Err(e) => {
@@ -560,7 +585,9 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
             }
         }
         ui::tray::MESSAGE => {
-            if l as u32 == WM_RBUTTONUP {
+            if l as u32 == windows_sys::Win32::UI::Shell::NIN_BALLOONSHOW {
+                platform::log("Windows displayed the completion notification");
+            } else if l as u32 == WM_RBUTTONUP {
                 app.menu();
             } else if l as u32 == WM_LBUTTONUP {
                 match w {

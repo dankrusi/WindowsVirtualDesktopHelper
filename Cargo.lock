@@ -9,6 +9,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d"
 
 [[package]]
+name = "sha1_smol"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbfa15b3dddfee50a0fff136974b3e1bde555604ba463834a7eb7deb6417705d"
+
+[[package]]
+name = "uuid"
+version = "1.29.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a0e2d11620c50695fe12bbbfde96b3477fe606e7284c22d505c12ce51214514"
+dependencies = [
+ "sha1_smol",
+]
+
+[[package]]
 name = "windows-collections"
 version = "0.100.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -135,6 +150,7 @@ dependencies = [
 name = "windows-virtual-desktop-helper"
 version = "3.0.0"
 dependencies = [
+ "uuid",
  "windows-reactor",
  "windows-sys",
 ]

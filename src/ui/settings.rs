@@ -7,12 +7,13 @@ use std::collections::BTreeMap;
 use windows_reactor::*;
 use windows_sys::Win32::Foundation::HWND;
 
-const PAGES: [(&str, &str, &str); 5] = [
+const PAGES: [(&str, &str, &str); 6] = [
     ("general", "General", "\u{E713}"),
     ("tray", "Tray icons", "\u{E9D9}"),
     ("overlays", "Desktop overlays", "\u{E7F4}"),
     ("hotkeys", "Keyboard shortcuts", "\u{E765}"),
     ("advanced", "Advanced", "\u{E90F}"),
+    ("about", "About", "\u{E946}"),
 ];
 const POS: [(&str, &str); 9] = [
     ("topleft", "Top left"),
@@ -35,10 +36,17 @@ enum Message {
     Page(Option<String>),
     Set(&'static str, String),
     Edit(String, String),
-    Save(String),
+    Flush(u64),
+    SetMany(Vec<(&'static str, String)>),
+    Reset(Vec<String>),
+    Link(&'static str),
+    Log,
     Preview(bool),
+    SchedulePreview(u64),
+    AutoPreview(u64),
     Advanced(String),
-    SaveAdvanced,
+    Editor(bool),
+    EditorReady,
     Folder,
     Startup,
     Dismiss,
@@ -50,12 +58,20 @@ enum Message {
     RefreshTray(bool),
 }
 struct SettingsUi {
+    sender: LocalSender<Message>,
     settings: Settings,
     parent: usize,
     page: String,
     error: String,
     edits: BTreeMap<String, String>,
     advanced: String,
+    advanced_dirty: bool,
+    editor_open: bool,
+    editor_ready: bool,
+    pending: Option<ComponentTask>,
+    generation: u64,
+    pending_preview: Option<ComponentTask>,
+    preview_generation: u64,
     preview: super::overlay::Overlays,
     capture: Option<super::shortcut_capture::Capture>,
     capture_key: Option<&'static str>,
@@ -69,15 +85,31 @@ impl Component for SettingsUi {
     fn create(input: &Settings, context: &ComponentContext<Self>) -> Self {
         let sender = context.sender();
         Self {
+            sender: context.sender(),
             tray_preview: super::tray_preview::Preview::new(input, move |reconnect| {
-                sender.send(Message::RefreshTray(reconnect));
+                sender.send(match reconnect {
+                    Some(reconnect) => Message::RefreshTray(reconnect),
+                    None => Message::Page(Some("about".into())),
+                });
             }),
             settings: input.clone(),
             parent: input.get("ui-parent").parse().unwrap_or(0),
-            page: "general".into(),
+            page: if input.get("ui-page") == "about" {
+                "about"
+            } else {
+                "general"
+            }
+            .into(),
             error: String::new(),
             edits: BTreeMap::new(),
             advanced: config_text(input),
+            advanced_dirty: false,
+            editor_open: false,
+            editor_ready: false,
+            pending: None,
+            generation: 0,
+            pending_preview: None,
+            preview_generation: 0,
             preview: super::overlay::Overlays::new(),
             capture: None,
             capture_key: None,
@@ -89,7 +121,9 @@ impl Component for SettingsUi {
         match message {
             Message::RefreshTray(reconnect) => self.tray_preview.refresh(&self.settings, reconnect),
             Message::Page(Some(page)) => {
+                self.flush();
                 self.tray_preview.refresh(&self.settings, false);
+                self.editor_ready = false;
                 self.page = page;
                 if self.narrow {
                     self.pane_open = false;
@@ -99,6 +133,7 @@ impl Component for SettingsUi {
             }
             Message::Page(None) => {}
             Message::Set(key, value) => {
+                self.flush();
                 if self.settings.get(key) == value {
                     return;
                 }
@@ -106,19 +141,50 @@ impl Component for SettingsUi {
                 candidate.set(key, value);
                 self.commit(candidate);
             }
-            Message::Edit(key, value) => {
-                self.edits.insert(key, value);
+            Message::Reset(keys) => {
+                self.flush();
+                if self.advanced_dirty || !self.edits.is_empty() {
+                    return;
+                }
+                let mut candidate = self.settings.clone();
+                let result = candidate
+                    .reset(keys.iter().map(String::as_str))
+                    .and_then(|()| {
+                        super::settings_process::reset(&candidate, self.parent as HWND, &keys)
+                    });
+                match result {
+                    Ok(()) => self.accept(candidate),
+                    Err(error) => self.error = error,
+                }
             }
-            Message::Save(key) => {
-                if let Some(value) = self.edits.get(&key) {
-                    let mut candidate = self.settings.clone();
-                    candidate.set(&key, value.clone());
-                    if self.commit(candidate) {
-                        self.edits.remove(&key);
-                    }
+            Message::SetMany(values) => {
+                if values
+                    .iter()
+                    .all(|(key, value)| self.settings.get(key) == value)
+                {
+                    return;
+                }
+                self.flush();
+                let mut candidate = self.settings.clone();
+                for (key, value) in values {
+                    candidate.set(key, value);
+                }
+                self.commit(candidate);
+            }
+            Message::Edit(key, value) => {
+                if value == self.settings.get(&key) && !self.edits.contains_key(&key) {
+                    return;
+                }
+                self.edits.insert(key, value);
+                self.schedule(context);
+            }
+            Message::Flush(generation) => {
+                if generation == self.generation {
+                    self.flush();
                 }
             }
             Message::Preview(status) => {
+                self.cancel_auto_preview();
                 self.preview.show(
                     &self.settings,
                     self.tray_preview.desktop_name(),
@@ -126,15 +192,61 @@ impl Component for SettingsUi {
                     Some(2200),
                 );
             }
-            Message::Advanced(text) => self.advanced = text,
-            Message::SaveAdvanced => match crate::settings::parse(&self.advanced) {
-                Ok(config) => {
-                    let mut candidate = self.settings.clone();
-                    candidate.config = config;
-                    self.commit(candidate);
+            Message::SchedulePreview(generation) => {
+                if generation == self.preview_generation
+                    && self.settings.bool("feature.showDesktopSwitchOverlay")
+                {
+                    self.pending_preview = Some(context.spawn_background(move |_| {
+                        std::thread::sleep(std::time::Duration::from_millis(500));
+                        Message::AutoPreview(generation)
+                    }));
                 }
-                Err(e) => self.error = e,
+            }
+            Message::AutoPreview(generation) => {
+                if generation == self.preview_generation
+                    && self.settings.bool("feature.showDesktopSwitchOverlay")
+                {
+                    self.pending_preview = None;
+                    let duration = self
+                        .settings
+                        .int("feature.showDesktopSwitchOverlay.duration");
+                    self.preview.show(
+                        &self.settings,
+                        self.tray_preview.desktop_name(),
+                        false,
+                        Some(if duration == 0 { 2200 } else { duration as u32 }),
+                    );
+                }
+            }
+            Message::Editor(open) => {
+                self.editor_open = open;
+                self.editor_ready = false;
+            }
+            Message::EditorReady => self.editor_ready = self.page == "advanced" && self.editor_open,
+            Message::Advanced(text) => {
+                if !self.editor_ready {
+                    return;
+                }
+                let text = text.replace("\r\n", "\n").replace('\r', "\n");
+                if text != self.advanced {
+                    self.advanced = text;
+                    self.advanced_dirty = true;
+                    self.schedule(context);
+                }
+            }
+            Message::Link(url) => unsafe {
+                super::open_url(std::ptr::null_mut(), url);
             },
+            Message::Log => {
+                let path = self.settings.path.with_file_name("app.log");
+                if path.exists() {
+                    unsafe {
+                        super::open_url(std::ptr::null_mut(), &path.to_string_lossy());
+                    }
+                } else {
+                    self.error = "No log has been created yet.".into();
+                }
+            }
             Message::Folder => super::settings_process::open_folder(&self.settings),
             Message::Startup => super::settings_process::startup_settings(),
             Message::Dismiss => self.error.clear(),
@@ -209,6 +321,16 @@ impl Component for SettingsUi {
                 None
             },
         );
+        // Reactor 0.100 sets Text before AcceptsReturn on first mount. Populate
+        // the multiline editor after mounting so WinUI cannot truncate to line one.
+        let editor_active = self.page == "advanced" && self.editor_open;
+        let editor_sender = context.sender();
+        context.use_effect("multiline-editor", editor_active, move || {
+            if editor_active {
+                editor_sender.send(Message::EditorReady);
+            }
+            None
+        });
         let nav = PAGES.iter().map(|(key, title, icon)| {
             (
                 *key,
@@ -234,6 +356,7 @@ impl Component for SettingsUi {
             "overlays" => "Choose when and where desktop names appear.",
             "hotkeys" => "Move between desktops without leaving the keyboard.",
             "advanced" => "Fine-tune your setup and manage configuration.",
+            "about" => "A little more clarity for your Windows desktops.",
             _ => "Make your virtual desktops feel like home.",
         };
         let body = match self.page.as_str() {
@@ -241,15 +364,34 @@ impl Component for SettingsUi {
             "overlays" => self.overlays(context),
             "hotkeys" => self.hotkeys(context),
             "advanced" => self.advanced(context),
+            "about" => self.about(context),
             _ => self.general(context),
         };
-        let content=ScrollViewer::new().horizontal_scroll_bar_visibility(ScrollBarVisibility::Disabled).content(
-            StackPanel::new().spacing(20.).margin(Thickness::new(28.,20.,32.,32.)).max_width(920.).horizontal_alignment(HorizontalAlignment::Stretch).children((
-                StackPanel::new().spacing(8.).children((TextBlock::new().text(title).font_size(28.).font_weight(FontWeight::SEMI_BOLD),description_text(description))),
-                InfoBar::new().is_open(!self.error.is_empty()).severity(InfoBarSeverity::Error).title("Change wasn't saved").message(&self.error).on_closed(context.callback(|()|Message::Dismiss)),
-                body,
-                TextBlock::new().text("Toggles and choices save automatically. Text fields use Save. Closing Settings keeps the helper running.").font_size(12.).opacity(0.65).text_wrapping(TextWrapping::Wrap)
-            )));
+        let content = ScrollViewer::new()
+            .horizontal_scroll_bar_visibility(ScrollBarVisibility::Disabled)
+            .content(
+                StackPanel::new()
+                    .spacing(20.)
+                    .margin(Thickness::new(28., 20., 32., 32.))
+                    .max_width(920.)
+                    .horizontal_alignment(HorizontalAlignment::Stretch)
+                    .children((
+                        StackPanel::new().spacing(8.).children((
+                            TextBlock::new()
+                                .text(title)
+                                .font_size(28.)
+                                .font_weight(FontWeight::SEMI_BOLD),
+                            description_text(description),
+                        )),
+                        InfoBar::new()
+                            .is_open(!self.error.is_empty())
+                            .severity(InfoBarSeverity::Error)
+                            .title("Change wasn't saved")
+                            .message(&self.error)
+                            .on_closed(context.callback(|()| Message::Dismiss)),
+                        body,
+                    )),
+            );
         NavigationView::new()
             .open_pane_length(240.)
             .pane_display_mode(if self.narrow {
@@ -285,11 +427,7 @@ impl SettingsUi {
     fn commit(&mut self, candidate: Settings) -> bool {
         match super::settings_process::publish(&candidate, self.parent as HWND) {
             Ok(()) => {
-                self.settings = candidate;
-                self.tray_preview.render(&self.settings);
-                super::settings_process::update_caption(&self.settings);
-                self.advanced = config_text(&self.settings);
-                self.error.clear();
+                self.accept(candidate);
                 true
             }
             Err(e) => {
@@ -298,54 +436,167 @@ impl SettingsUi {
             }
         }
     }
+    fn accept(&mut self, candidate: Settings) {
+        if switch_preview_changed(&self.settings, &candidate) {
+            self.cancel_auto_preview();
+            self.preview.clear();
+            self.sender
+                .send(Message::SchedulePreview(self.preview_generation));
+        }
+        self.settings = candidate;
+        self.tray_preview.render(&self.settings);
+        super::settings_process::update_caption(&self.settings);
+        if !self.advanced_dirty {
+            self.advanced = config_text(&self.settings);
+        }
+        self.error.clear();
+    }
+    fn cancel_auto_preview(&mut self) {
+        self.preview_generation += 1;
+        if let Some(task) = self.pending_preview.take() {
+            task.cancel();
+        }
+    }
+    fn schedule(&mut self, context: &ComponentContext<Self>) {
+        if let Some(task) = self.pending.take() {
+            task.cancel();
+        }
+        self.generation += 1;
+        let generation = self.generation;
+        self.pending = Some(context.spawn_background(move |_| {
+            std::thread::sleep(std::time::Duration::from_millis(600));
+            Message::Flush(generation)
+        }));
+    }
+    fn flush(&mut self) {
+        if let Some(task) = self.pending.take() {
+            task.cancel();
+        }
+        if !self.advanced_dirty && self.edits.is_empty() {
+            return;
+        }
+        let mut candidate = self.settings.clone();
+        if self.advanced_dirty {
+            match crate::settings::parse(&self.advanced) {
+                Ok(config) => candidate.config = config,
+                Err(error) => {
+                    self.error = error;
+                    return;
+                }
+            }
+        }
+        for (key, value) in &self.edits {
+            candidate.set(key, value.clone());
+        }
+        if self.commit(candidate) {
+            self.edits.clear();
+            self.advanced_dirty = false;
+        }
+    }
     fn enabled(&self, key: &str) -> bool {
-        !self.settings.arguments.contains_key(key)
+        !self.settings.arguments.contains_key(key) && self.active(key)
+    }
+    fn active(&self, key: &str) -> bool {
+        if key == "feature.showDesktopNumberInIconTray.clickToOpenTaskView" {
+            return self.settings.bool("feature.showDesktopNumberInIconTray")
+                || self.settings.bool("feature.showDesktopNameInIconTray");
+        }
+        let parent = if key.starts_with("theme.overlay.") {
+            Some("feature.showDesktopSwitchOverlay")
+        } else if key.starts_with("theme.status.") {
+            Some("feature.showDesktopStatusOverlay")
+        } else {
+            [
+                "feature.showPrevNextIcons",
+                "feature.showDesktopSwitchOverlay",
+                "feature.showDesktopStatusOverlay",
+                "feature.useHotKeyToJumpToDesktopNumber",
+                "feature.useHotKeyToJumpToPreviousDesktop",
+                "feature.useHotKeyToSwitchDesktopForward",
+                "feature.useHotKeyToSwitchDesktopBackward",
+            ]
+            .into_iter()
+            .find(|p| key.strip_prefix(p).is_some_and(|s| s.starts_with('.')))
+        };
+        parent.is_none_or(|key| self.settings.bool(key))
+    }
+    fn managed(&self, keys: &[&str], supported: bool, control: View) -> View {
+        let overridden = keys
+            .iter()
+            .any(|key| self.settings.arguments.contains_key(*key));
+        if !overridden && supported {
+            return control;
+        }
+        let values = keys
+            .iter()
+            .map(|key| format!("{key}: {}", self.settings.get(key)))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let reset_keys = keys
+            .iter()
+            .map(|key| (*key).to_string())
+            .collect::<Vec<_>>();
+        StackPanel::new().spacing(4.).children((
+            control,
+            Border::new().corner_radius(8.).background(ThemeBrush::CardBackground).content(
+                Grid::new().columns([GridLength::STAR, GridLength::Auto]).children((
+                    InfoBar::new().grid_column(0).is_open(true).is_closable(false).severity(InfoBarSeverity::Informational)
+                        .title(if overridden { "Set by command-line options" } else { "Custom configuration" })
+                        .message(format!("{}\n{values}", if overridden { "Reset restores the default for this session. Launch options apply again after restarting." } else { "Edit this value in Advanced, or reset it to use the options here." })),
+                    Button::new().grid_column(1).margin(16.).vertical_alignment(VerticalAlignment::Center)
+                        .automation_name("Reset to default").on_click(self.sender.callback(move |()| Message::Reset(reset_keys.clone())))
+                        .content("Reset")
+                ))
+            )
+        ))
     }
     fn row(&self, icon: &str, title: &str, description: &str, key: &str, control: View) -> View {
-        let locked = !key.is_empty() && !self.enabled(key);
-        let description = if locked {
-            format!("{description} Set by a command-line override.")
-        } else {
-            description.into()
-        };
+        let is_toggle = DEFAULTS
+            .iter()
+            .any(|(name, value)| *name == key && (*value == "true" || *value == "false"));
+        let stacked = self.narrow && !is_toggle;
         let controls = Border::new()
-            .grid_column(if self.narrow { 1 } else { 2 })
-            .grid_row(i32::from(self.narrow))
-            .margin(if self.narrow {
+            .grid_column(if stacked { 1 } else { 2 })
+            .grid_row(i32::from(stacked))
+            .margin(if stacked {
                 Thickness::new(0., 12., 0., 0.)
             } else {
                 Thickness::new(16., 0., 0., 0.)
             })
             .vertical_alignment(VerticalAlignment::Center)
-            .horizontal_alignment(if self.narrow {
+            .horizontal_alignment(if stacked {
                 HorizontalAlignment::Left
             } else {
                 HorizontalAlignment::Right
             })
             .content(control);
-        card(
-            Grid::new()
-                .columns([GridLength::Pixel(32.), GridLength::STAR, GridLength::Auto])
-                .rows([GridLength::Auto, GridLength::Auto])
-                .column_spacing(16.)
-                .children((
-                    FontIcon::new()
-                        .glyph(icon)
-                        .grid_column(0)
-                        .vertical_alignment(VerticalAlignment::Center),
-                    StackPanel::new()
-                        .grid_column(1)
-                        .spacing(4.)
-                        .vertical_alignment(VerticalAlignment::Center)
-                        .children((
-                            TextBlock::new()
-                                .text(title)
-                                .font_size(14.)
-                                .text_wrapping(TextWrapping::Wrap),
-                            description_text(&description),
-                        )),
-                    controls,
-                )),
+        self.managed(
+            &[key],
+            true,
+            card(
+                Grid::new()
+                    .columns([GridLength::Pixel(32.), GridLength::STAR, GridLength::Auto])
+                    .rows([GridLength::Auto, GridLength::Auto])
+                    .column_spacing(16.)
+                    .children((
+                        FontIcon::new()
+                            .glyph(icon)
+                            .grid_column(0)
+                            .vertical_alignment(VerticalAlignment::Center),
+                        StackPanel::new()
+                            .grid_column(1)
+                            .spacing(4.)
+                            .vertical_alignment(VerticalAlignment::Center)
+                            .children((
+                                TextBlock::new()
+                                    .text(title)
+                                    .font_size(14.)
+                                    .text_wrapping(TextWrapping::Wrap),
+                                description_text(description),
+                            )),
+                        controls,
+                    )),
+            ),
         )
     }
     fn toggle(
@@ -361,7 +612,7 @@ impl SettingsUi {
             title,
             description,
             key,
-            ToggleSwitch::new()
+            switch()
                 .is_on(self.settings.bool(key))
                 .is_enabled(self.enabled(key))
                 .on_toggled(c.callback(move |v: bool| Message::Set(key, v.to_string())))
@@ -378,36 +629,32 @@ impl SettingsUi {
         description: &str,
         choices: &'static [(&'static str, &'static str)],
     ) -> View {
-        // Preserve custom modifier combinations and legacy values in the picker.
-        let mut options: Vec<(String, String)> = choices
+        let selected = choices
             .iter()
-            .map(|(v, label)| (v.to_string(), label.to_string()))
-            .collect();
-        let selected = options
-            .iter()
-            .position(|(v, _)| v == self.settings.get(key))
-            .unwrap_or_else(|| {
-                options.push((self.settings.get(key).into(), self.settings.get(key).into()));
-                options.len() - 1
-            });
-        self.row(
-            icon,
-            title,
-            description,
-            key,
-            ComboBox::new()
-                .width(210.)
-                .items_source(options.iter().map(|(_, label)| label.clone()))
-                .selected_index(selected)
-                .is_enabled(self.enabled(key))
-                .automation_name(title)
-                .on_selection_changed(c.callback(move |index: Option<usize>| {
-                    index
-                        .and_then(|i| options.get(i))
-                        .map(|(v, _)| Message::Set(key, v.clone()))
-                        .unwrap_or(Message::Page(None))
-                }))
-                .into(),
+            .position(|(value, _)| *value == self.settings.get(key));
+        self.managed(
+            &[key],
+            selected.is_some(),
+            self.row(
+                icon,
+                title,
+                description,
+                "",
+                ComboBox::new()
+                    .width(210.)
+                    .items_source(choices.iter().map(|(_, label)| *label))
+                    .selected_index(selected)
+                    .placeholder_text("Custom")
+                    .is_enabled(self.enabled(key) && selected.is_some())
+                    .automation_name(title)
+                    .on_selection_changed(c.callback(move |index: Option<usize>| {
+                        index
+                            .and_then(|i| choices.get(i))
+                            .map(|(value, _)| Message::Set(key, (*value).into()))
+                            .unwrap_or(Message::Page(None))
+                    }))
+                    .into(),
+            ),
         )
     }
     fn number(
@@ -444,8 +691,6 @@ impl SettingsUi {
         title: &str,
         description: &str,
     ) -> View {
-        let edit_key = key.to_string();
-        let save_key = edit_key.clone();
         let value = self
             .edits
             .get(key)
@@ -456,21 +701,233 @@ impl SettingsUi {
             title,
             description,
             key,
-            StackPanel::new()
-                .orientation(Orientation::Horizontal)
-                .spacing(8.)
-                .children((
-                    TextBox::new()
-                        .width(160.)
-                        .text(value)
-                        .is_enabled(self.enabled(key))
-                        .automation_name(title)
-                        .on_text_changed(c.callback(move |v| Message::Edit(edit_key.clone(), v))),
-                    Button::new()
-                        .is_enabled(self.enabled(key) && self.edits.contains_key(key))
-                        .on_click(c.callback(move |()| Message::Save(save_key.clone())))
-                        .content("Save"),
+            TextBox::new()
+                .width(210.)
+                .text(value)
+                .is_enabled(self.enabled(key))
+                .automation_name(title)
+                .on_text_changed(c.callback(move |value| Message::Edit(key.into(), value)))
+                .into(),
+        )
+    }
+    fn presets(&self, c: &ViewContext<Self>, keys: &'static [&'static str], title: &str) -> View {
+        let selected = crate::settings::preset_index(&self.settings, keys);
+        self.managed(
+            keys,
+            selected.is_some(),
+            self.row(
+                "\u{E8A4}",
+                title,
+                "",
+                "",
+                ComboBox::new()
+                    .width(210.)
+                    .items_source(["Small", "Medium", "Large"])
+                    .selected_index(selected)
+                    .placeholder_text("Custom")
+                    .is_enabled(selected.is_some() && keys.iter().all(|key| self.enabled(key)))
+                    .automation_name(title)
+                    .on_selection_changed(c.callback(move |index: Option<usize>| {
+                        index
+                            .and_then(|i| crate::settings::SIZES.get(i))
+                            .map(|value| {
+                                Message::SetMany(
+                                    keys.iter().map(|key| (*key, (*value).into())).collect(),
+                                )
+                            })
+                            .unwrap_or(Message::Page(None))
+                    }))
+                    .into(),
+            ),
+        )
+    }
+    fn overlay_size(
+        &self,
+        c: &ViewContext<Self>,
+        dimensions: &'static [&'static str],
+        custom_key: &'static str,
+    ) -> View {
+        let keys = [dimensions[0], dimensions[1], custom_key];
+        let selected = if self.settings.bool(custom_key) {
+            3
+        } else {
+            crate::settings::preset_index(&self.settings, dimensions).unwrap_or(3)
+        };
+        let numeric = dimensions
+            .iter()
+            .map(|key| (*key, format!("{:.0}", self.settings.number(key))))
+            .collect::<Vec<_>>();
+        let picker = ComboBox::new()
+            .width(if selected == 3 { 140. } else { 210. })
+            .items_source(["Small", "Medium", "Large", "Custom"])
+            .selected_index(Some(selected))
+            .is_enabled(keys.iter().all(|key| self.enabled(key)))
+            .automation_name("Size")
+            .on_selection_changed(c.callback(move |index: Option<usize>| {
+                let Some(index) = index.filter(|i| *i != selected && *i <= 3) else {
+                    return Message::Page(None);
+                };
+                let mut values = if index == 3 {
+                    numeric.clone()
+                } else {
+                    dimensions
+                        .iter()
+                        .map(|key| (*key, crate::settings::SIZES[index].into()))
+                        .collect()
+                };
+                values.push((custom_key, (index == 3).to_string()));
+                Message::SetMany(values)
+            }));
+        let mut controls = vec![picker.into()];
+        if selected == 3 {
+            controls.push(
+                Button::new()
+                    .width(62.)
+                    .is_enabled(keys.iter().all(|key| self.enabled(key)))
+                    .automation_name("Reset size")
+                    .on_click(c.callback(move |()| {
+                        Message::Reset(keys.iter().map(|key| (*key).into()).collect())
+                    }))
+                    .content("Reset"),
+            );
+        }
+        let mut rows = vec![self.managed(
+            &keys,
+            true,
+            self.row(
+                "\u{E8A4}",
+                "Size",
+                "",
+                "",
+                StackPanel::new()
+                    .orientation(Orientation::Horizontal)
+                    .spacing(8.)
+                    .keyed_children(controls.into_iter().enumerate().map(|(i, v)| (i as u64, v))),
+            ),
+        )];
+        if selected == 3 {
+            for (key, title, maximum) in [
+                (dimensions[0], "Width", 1920_f64),
+                (dimensions[1], "Height", 1080_f64),
+            ] {
+                let value = self.settings.number(key);
+                let enabled = self.enabled(key) && self.enabled(custom_key);
+                rows.push(
+                    self.row(
+                        "\u{E8A4}",
+                        title,
+                        "",
+                        key,
+                        StackPanel::new().width(210.).spacing(4.).children((
+                            TextBlock::new()
+                                .text(format!("{value:.0} px"))
+                                .opacity(if enabled { 1. } else { 0.4 })
+                                .horizontal_alignment(HorizontalAlignment::Right),
+                            Slider::new()
+                                .minimum(1.)
+                                .maximum(maximum.max(value))
+                                .step_frequency(1.)
+                                .value(value)
+                                .is_enabled(enabled)
+                                .automation_name(title)
+                                .on_value_changed(c.callback(move |value| {
+                                    Message::SetMany(vec![
+                                        (key, format!("{value:.0}")),
+                                        (custom_key, "true".into()),
+                                    ])
+                                })),
+                        )),
+                    ),
+                );
+            }
+        }
+        StackPanel::new()
+            .spacing(4.)
+            .keyed_children(rows.into_iter().enumerate().map(|(i, v)| (i as u64, v)))
+    }
+    fn distance(&self, c: &ViewContext<Self>, key: &'static str, position: &str) -> View {
+        let value = self.settings.number(key);
+        let supported = (0. ..=200.).contains(&value);
+        let relevant = self.settings.get(position) != "middlecenter";
+        let enabled = self.enabled(key) && supported && relevant;
+        self.managed(
+            &[key],
+            supported,
+            self.row(
+                "\u{E8A9}",
+                "Distance from screen edge",
+                if relevant {
+                    ""
+                } else {
+                    "Not used with the Center position."
+                },
+                "",
+                StackPanel::new().width(210.).spacing(4.).children((
+                    TextBlock::new()
+                        .text(format!("{value:.0} px"))
+                        .opacity(if enabled { 1. } else { 0.4 })
+                        .horizontal_alignment(HorizontalAlignment::Right),
+                    Slider::new()
+                        .minimum(0.)
+                        .maximum(200.)
+                        .step_frequency(1.)
+                        .value(value.clamp(0., 200.))
+                        .is_enabled(enabled)
+                        .automation_name("Distance from screen edge")
+                        .on_value_changed(
+                            c.callback(move |value| Message::Set(key, format!("{value:.0}"))),
+                        ),
                 )),
+            ),
+        )
+    }
+    fn symbols(&self, c: &ViewContext<Self>) -> View {
+        const KEYS: [&str; 2] = [
+            "feature.showPrevNextIcons.prevChar",
+            "feature.showPrevNextIcons.nextChar",
+        ];
+        const PAIRS: [(&str, &str, &str); 5] = [
+            ("\u{2039}", "\u{203a}", "\u{2039}  \u{203a}    Chevrons"),
+            ("\u{2190}", "\u{2192}", "\u{2190}  \u{2192}    Arrows"),
+            ("\u{25c0}", "\u{25b6}", "\u{25c0}  \u{25b6}    Triangles"),
+            (
+                "\u{00ab}",
+                "\u{00bb}",
+                "\u{00ab}  \u{00bb}    Double chevrons",
+            ),
+            ("<", ">", "<  >    Angles"),
+        ];
+        let selected = PAIRS.iter().position(|(prev, next, _)| {
+            self.settings.get(KEYS[0]) == *prev && self.settings.get(KEYS[1]) == *next
+        });
+        self.managed(
+            &KEYS,
+            selected.is_some(),
+            self.row(
+                "\u{E8AB}",
+                "Previous/next symbol",
+                "Choose a matching pair of navigation symbols.",
+                "",
+                ComboBox::new()
+                    .width(210.)
+                    .items_source(PAIRS.iter().map(|p| p.2))
+                    .selected_index(selected)
+                    .placeholder_text("Custom")
+                    .is_enabled(selected.is_some() && KEYS.iter().all(|key| self.enabled(key)))
+                    .automation_name("Previous/next symbol")
+                    .on_selection_changed(c.callback(|index: Option<usize>| {
+                        index
+                            .and_then(|i| PAIRS.get(i))
+                            .map(|(prev, next, _)| {
+                                Message::SetMany(vec![
+                                    (KEYS[0], (*prev).into()),
+                                    (KEYS[1], (*next).into()),
+                                ])
+                            })
+                            .unwrap_or(Message::Page(None))
+                    }))
+                    .into(),
+            ),
         )
     }
     fn general(&self, c: &ViewContext<Self>) -> View {
@@ -494,7 +951,7 @@ impl SettingsUi {
             )
         };
         section(vec![
-            self.hero(),
+            card(self.tray_preview.desktop_view(&self.settings)),
             group_title("Personalization"),
             self.choice(
                 c,
@@ -562,175 +1019,154 @@ impl SettingsUi {
                 "Hide unavailable arrows",
                 "Hide Previous on the first desktop and Next on the last.",
             ),
-            group_title("Appearance"),
-            self.toggle(
-                c,
-                "theme.icons.transparentBackground",
-                "\u{E790}",
-                "Transparent background",
-                "Blend into the taskbar without a black or white square.",
-            ),
-            self.text_setting(
-                c,
-                "feature.showPrevNextIcons.prevChar",
-                "Previous symbol",
-                "Choose the character used for the previous arrow.",
-            ),
-            self.text_setting(
-                c,
-                "feature.showPrevNextIcons.nextChar",
-                "Next symbol",
-                "Choose the character used for the next arrow.",
-            ),
+            self.symbols(c),
         ])
     }
     fn overlays(&self, c: &ViewContext<Self>) -> View {
-        section(vec![
-            self.hero(),
-            group_title("When switching desktops"),
-            self.toggle(
-                c,
-                "feature.showDesktopSwitchOverlay",
-                "\u{E8BD}",
-                "Desktop switch notification",
-                "Briefly show the name of the desktop you switch to.",
-            ),
-            self.choice(
-                c,
-                "feature.showDesktopSwitchOverlay.position",
-                "\u{E8A9}",
-                "Position",
-                "Place the notification where it works best for you.",
-                &POS,
-            ),
-            self.number(
-                c,
-                "feature.showDesktopSwitchOverlay.duration",
-                "Display time",
-                "Milliseconds. Set to 0 to keep it visible until the next switch.",
-                0.,
-                60000.,
-            ),
-            self.toggle(
-                c,
-                "feature.showDesktopSwitchOverlay.showOnAllMonitors",
-                "\u{E7F4}",
-                "Show on every monitor",
-                "Display the notification across your screens.",
-            ),
-            self.toggle(
-                c,
-                "feature.showDesktopSwitchOverlay.animate",
-                "\u{E768}",
-                "Animation",
-                "Fade the notification in smoothly.",
-            ),
-            self.toggle(
-                c,
-                "feature.showDesktopSwitchOverlay.translucent",
-                "\u{E790}",
-                "Translucent notification",
-                "Let the desktop show through the notification.",
-            ),
-            self.row(
-                "\u{E768}",
-                "Try the notification",
-                "Preview your current appearance and placement.",
-                "",
-                Button::new()
-                    .on_click(c.callback(|()| Message::Preview(false)))
-                    .content("Preview"),
-            ),
-            group_title("Always-visible desktop name"),
-            self.toggle(
-                c,
-                "feature.showDesktopStatusOverlay",
-                "\u{E7B3}",
-                "Desktop status label",
-                "Keep a small desktop name on screen.",
-            ),
-            self.choice(
-                c,
-                "feature.showDesktopStatusOverlay.position",
-                "\u{E8A9}",
-                "Label position",
-                "Choose a screen edge or corner.",
-                &POS,
-            ),
-            self.toggle(
-                c,
-                "feature.showDesktopStatusOverlay.showOnAllMonitors",
-                "\u{E7F4}",
-                "Label on every monitor",
-                "Show the permanent label on all screens.",
-            ),
-            self.row(
-                "\u{E768}",
-                "Try the status label",
-                "Show a temporary preview of the permanent label.",
-                "",
-                Button::new()
-                    .on_click(c.callback(|()| Message::Preview(true)))
-                    .content("Preview"),
-            ),
-            group_title("Size and text"),
-            self.number(
-                c,
-                "theme.overlay.width",
-                "Notification width",
-                "Device-independent pixels; scales with each monitor.",
-                100.,
-                1600.,
-            ),
-            self.number(
-                c,
-                "theme.overlay.height",
-                "Notification height",
-                "Device-independent pixels.",
-                40.,
-                800.,
-            ),
-            self.number(
-                c,
-                "theme.overlay.fontSize",
-                "Notification text size",
-                "Points.",
-                8.,
-                96.,
-            ),
-            self.number(
-                c,
-                "theme.status.width",
-                "Status label width",
-                "Device-independent pixels.",
-                80.,
-                1000.,
-            ),
-            self.number(
-                c,
-                "theme.status.height",
-                "Status label height",
-                "Device-independent pixels.",
-                20.,
-                200.,
-            ),
-            self.number(
-                c,
-                "theme.status.fontSize",
-                "Status text size",
-                "Points.",
-                8.,
-                48.,
-            ),
-            self.number(
-                c,
-                "theme.status.offset",
-                "Distance from screen edge",
-                "Device-independent pixels.",
-                0.,
-                200.,
-            ),
-        ])
+        let mut rows = vec![card(self.tray_preview.desktop_view(&self.settings))];
+        for status in [false, true] {
+            let (
+                title,
+                feature,
+                position,
+                all_monitors,
+                animate,
+                translucent,
+                border,
+                corners,
+                dimensions,
+                text,
+                offset,
+            ): (
+                _,
+                _,
+                _,
+                _,
+                _,
+                _,
+                _,
+                _,
+                &'static [&'static str],
+                &'static [&'static str],
+                _,
+            ) = if status {
+                (
+                    "Always-visible desktop name",
+                    "feature.showDesktopStatusOverlay",
+                    "feature.showDesktopStatusOverlay.position",
+                    "feature.showDesktopStatusOverlay.showOnAllMonitors",
+                    "feature.showDesktopStatusOverlay.animate",
+                    "feature.showDesktopStatusOverlay.translucent",
+                    "theme.status.border",
+                    "theme.status.roundedCorners",
+                    &["theme.status.width", "theme.status.height"],
+                    &["theme.status.fontSize"],
+                    "theme.status.offset",
+                )
+            } else {
+                (
+                    "When switching desktops",
+                    "feature.showDesktopSwitchOverlay",
+                    "feature.showDesktopSwitchOverlay.position",
+                    "feature.showDesktopSwitchOverlay.showOnAllMonitors",
+                    "feature.showDesktopSwitchOverlay.animate",
+                    "feature.showDesktopSwitchOverlay.translucent",
+                    "theme.overlay.border",
+                    "theme.overlay.roundedCorners",
+                    &["theme.overlay.width", "theme.overlay.height"],
+                    &["theme.overlay.fontSize"],
+                    "theme.overlay.offset",
+                )
+            };
+            rows.extend([
+                group_title(title),
+                self.toggle(
+                    c,
+                    feature,
+                    "\u{E7F4}",
+                    if status {
+                        "Show desktop name"
+                    } else {
+                        "Show desktop notification"
+                    },
+                    if status {
+                        "Keep the current desktop name visible."
+                    } else {
+                        "Briefly show the desktop name after switching."
+                    },
+                ),
+                self.overlay_size(
+                    c,
+                    dimensions,
+                    if status {
+                        "theme.status.customSize"
+                    } else {
+                        "theme.overlay.customSize"
+                    },
+                ),
+                self.presets(c, text, "Text size"),
+                self.choice(c, position, "\u{E8A9}", "Position", "", &POS),
+                self.distance(c, offset, position),
+                self.toggle(
+                    c,
+                    border,
+                    "\u{E739}",
+                    "Border",
+                    "Outline the desktop label.",
+                ),
+                self.toggle(
+                    c,
+                    corners,
+                    "\u{E7C1}",
+                    "Rounded corners",
+                    "Soften the edges of the label.",
+                ),
+                self.toggle(
+                    c,
+                    translucent,
+                    "\u{E790}",
+                    "Translucent",
+                    "Let the desktop show through.",
+                ),
+                self.toggle(
+                    c,
+                    animate,
+                    "\u{E768}",
+                    "Animation",
+                    "Fade the label in smoothly.",
+                ),
+                self.toggle(
+                    c,
+                    all_monitors,
+                    "\u{E7F4}",
+                    "Show on every monitor",
+                    "Use the same appearance across your screens.",
+                ),
+            ]);
+            if !status {
+                rows.push(self.number(
+                    c,
+                    "feature.showDesktopSwitchOverlay.duration",
+                    "Display time",
+                    "Milliseconds. Use 0 to keep visible until the next switch.",
+                    0.,
+                    60000.,
+                ));
+            }
+            rows.push(
+                self.row(
+                    "\u{E768}",
+                    "Preview on desktop",
+                    "Try the current appearance and placement.",
+                    "",
+                    Button::new()
+                        .is_enabled(self.settings.bool(feature))
+                        .on_click(c.callback(move |()| Message::Preview(status)))
+                        .content("Preview"),
+                ),
+            );
+        }
+        section(rows)
     }
     fn shortcut(
         &self,
@@ -760,7 +1196,7 @@ impl SettingsUi {
                     } else {
                         self.settings.get(key)
                     }),
-                ToggleSwitch::new()
+                switch()
                     .is_on(self.settings.bool(enabled))
                     .is_enabled(self.enabled(enabled))
                     .automation_name(format!("Enable {title}"))
@@ -774,7 +1210,6 @@ impl SettingsUi {
         group_title("Switch desktops"),self.shortcut(c,"feature.useHotKeyToJumpToPreviousDesktop","feature.useHotKeyToJumpToPreviousDesktop.hotkey","Most recent desktop","Toggle between the two desktops you used most recently."),self.shortcut(c,"feature.useHotKeyToSwitchDesktopForward","feature.useHotKeyToSwitchDesktopForward.hotkey","Next desktop","Move one desktop to the right."),self.shortcut(c,"feature.useHotKeyToSwitchDesktopBackward","feature.useHotKeyToSwitchDesktopBackward.hotkey","Previous desktop","Move one desktop to the left."),
         group_title("Jump to a desktop number"),self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber","\u{E8EF}","Number shortcuts","Jump directly to desktops 1–9."),self.choice(c,"feature.useHotKeyToJumpToDesktopNumber.hotkey","\u{E765}","Modifier keys","Hold these keys while pressing a desktop number.",&[("Alt","Alt"),("Ctrl + Alt","Ctrl + Alt"),("Ctrl + Shift","Ctrl + Shift"),("Win + Alt","Win + Alt"),("Ctrl + Alt + Shift","Ctrl + Alt + Shift")]),
         self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber.useDigits","\u{E765}","Number row","Use the 1–9 keys above the letters."),self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits","\u{E765}","Number pad","Use the 1–9 keys on the number pad."),self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys","\u{E765}","Function keys","Use F1–F9 to select the corresponding desktop."),
-        description_text("Custom hotkeys and actions are preserved. Edit them in Advanced → Configuration editor.")
     ])
     }
     fn advanced(&self, c: &ViewContext<Self>) -> View {
@@ -807,40 +1242,90 @@ impl SettingsUi {
                 "The font used for the permanent label.",
             ),
             Expander::new()
+                .is_expanded(self.editor_open)
+                .on_is_expanded_changed(c.callback(Message::Editor))
                 .horizontal_alignment(HorizontalAlignment::Stretch)
                 .slots([
                     SlotView::new(
                         ExpanderSlot::Header,
                         StackPanel::new().spacing(4.).children((
                             TextBlock::new().text("Configuration editor"),
-                            description_text(
-                                "All settings, colors and custom hotkeys. Changes here need Save.",
-                            ),
+                            description_text("All settings, colors and custom hotkeys."),
                         )),
                     ),
                     SlotView::new(
                         ExpanderSlot::Content,
-                        StackPanel::new().spacing(12.).children((
-                            TextBox::new()
-                                .text(&self.advanced)
-                                .accepts_return(true)
-                                .text_wrapping(TextWrapping::NoWrap)
-                                .height(350.)
-                                .automation_name("Configuration editor")
-                                .on_text_changed(c.callback(Message::Advanced)),
-                            Button::new()
-                                .style(ButtonStyle::Accent)
-                                .horizontal_alignment(HorizontalAlignment::Left)
-                                .on_click(c.callback(|()| Message::SaveAdvanced))
-                                .content("Save configuration"),
-                        )),
+                        StackPanel::new().spacing(12.).children((TextBox::new()
+                            .text(if self.editor_ready {
+                                &self.advanced
+                            } else {
+                                ""
+                            })
+                            .width(if self.narrow { 450. } else { 650. })
+                            .accepts_return(true)
+                            .text_wrapping(TextWrapping::NoWrap)
+                            .height(350.)
+                            .automation_name("Configuration editor")
+                            .on_text_changed(c.callback(Message::Advanced)),)),
                     ),
                 ]),
+        ])
+    }
+    fn about(&self, c: &ViewContext<Self>) -> View {
+        let link = |title: &str, url: &'static str| {
+            Button::new()
+                .on_click(c.callback(move |()| Message::Link(url)))
+                .content(title)
+        };
+        section(vec![
+            card(StackPanel::new().spacing(16.).children((
+                Border::new().width(80.).height(80.).corner_radius(16.).background(ThemeBrush::Accent).horizontal_alignment(HorizontalAlignment::Left)
+                    .content(Canvas::new().width(48.).height(40.).children((
+                        Border::new().canvas_left(0.).canvas_top(0.).width(36.).height(28.).corner_radius(3.).border_brush(Color::rgb(255,255,255)).border_thickness(2.),
+                        Border::new().canvas_left(12.).canvas_top(12.).width(36.).height(28.).corner_radius(3.).background(ThemeBrush::Accent).border_brush(Color::rgb(255,255,255)).border_thickness(2.)
+                    ))),
+                TextBlock::new().text("Windows Virtual Desktop Helper").font_size(24.).font_weight(FontWeight::SEMI_BOLD).text_wrapping(TextWrapping::Wrap),
+                description_text(&format!("Version {}  \u{00b7}  by Dan Krusi and contributors", env!("CARGO_PKG_VERSION"))),
+                TextBlock::new().text("Know which desktop you're on. Move between workspaces with tray icons, desktop labels and keyboard shortcuts.").text_wrapping(TextWrapping::Wrap),
+                StackPanel::new().orientation(Orientation::Horizontal).spacing(8.).children((link("View on GitHub", "https://github.com/dankrusi/WindowsVirtualDesktopHelper"), link("Donate", "https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6")))
+            ))),
+            group_title("Support and diagnostics"),
+            self.row("\u{E119}", "Contact", "dan@dankrusi.com", "", link("Email Dan", "mailto:dan@dankrusi.com")),
+            self.row("\u{E8A5}", "Report an issue", "Share a bug report or suggest an improvement.", "", link("GitHub issues", "https://github.com/dankrusi/WindowsVirtualDesktopHelper/issues")),
+            self.row("\u{E9D9}", "Application log", "View recent activity and connection errors.", "", Button::new().on_click(c.callback(|()| Message::Log)).content("Show log")),
+            self.row("\u{E713}", "Configuration", "Inspect settings, colors and custom shortcuts.", "", Button::new().on_click(c.callback(|()| Message::Page(Some("advanced".into())))).content("Show configuration")),
+            group_title("Open source"),
+            card(StackPanel::new().spacing(8.).children((
+                TextBlock::new().text("Made with Rust and Microsoft WinUI 3").font_weight(FontWeight::SEMI_BOLD),
+                description_text("GPL-3.0. VirtualDesktopAPI: MIT. Windows bindings and windows-reactor: MIT / Apache-2.0. rustc-hash: Apache-2.0 / MIT. uuid: MIT. sha1_smol: BSD-3-Clause."),
+                link("License and source", "https://github.com/dankrusi/WindowsVirtualDesktopHelper")
+            )))
         ])
     }
     fn hero(&self) -> View {
         card(self.tray_preview.view())
     }
+}
+impl Drop for SettingsUi {
+    fn drop(&mut self) {
+        self.cancel_auto_preview();
+        self.flush();
+    }
+}
+fn switch_preview_changed(before: &Settings, after: &Settings) -> bool {
+    DEFAULTS.iter().any(|(key, _)| {
+        (*key == "feature.showDesktopSwitchOverlay"
+            || key.starts_with("feature.showDesktopSwitchOverlay.")
+            || (key.starts_with("theme.overlay.") && *key != "theme.overlay.customSize"))
+            && before.get(key) != after.get(key)
+    })
+}
+fn switch() -> ToggleSwitch {
+    // Constrain WinUI's default On/Off content area to the actual switch track.
+    ToggleSwitch::new()
+        .min_width(40.)
+        .width(40.)
+        .horizontal_alignment(HorizontalAlignment::Right)
 }
 fn card(content: View) -> View {
     Border::new()
@@ -880,10 +1365,50 @@ fn config_text(settings: &Settings) -> String {
     values.extend(settings.config.clone());
     values
         .iter()
-        .map(|(k, v)| format!("{k}: {}\r\n", crate::settings::quote(v)))
+        .map(|(k, v)| format!("{k}: {}\n", crate::settings::quote(v)))
         .collect()
 }
 pub fn run() -> Result<(), String> {
     let settings = Settings::load()?;
     App::run_component::<SettingsUi>(settings).map_err(|e|format!("WinUI Settings could not start: {e}. Install Microsoft Windows App Runtime 2.4 or later."))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn automatic_preview_tracks_effective_switch_settings_only() {
+        let before = Settings {
+            config: BTreeMap::new(),
+            arguments: BTreeMap::new(),
+            path: Default::default(),
+        };
+        for (key, value, expected) in [
+            ("theme.overlay.width", "600", true),
+            ("theme.overlay.roundedCorners", "false", true),
+            (
+                "feature.showDesktopSwitchOverlay.position",
+                "topcenter",
+                true,
+            ),
+            ("feature.showDesktopSwitchOverlay.duration", "4000", true),
+            ("feature.showDesktopSwitchOverlay", "false", true),
+            ("theme.overlay.customSize", "true", false),
+            ("theme.status.width", "600", false),
+            ("feature.showDesktopStatusOverlay", "true", false),
+            ("theme.overlay.width", "480", false),
+        ] {
+            let mut after = before.clone();
+            after.set(key, value);
+            assert_eq!(switch_preview_changed(&before, &after), expected, "{key}");
+        }
+        let mut overridden = before.clone();
+        overridden
+            .arguments
+            .insert("theme.overlay.width".into(), "800".into());
+        let mut after = overridden.clone();
+        after.set("theme.overlay.width", "600");
+        assert!(!switch_preview_changed(&overridden, &after));
+    }
 }

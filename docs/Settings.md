@@ -4,7 +4,39 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 
 ## Settings Documentation
 
-(as of v2.0)
+(Rust / WinUI 3 version)
+
+### Size presets and overlay appearance
+
+The core accepts `"small"`, `"medium"`, and `"large"` in configuration files and command-line overrides. Existing numeric dimensions and fractional font sizes remain supported. Both overlay Size pickers offer Small, Medium, Large and Custom. Custom reveals independent width and height sliders with live numeric values; Reset returns both dimensions to Medium. The Custom choice persists across restarts, including when its dimensions happen to match a preset. Text size remains independent; custom font sizes show an information box with Reset to re-enable the picker. Command-line overrides can also be reset for the current run; the original launch arguments apply again after a full restart.
+
+| Key | Small | Medium | Large |
+| --- | ---: | ---: | ---: |
+| `theme.overlay.width` | 320 | 480 | 640 |
+| `theme.overlay.height` | 96 | 128 | 176 |
+| `theme.overlay.fontSize` | 16 | 20 | 28 |
+| `theme.status.width` | 180 | 250 | 340 |
+| `theme.status.height` | 32 | 40 | 56 |
+| `theme.status.fontSize` | 10 | 12 | 16 |
+
+Dimensions are device-independent pixels; text sizes are points. Each monitor's DPI determines the actual window size. Medium matches the existing defaults.
+
+`theme.overlay.customSize` and `theme.status.customSize` (both default `false`) remember an explicit Custom selection. They do not change rendering: width and height remain authoritative. Numeric combinations outside the presets automatically show Custom. Sliders normally cover 1–1920 DIP wide and 1–1080 DIP high; larger existing values extend the range and are preserved.
+
+```text
+theme.overlay.width: "large"
+theme.overlay.height: "large"
+theme.overlay.fontSize: "medium"
+theme.overlay.offset: 24
+theme.overlay.border: true
+theme.overlay.roundedCorners: true
+```
+
+Both `theme.overlay` and `theme.status` accept `offset` (default `0`), `border` (default `false`), and `roundedCorners` (default `true`, 8 DIP radius). Position and spacing use the monitor work area, keeping labels clear of the taskbar. Both `feature.showDesktopSwitchOverlay.translucent` and `feature.showDesktopStatusOverlay.translucent` use 60% opacity when enabled; disabling them makes the entire label opaque.
+
+The previous/next symbol picker updates both existing `prevChar` and `nextChar` settings together. Custom symbol pairs remain supported through configuration. Tray icons are transparent by default; the legacy `theme.icons.transparentBackground: false` setting remains available in configuration only.
+
+All UI changes save automatically. Changes to the switching-desktop overlay automatically preview on the desktop after 500 ms without further changes. The preview follows the configured display time; a display time of zero uses a temporary 2.2-second preview. Disabling the feature cancels pending previews and clears the current one. The Preview button is also available for both overlays. Invalid configuration edits keep the previous settings active and show an inline error. Command-line overrides are never written into the configuration file.
 
 ### Settings
 
@@ -21,17 +53,17 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | theme.icons.iconFG.dark | ``"white"`` |  |
 | theme.icons.iconBG.light | ``"white"`` |  |
 | theme.icons.iconFG.light | ``"black"`` |  |
-| theme.overlay.width | ``900`` | With width in pixels of the switch overlay. |
-| theme.overlay.height | ``430`` | With height in pixels of the switch overlay. |
+| theme.overlay.width | ``480`` | Width in device-independent pixels, or a size preset. |
+| theme.overlay.height | ``128`` | Height in device-independent pixels, or a size preset. |
 | theme.overlay.font | ``"Segoe UI Light"`` | Defines the font name to use for the switch overlay. |
-| theme.overlay.fontSize | ``30`` | Defines the font size to use for the switch overlay. |
+| theme.overlay.fontSize | ``20`` | Text size in points, or a size preset. |
 | theme.overlay.overlayBG.dark | ``"black"`` |  |
 | theme.overlay.overlayFG.dark | ``"white"`` |  |
 | theme.overlay.overlayBG.light | ``"black"`` |  |
 | theme.overlay.overlayFG.light | ``"white"`` |  |
 | theme.status.width | ``250`` | With width in pixels of the status overlay. |
 | theme.status.height | ``40`` | With height in pixels of the status overlay. |
-| theme.status.offset | ``0`` | With height in pixels of the status overlay. |
+| theme.status.offset | ``0`` | Distance from the work-area edge in device-independent pixels. |
 | theme.status.font | ``"Segoe UI Light"`` | Defines the font name to use for the status overlay. |
 | theme.status.fontSize | ``12`` | Defines the font size to use for the status overlay. |
 | theme.status.overlayBG.dark | ``"black"`` |  |

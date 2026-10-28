@@ -5,12 +5,14 @@ use std::process::{Child, Command};
 use windows_sys::Win32::System::DataExchange::COPYDATASTRUCT;
 use windows_sys::Win32::{Foundation::*, UI::WindowsAndMessaging::*};
 pub const SETTINGS_MESSAGE: usize = 0x57564448;
+pub const RESET_MESSAGE: usize = 0x57564449;
+pub const SHOW_ABOUT: u32 = WM_APP + 37;
 pub struct SettingsProcess(Child);
 impl SettingsProcess {
-    pub fn open(parent: HWND, settings: &Settings) -> Result<Self, String> {
+    pub fn open(parent: HWND, settings: &Settings, about: bool) -> Result<Self, String> {
         let mut command = Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
         for (k, v) in &settings.arguments {
-            if k != "ui-parent" && k != "settings-ui" {
+            if k != "ui-parent" && k != "settings-ui" && k != "ui-page" && k != "notify" {
                 command.arg(format!("--{k}")).arg(v);
             }
         }
@@ -18,13 +20,36 @@ impl SettingsProcess {
             .arg("--settings-ui")
             .arg("--ui-parent")
             .arg((parent as usize).to_string());
+        command
+            .arg("--ui-page")
+            .arg(if about { "about" } else { "general" });
         command.spawn().map(Self).map_err(|e| e.to_string())
     }
-    pub fn activate(&mut self) -> bool {
+    pub fn activate(&mut self, about: bool) -> bool {
         if !matches!(self.0.try_wait(), Ok(None)) {
             return false;
         }
         unsafe {
+            if about {
+                let mut observer = std::ptr::null_mut();
+                loop {
+                    observer = FindWindowExW(
+                        std::ptr::null_mut(),
+                        observer,
+                        wide("WVDH.SettingsPreviewObserver").as_ptr(),
+                        std::ptr::null(),
+                    );
+                    if observer.is_null() {
+                        break;
+                    }
+                    let mut pid = 0;
+                    GetWindowThreadProcessId(observer, &mut pid);
+                    if pid == self.0.id() {
+                        PostMessageW(observer, SHOW_ABOUT, 0, 0);
+                        break;
+                    }
+                }
+            }
             let hwnd = window_for_process(self.0.id());
             if !hwnd.is_null() {
                 ShowWindow(hwnd, SW_RESTORE);
@@ -76,8 +101,19 @@ pub fn publish(settings: &Settings, parent: HWND) -> Result<(), String> {
         .iter()
         .map(|(k, v)| format!("{k}: {}\n", crate::settings::quote(v)))
         .collect::<String>();
+    send(parent, SETTINGS_MESSAGE, &text)
+}
+pub fn reset(settings: &Settings, parent: HWND, keys: &[String]) -> Result<(), String> {
+    settings.validate()?;
+    crate::hotkeys::bindings(settings)?;
+    if parent.is_null() {
+        return settings.save();
+    }
+    send(parent, RESET_MESSAGE, &keys.join("\n"))
+}
+fn send(parent: HWND, message: usize, text: &str) -> Result<(), String> {
     let data = COPYDATASTRUCT {
-        dwData: SETTINGS_MESSAGE,
+        dwData: message,
         cbData: text.len() as u32,
         lpData: text.as_ptr() as *mut _,
     };

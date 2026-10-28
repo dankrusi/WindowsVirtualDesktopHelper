@@ -60,7 +60,7 @@ Command-line settings take priority and are not saved:
 WindowsVirtualDesktopHelper.exe --general.theme dark --theme.overlay.overlayBG.dark "red"
 ```
 
-Use Settings → Advanced for the complete configuration, including arbitrary custom hotkeys. Toggles and pickers save immediately; text fields and the configuration editor have explicit Save buttons. Invalid changes and occupied shortcuts display inline errors and leave the previous configuration active. Command-line overrides appear disabled. Portable startup changes immediately when toggled; MSIX startup is managed through the Windows Startup Apps settings link.
+Use Settings → Advanced for the complete configuration, including arbitrary custom hotkeys. Toggles and pickers apply immediately. Text fields and valid configuration edits apply automatically after a short typing pause, and pending edits are flushed when navigating or closing Settings. Invalid changes and occupied shortcuts display inline errors and leave the previous configuration active. Command-line overrides and values outside the available presets appear in a shared information box showing their exact values, with the corresponding controls disabled. Each custom-value notice includes Reset to restore defaults and unlock the control. Turning off a feature disables its related controls. The desktop appearance preview enlarges overlays and tray details for readability. Portable startup changes immediately when toggled; MSIX startup is managed through the Windows Startup Apps settings link.
 
 See [settings](docs/Settings.md), [hotkeys](docs/Hotkeys.md), and [actions](docs/Actions.md). `--diagnostics --diagnostics.output path.txt` performs a read-only COM connectivity check.
 
@@ -73,3 +73,5 @@ The original C# implementation remains available in Git history. Third-party not
 Thanks to Dan Krusi, MScholtes, Flaflo, zgdump, and all [contributors](https://github.com/dankrusi/WindowsVirtualDesktopHelper/graphs/contributors).
 
 [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6)
+
+For an explicit completion notification after launching an updated build, use `--notify "Update complete"`. This sends one Windows tray notification; ordinary launches remain quiet apart from the configured welcome overlay.

@@ -49,3 +49,24 @@ cargo test live_switch_and_registry_notification -- --ignored --nocapture
 - x64 and x86 MSIX builds validate the new Windows App Runtime framework dependency; ARM64 source checking passes. Signed installation, clean-machine runtime acquisition, other Windows versions, and physical mixed-DPI monitors still need release testing.
 
 - Follow-up to `Screenshot 2026-10-28 191534.png`: verified that preview images show the current desktop and dimmed previous arrow. Added coverage for visible glyph size/padding at six DPIs, shared icon selection at first/last desktops, and alpha conversion into the WinUI preview bitmap.
+
+## 2026-10-28 UI updates
+
+- Formatting and Clippy with warnings denied; 17 tests pass on x64 and x86 (the opt-in desktop-switch integration test stays ignored). ARM64 source check passes.
+- Preset tests cover all six dimension/text keys, numeric compatibility, mixed/custom sizes, CLI precedence, and invalid values. Overlay tests cover work-area positioning at 150% DPI, border pixels, rounded-corner alpha, opacity, and independent status appearance.
+- Native WinUI checks use a separate APPDATA directory: dark and light themes, 720-DIP compact layout, right-aligned switches, group disabling, command-line override information, and the About page.
+- Font edits save without a button. The multiline editor keeps all configuration lines, rejects invalid input without touching the saved file, and automatically saves valid presets and custom values.
+- x64 and x86 release packages pass MakeAppx and native-payload validation. ARM64 packaging still requires the ARM64 MSVC linker toolchain.
+
+## Tray identities, reset and enlarged preview
+
+- 20 tests pass on x64 and x86; Clippy and formatting pass. Tests freeze a representative tray UUID, check distinct roles and executable locations, and check unique, valid UTF-16 tooltips even with very long emoji names.
+- Read-only inspection of Windows 11 notification registrations confirms four distinct GUIDs for the test executable and the same four registrations after restarting that process. Final user placement remains controlled by Explorer.
+- An isolated parent/Settings integration run verifies Reset removes a CLI theme override in the parent, restores the default, and enables the picker. Resetting a custom arrow pair changes both values together, updates tray pixels, removes the notice, and enables the dropdown.
+- The desktop miniature enlarges labels, corner radii, and taskbar details by 2.25x while preserving configured positioning, colors and opacity; actual overlays and tray icons retain their configured sizes.
+
+## Custom overlay sizing and automatic preview
+
+- Formatting and Clippy with warnings denied pass; 21 tests pass and the live desktop-switch test remains opt-in. Preview routing coverage checks switching settings, unchanged values, unrelated status settings, editor-only state and CLI precedence.
+- The x64 release package passes MakeAppx and native-payload validation. The updated portable app was relaunched with the existing configuration preserved; Windows confirmed displaying the completion notification.
+- Interactive checks for Custom width/height, Reset, persistence and the 500 ms preview debounce are handed to the user at their request. Automated UI testing is no longer part of the workflow unless requested.

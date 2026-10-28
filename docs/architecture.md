@@ -19,3 +19,13 @@ Tray glyphs render into a supersampled grayscale mask and become premultiplied B
 `scripts/build-msix.ps1` builds architecture-specific Cargo release binaries, validates an MSIX with MakeAppx, checks the native PE payload, and emits portable ZIP, MSIX, Store upload archive and SHA-256 files in `dist/`. Signing is explicit. Store identity files are preserved. Historical published Scoop downloads remain in `installers/scoop`.
 
 The undocumented Windows desktop interfaces still require compatibility testing on each supported Windows build. A successful build or current-machine smoke test does not establish compatibility across every Windows/Insider release. See [validation](validation.md).
+
+### Persistent notification-area identities
+
+Every icon role (desktop number, desktop initial, previous, next, and fallback controls) has its own UUID v5 and unique role-prefixed tooltip. The UUID namespace is fixed; names combine the normalized executable path and numeric role. The same GUID and `NIF_GUID` flag are used for add, modify, delete and notification calls. Desktop names, settings, window handles, and build versions do not change an icon's identity.
+
+Microsoft recommends GUID identification instead of a window handle plus numeric ID. Windows binds the registration to the executable path, so portable copies and development builds have separate identities; moving an unsigned executable can lose its saved placement. Switching from the former registrations without GUIDs may require arranging or promoting the new icons once. Explorer retains control of final visibility and ordering; no icon-cache or taskbar registry settings are changed by the app.
+
+References: [NOTIFYICONDATA and GUID troubleshooting](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-notifyicondataw), [notification-area identifiers](https://learn.microsoft.com/en-us/windows/win32/shell/notification-area).
+
+Settings reset requests use a separate validated IPC command containing known setting keys. The parent restores defaults and removes selected in-memory CLI overrides through the same transaction as ordinary changes. Default values are written explicitly so auxiliary configuration files cannot restore the custom value on reload. Launch arguments apply again on a full restart.

@@ -54,13 +54,32 @@ impl Settings {
         self.get(key).eq_ignore_ascii_case("true")
     }
     pub fn int(&self, key: &str) -> i32 {
-        self.get(key).parse().unwrap_or(0)
+        self.number(key) as i32
     }
     pub fn number(&self, key: &str) -> f64 {
-        self.get(key).parse().unwrap_or(0.)
+        resolve_number(key, self.get(key)).unwrap_or(0.)
     }
     pub fn set(&mut self, key: &str, value: impl Into<String>) {
         self.config.insert(key.into(), value.into());
+    }
+    pub fn reset<'a>(&mut self, keys: impl IntoIterator<Item = &'a str>) -> Result<(), String> {
+        let defaults = keys
+            .into_iter()
+            .map(|key| {
+                DEFAULTS
+                    .iter()
+                    .find(|(name, _)| *name == key)
+                    .copied()
+                    .ok_or_else(|| format!("Unknown setting: {key}"))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        for (key, value) in defaults {
+            // Write defaults explicitly so values from extra .config files do
+            // not reappear on restart. CLI overrides are cleared for this run.
+            self.arguments.remove(key);
+            self.set(key, value);
+        }
+        Ok(())
     }
     pub fn merged(&self) -> BTreeMap<String, String> {
         let mut map: BTreeMap<_, _> = DEFAULTS
@@ -76,8 +95,10 @@ impl Settings {
             let v = self.get(key);
             let valid = if *default == "true" || *default == "false" {
                 v.eq_ignore_ascii_case("true") || v.eq_ignore_ascii_case("false")
-            } else if key.ends_with(".fontSize") {
-                v.parse::<f64>().is_ok_and(|n| n.is_finite())
+            } else if preset_values(key).is_some() {
+                resolve_number(key, v).is_some_and(|n| {
+                    n.is_finite() && (key.ends_with(".fontSize") || n.fract() == 0.)
+                })
             } else if default.parse::<i32>().is_ok() {
                 v.parse::<i32>().is_ok()
             } else if default.parse::<f64>().is_ok() {
@@ -129,6 +150,38 @@ impl Settings {
             .collect::<String>();
         atomic_write(&self.path, &text)
     }
+}
+
+pub const SIZES: [&str; 3] = ["small", "medium", "large"];
+
+/// Presets are part of the configuration contract, not just UI labels.
+/// Legacy numeric values remain valid and resolve to exactly the same dimensions.
+pub fn preset_values(key: &str) -> Option<[f64; 3]> {
+    Some(match key {
+        "theme.overlay.width" => [320., 480., 640.],
+        "theme.overlay.height" => [96., 128., 176.],
+        "theme.overlay.fontSize" => [16., 20., 28.],
+        "theme.status.width" => [180., 250., 340.],
+        "theme.status.height" => [32., 40., 56.],
+        "theme.status.fontSize" => [10., 12., 16.],
+        _ => return None,
+    })
+}
+pub fn resolve_number(key: &str, value: &str) -> Option<f64> {
+    if let (Some(values), Some(index)) = (
+        preset_values(key),
+        SIZES.iter().position(|s| value.eq_ignore_ascii_case(s)),
+    ) {
+        Some(values[index])
+    } else {
+        value.parse().ok()
+    }
+}
+pub fn preset_index(settings: &Settings, keys: &[&str]) -> Option<usize> {
+    (0..SIZES.len()).find(|&i| {
+        keys.iter()
+            .all(|key| preset_values(key).is_some_and(|values| values[i] == settings.number(key)))
+    })
 }
 fn atomic_write(path: &Path, text: &str) -> Result<(), String> {
     use windows_sys::Win32::Storage::FileSystem::{
@@ -271,7 +324,7 @@ mod tests {
         assert_eq!(s.get("general.theme"), "dark");
         assert!(s.bool("feature.showDesktopNumberInIconTray"));
         assert!(s.validate().is_ok());
-        assert_eq!(DEFAULTS.len(), 62);
+        assert_eq!(DEFAULTS.len(), 69);
     }
     #[test]
     fn saving_preserves_unknown_keys_and_never_cli_overrides() {
@@ -320,5 +373,78 @@ mod tests {
         assert!(s.validate().is_ok());
         s.set("feature.showDesktopSwitchOverlay.duration", "1.5");
         assert!(s.validate().is_err());
+    }
+    #[test]
+    fn named_sizes_resolve_in_core_and_preserve_custom_numeric_values() {
+        let mut s = Settings {
+            config: BTreeMap::new(),
+            arguments: BTreeMap::new(),
+            path: PathBuf::new(),
+        };
+        for key in [
+            "theme.overlay.width",
+            "theme.overlay.height",
+            "theme.overlay.fontSize",
+            "theme.status.width",
+            "theme.status.height",
+            "theme.status.fontSize",
+        ] {
+            for (i, size) in SIZES.iter().enumerate() {
+                s.set(key, *size);
+                assert!(s.validate().is_ok(), "{key}: {size}");
+                assert_eq!(s.number(key), preset_values(key).unwrap()[i]);
+            }
+        }
+        s.set("theme.overlay.width", "small");
+        s.set("theme.overlay.height", "96");
+        assert_eq!(
+            preset_index(&s, &["theme.overlay.width", "theme.overlay.height"]),
+            Some(0)
+        );
+        s.set("theme.overlay.height", "97");
+        assert_eq!(
+            preset_index(&s, &["theme.overlay.width", "theme.overlay.height"]),
+            None
+        );
+        assert_eq!(s.int("theme.overlay.height"), 97);
+        s.arguments
+            .insert("theme.overlay.width".into(), "LARGE".into());
+        assert_eq!(s.int("theme.overlay.width"), 640);
+        assert_eq!(s.config["theme.overlay.width"], "small");
+        s.set("theme.status.fontSize", "12.5");
+        assert_eq!(s.number("theme.status.fontSize"), 12.5);
+        assert!(s.validate().is_ok());
+        for invalid in ["huge", "NaN", "inf", "0"] {
+            s.set("theme.status.fontSize", invalid);
+            assert!(s.validate().is_err());
+        }
+    }
+    #[test]
+    fn reset_restores_group_defaults_and_clears_only_selected_overrides() {
+        let mut s = Settings {
+            config: BTreeMap::new(),
+            arguments: BTreeMap::new(),
+            path: PathBuf::new(),
+        };
+        s.set("theme.overlay.height", "97");
+        s.set("custom.action", "keep me");
+        s.arguments
+            .insert("theme.overlay.width".into(), "900".into());
+        s.arguments.insert("general.theme".into(), "dark".into());
+        let before = s.clone();
+        assert!(s.reset(["theme.overlay.width", "not.a.setting"]).is_err());
+        assert_eq!(s, before);
+        s.reset(["theme.overlay.width", "theme.overlay.height"])
+            .unwrap();
+        assert_eq!(
+            preset_index(&s, &["theme.overlay.width", "theme.overlay.height"]),
+            Some(1)
+        );
+        assert!(!s.arguments.contains_key("theme.overlay.width"));
+        assert_eq!(s.arguments["general.theme"], "dark");
+        assert_eq!(s.config["custom.action"], "keep me");
+        assert_eq!(s.config["theme.overlay.width"], "480");
+        assert_eq!(s.config["theme.overlay.height"], "128");
+        assert!(s.validate().is_ok());
     }
 }
