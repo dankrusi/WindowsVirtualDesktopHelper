@@ -142,7 +142,7 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxUseHotKeysToJumpToDesktopCtrl.Name = "checkBoxUseHotKeysToJumpToDesktopCtrl";
             this.checkBoxUseHotKeysToJumpToDesktopCtrl.Size = new System.Drawing.Size(75, 46);
             this.checkBoxUseHotKeysToJumpToDesktopCtrl.TabIndex = 24;
-            this.checkBoxUseHotKeysToJumpToDesktopCtrl.Text = "Ctrl";
+            this.checkBoxUseHotKeysToJumpToDesktopCtrl.Text = "Ctrl+#";
             this.checkBoxUseHotKeysToJumpToDesktopCtrl.UseVisualStyleBackColor = true;
             this.checkBoxUseHotKeysToJumpToDesktopCtrl.CheckedChanged += new System.EventHandler(this.checkBoxUseHotKeysToJumpToDesktopModifier_CheckedChanged);
             //
@@ -154,7 +154,7 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxUseHotKeysToJumpToDesktopAlt.Name = "checkBoxUseHotKeysToJumpToDesktopAlt";
             this.checkBoxUseHotKeysToJumpToDesktopAlt.Size = new System.Drawing.Size(70, 46);
             this.checkBoxUseHotKeysToJumpToDesktopAlt.TabIndex = 25;
-            this.checkBoxUseHotKeysToJumpToDesktopAlt.Text = "Alt";
+            this.checkBoxUseHotKeysToJumpToDesktopAlt.Text = "Alt+#";
             this.checkBoxUseHotKeysToJumpToDesktopAlt.UseVisualStyleBackColor = true;
             this.checkBoxUseHotKeysToJumpToDesktopAlt.CheckedChanged += new System.EventHandler(this.checkBoxUseHotKeysToJumpToDesktopModifier_CheckedChanged);
             //
@@ -166,7 +166,7 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxUseHotKeysToJumpToDesktopShift.Name = "checkBoxUseHotKeysToJumpToDesktopShift";
             this.checkBoxUseHotKeysToJumpToDesktopShift.Size = new System.Drawing.Size(86, 46);
             this.checkBoxUseHotKeysToJumpToDesktopShift.TabIndex = 26;
-            this.checkBoxUseHotKeysToJumpToDesktopShift.Text = "Shift";
+            this.checkBoxUseHotKeysToJumpToDesktopShift.Text = "Shift+#";
             this.checkBoxUseHotKeysToJumpToDesktopShift.UseVisualStyleBackColor = true;
             this.checkBoxUseHotKeysToJumpToDesktopShift.CheckedChanged += new System.EventHandler(this.checkBoxUseHotKeysToJumpToDesktopModifier_CheckedChanged);
             //
@@ -178,7 +178,7 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxUseHotKeysToJumpToDesktopWin.Name = "checkBoxUseHotKeysToJumpToDesktopWin";
             this.checkBoxUseHotKeysToJumpToDesktopWin.Size = new System.Drawing.Size(82, 46);
             this.checkBoxUseHotKeysToJumpToDesktopWin.TabIndex = 27;
-            this.checkBoxUseHotKeysToJumpToDesktopWin.Text = "Win";
+            this.checkBoxUseHotKeysToJumpToDesktopWin.Text = "Win+#";
             this.checkBoxUseHotKeysToJumpToDesktopWin.UseVisualStyleBackColor = true;
             this.checkBoxUseHotKeysToJumpToDesktopWin.CheckedChanged += new System.EventHandler(this.checkBoxUseHotKeysToJumpToDesktopModifier_CheckedChanged);
             //
