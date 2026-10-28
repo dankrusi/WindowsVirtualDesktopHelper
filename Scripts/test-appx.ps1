@@ -6,6 +6,8 @@ param(
     [ValidateSet('x64', 'x86')][string]$ExpectedArchitecture,
     [string]$ExpectedIdentityName,
     [string]$ExpectedPublisher,
+    [string]$ExpectedPublisherDisplayName,
+    [string]$ExpectedDisplayName,
     [string]$PayloadDirectory
 )
 
@@ -33,6 +35,9 @@ try {
     if ($ExpectedArchitecture -and $identity.ProcessorArchitecture -ne $ExpectedArchitecture) { throw 'APPX architecture mismatch.' }
     if ($ExpectedIdentityName -and $identity.Name -ne $ExpectedIdentityName) { throw 'APPX identity name mismatch.' }
     if ($ExpectedPublisher -and $identity.Publisher -ne $ExpectedPublisher) { throw 'APPX publisher mismatch.' }
+    if ($ExpectedPublisherDisplayName -and $manifest.Package.Properties.PublisherDisplayName -cne $ExpectedPublisherDisplayName) { throw 'APPX publisher display name mismatch.' }
+    $displayName = $manifest.Package.Properties.DisplayName
+    if ($ExpectedDisplayName -and $displayName -cne $ExpectedDisplayName) { throw 'APPX display name does not match the configured reserved Store name.' }
     $exeStream = $entries['WindowsVirtualDesktopHelper.exe'].Open()
     $exeMemory = New-Object System.IO.MemoryStream
     try {
@@ -47,9 +52,13 @@ try {
     $namespaces.AddNamespace('f', $manifest.DocumentElement.NamespaceURI)
     $namespaces.AddNamespace('r', 'http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities')
     $namespaces.AddNamespace('d', 'http://schemas.microsoft.com/appx/manifest/desktop/windows10')
+    $namespaces.AddNamespace('u', 'http://schemas.microsoft.com/appx/manifest/uap/windows10')
+    $visualElements = $manifest.SelectSingleNode('//u:VisualElements', $namespaces)
+    if (-not $visualElements -or $visualElements.DisplayName -cne $displayName) { throw 'App tile display name differs from the package display name.' }
     if (-not $manifest.SelectSingleNode('/f:Package/f:Capabilities/r:Capability[@Name="runFullTrust"]', $namespaces)) { throw 'Desktop package must declare runFullTrust.' }
     $startup = $manifest.SelectSingleNode('//d:StartupTask', $namespaces)
     if (-not $startup -or $startup.Enabled -ne 'false') { throw 'Startup task must be opt-in.' }
+    if ($startup.DisplayName -cne $displayName) { throw 'Startup task display name differs from the package display name.' }
     $application = $manifest.Package.Applications.Application
     if ($application.EntryPoint -ne 'Windows.FullTrustApplication' -or -not $entries.ContainsKey($application.Executable)) { throw 'Invalid desktop application entry point.' }
     foreach ($asset in @(@('Assets/StoreLogo.png', 50), @('Assets/Square44x44Logo.png', 44), @('Assets/Square150x150Logo.png', 150))) {

@@ -3,6 +3,7 @@
 ## Changes
 
 * Add unsigned x64/x86 APPX packaging, Store upload archives, build/validation scripts, and a GitHub Actions pipeline.
+* Apply and validate the reserved Store app name across package, tile, and startup-task display names.
 * Use the manifest startup task and Windows startup settings in packaged builds.
 
 

@@ -17,6 +17,7 @@ param(
     [string]$IdentityName,
     [string]$Publisher,
     [string]$PublisherDisplayName,
+    [string]$DisplayName,
     [string]$WindowsSdkVersion,
     [string]$MSBuildPath,
     [switch]$Store
@@ -45,15 +46,18 @@ if ($IdentityFile -and (Test-Path -LiteralPath $IdentityFile)) {
     if (-not $IdentityName) { $IdentityName = $identity.Name }
     if (-not $Publisher) { $Publisher = $identity.Publisher }
     if (-not $PublisherDisplayName) { $PublisherDisplayName = $identity.PublisherDisplayName }
+    if (-not $DisplayName -and $identity.PSObject.Properties['DisplayName']) { $DisplayName = $identity.DisplayName }
 }
-if ($Store -and (-not $IdentityName -or -not $Publisher -or -not $PublisherDisplayName)) {
-    throw 'Store builds require Name, Publisher, and PublisherDisplayName from Partner Center. See Packaging/Appx/StoreIdentity.example.json.'
+if ($Store -and (-not $IdentityName -or -not $Publisher -or -not $PublisherDisplayName -or -not $DisplayName)) {
+    throw 'Store builds require Name, Publisher, PublisherDisplayName, and the reserved app DisplayName from Partner Center. See Packaging/Appx/StoreIdentity.example.json.'
 }
 if (-not $IdentityName) { $IdentityName = 'WindowsVirtualDesktopHelper.Development' }
 if (-not $Publisher) { $Publisher = 'CN=WindowsVirtualDesktopHelper Development' }
 if (-not $PublisherDisplayName) { $PublisherDisplayName = 'Dan Krusi' }
+if (-not $DisplayName) { $DisplayName = 'Windows Virtual Desktop Helper' }
+if ([string]::IsNullOrWhiteSpace($DisplayName) -or $DisplayName.Length -gt 256 -or $DisplayName -ne $DisplayName.Trim()) { throw 'App DisplayName must be 1-256 characters without leading or trailing whitespace.' }
 if ($IdentityName -notmatch '^[A-Za-z0-9.-]{3,50}$') { throw 'Package identity name must be 3-50 ASCII letters, digits, periods, or hyphens.' }
-if ($Store -and ($IdentityName -match 'REPLACE|\.Development$' -or $Publisher -match 'REPLACE|Development' -or $PublisherDisplayName -match 'REPLACE')) {
+if ($Store -and ($IdentityName -match 'REPLACE|\.Development$' -or $Publisher -match 'REPLACE|Development' -or $PublisherDisplayName -match 'REPLACE' -or $DisplayName -match 'REPLACE')) {
     throw 'Replace the example/development identity with the exact Partner Center identity before building for the Store.'
 }
 
@@ -138,13 +142,19 @@ $manifest.Package.Identity.SetAttribute('Publisher', $Publisher)
 $manifest.Package.Identity.SetAttribute('Version', $Version)
 $manifest.Package.Identity.SetAttribute('ProcessorArchitecture', $Architecture)
 $manifest.Package.Properties.PublisherDisplayName = $PublisherDisplayName
+$manifest.Package.Properties.DisplayName = $DisplayName
+$manifestNamespaces = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+$manifestNamespaces.AddNamespace('uap', 'http://schemas.microsoft.com/appx/manifest/uap/windows10')
+$manifestNamespaces.AddNamespace('desktop', 'http://schemas.microsoft.com/appx/manifest/desktop/windows10')
+$manifest.SelectSingleNode('//uap:VisualElements', $manifestNamespaces).SetAttribute('DisplayName', $DisplayName)
+$manifest.SelectSingleNode('//desktop:StartupTask', $manifestNamespaces).SetAttribute('DisplayName', $DisplayName)
 $manifestPath = Join-Path $stageDirectory 'AppxManifest.xml'
 $manifest.Save($manifestPath)
 
 $packagePath = Join-Path $outputRoot ($artifactName + '.appx')
 & $makeAppx pack /d $stageDirectory /p $packagePath /h SHA256 /o
 if ($LASTEXITCODE -ne 0) { throw "MakeAppx validation/packing failed with exit code $LASTEXITCODE." }
-& (Join-Path $PSScriptRoot 'test-appx.ps1') -PackagePath $packagePath -ExpectedVersion $Version -ExpectedArchitecture $Architecture -ExpectedIdentityName $IdentityName -ExpectedPublisher $Publisher -PayloadDirectory $stageDirectory
+& (Join-Path $PSScriptRoot 'test-appx.ps1') -PackagePath $packagePath -ExpectedVersion $Version -ExpectedArchitecture $Architecture -ExpectedIdentityName $IdentityName -ExpectedPublisher $Publisher -ExpectedPublisherDisplayName $PublisherDisplayName -ExpectedDisplayName $DisplayName -PayloadDirectory $stageDirectory
 
 # Partner Center accepts .appxupload archives containing an APPX; symbols are optional.
 # Do not include PDBs in the installable package or claim crash symbols are supplied.

@@ -12,13 +12,14 @@ No signing certificate, NuGet packages, or Visual Studio installer-project exten
 
 ## Microsoft Store identity
 
-`Packaging/Appx/StoreIdentity.json` is configured for Store product **9N4HNXPRTSDC**, using package identity `16065DanKrusi.VirtualDesktopHelper` and publisher `CN=87DD2A22-6F4A-4054-9D4F-CF33AF77D555`.
+`Packaging/Appx/StoreIdentity.json` is configured for Store product **9N4HNXPRTSDC**, with reserved app name **Virtual Desktop Helper**, package identity `16065DanKrusi.VirtualDesktopHelper`, and publisher `CN=87DD2A22-6F4A-4054-9D4F-CF33AF77D555`.
 
 For a different Store listing, open Partner Center → the app → Product management → Product identity. Copy `Packaging/Appx/StoreIdentity.example.json` to `Packaging/Appx/StoreIdentity.json` and replace its values with:
 
 * `Name`: Package/Identity/Name.
 * `Publisher`: Package/Identity/Publisher, including the full `CN=...` value.
 * `PublisherDisplayName`: Package/Properties/PublisherDisplayName.
+* `DisplayName`: the exact app name reserved for this Store product, from the app name reservations page. This is a friendly name, not the package identity name or publisher display name.
 
 These are public package identity values, not account credentials. Commit this JSON file to let CI build packages for the correct Store listing. Never put a password, certificate, or Partner Center API credential in it.
 
@@ -27,7 +28,7 @@ These are public package identity values, not account credentials. Commit this J
 .\Scripts\build-appx.ps1 -Store -Architecture x86
 ```
 
-Individual values can also be passed using `-IdentityName`, `-Publisher`, and `-PublisherDisplayName`. `-IdentityFile` selects a different JSON file. Store builds fail before compilation if identity values are missing or still contain the example/development identity.
+Individual values can also be passed using `-IdentityName`, `-Publisher`, `-PublisherDisplayName`, and `-DisplayName`. `-IdentityFile` selects a different JSON file. Store builds fail before compilation if identity values or the reserved display name are missing or still contain example/development values.
 
 Without `-Store`, the script builds a clearly named development package with a development identity. It does not automatically read the checked-in Store identity in this mode:
 
@@ -61,7 +62,7 @@ Useful build overrides:
 
 ## Manifest and application behavior
 
-`Packaging/Appx/AppxManifest.xml` is the manifest template. The script sets identity, version, publisher display name, and architecture in a staged copy, and generates 44×44, 50×50, and 150×150 PNG assets from the existing repository logo.
+`Packaging/Appx/AppxManifest.xml` is the manifest template. The script sets identity, version, publisher display name, and architecture in a staged copy, and generates 44×44, 50×50, and 150×150 PNG assets from the existing repository logo. It applies the configured reserved app name to `Package/Properties/DisplayName`, the application's visual elements, and the startup task. Validation checks these names against the configuration; Partner Center checks whether the name is actually reserved for the product.
 
 The package targets Windows Desktop from Windows 10 version 1809, and declares `runFullTrust` because the application uses desktop COM APIs, global hotkeys, and tray icons. The .NET Framework requirement is 4.7.2. Full-trust capability approval and application compatibility remain part of Store certification.
 
