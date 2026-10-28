@@ -1,9 +1,12 @@
 # 3.0.0 (unreleased)
 
 - Replace C#/.NET and MSI with native Rust/Win32 and MSIX packaging.
-- Preserve all 61 configuration defaults, CLI overrides, desktop actions and custom hotkeys.
+- Preserve all 61 original configuration keys, CLI overrides, desktop actions and custom hotkeys.
 - Replace desktop/focus/theme polling with registry notifications, foreground hooks and window messages.
-- Add reusable settings rows, light/dark styling, DPI support and native vector/overlay previews.
+- Replace the hand-drawn Settings window with actual WinUI 3 navigation and cards, automatic saving, inline errors, shortcut recording and overlay previews.
+- Use a compact 480 x 128 DIP switch notification by default; preserve explicitly configured sizes.
+- Render transparent, antialiased tray icons at taskbar DPI, update them in place, and scale overlays per monitor.
+- Require Windows 11 and Microsoft Windows App Runtime 2.4+ for the modern WinUI build.
 - Use stable desktop IDs for history; reconnect after Explorer restarts.
 - Add Cargo checks, native PE/package validation and x64/x86/ARM64 CI builds.
 

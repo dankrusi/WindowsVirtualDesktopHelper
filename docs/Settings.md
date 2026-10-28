@@ -93,3 +93,9 @@ Command line arguments take precedence over the config file settings.
 
 See [Hotkeys Documentation](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/docs/Hotkeys.md)
 for more information on how to define custom hotkeys.
+
+## Tray transparency and sizing (v3)
+
+`theme.icons.transparentBackground` defaults to `true`. Tray glyphs use premultiplied alpha and scale to the taskbar DPI; disabled arrows reduce opacity. Set this flag to `false` to restore the configured `theme.icons.iconBG.light` / `.dark` backgrounds. Tray colors follow the Windows taskbar theme independently of the Settings window theme.
+
+The default switch notification is a compact 480 x 128 DIP banner with 20-point text; explicitly configured dimensions are preserved. Overlay width, height and edge offset are device-independent pixels; font sizes are points. Each monitor receives its own scaled overlay, constrained to its work area. Settings → Desktop overlays exposes the size controls and actual renderer previews.

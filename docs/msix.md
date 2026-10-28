@@ -8,7 +8,9 @@ Build a native MSIX and portable ZIP with the Windows SDK's MakeAppx tool:
 .\scripts\build-msix.ps1 -Store -Architecture x64 -IdentityFile packaging\msix\StoreIdentity.json
 ```
 
-Requirements: Rust MSVC toolchain, Visual Studio C++ Build Tools (including the target architecture tools), Windows SDK, PowerShell 5.1 or later. No Visual Studio Installer Projects extension or .NET development workload is needed. Cargo.toml is the version source; MSIX appends a fourth zero component.
+Requirements: Rust 1.95+ MSVC toolchain, Visual Studio C++ Build Tools (including the target architecture tools), Windows SDK, PowerShell 5.1 or later. No Visual Studio Installer Projects extension or .NET development workload is needed. Cargo.toml is the version source; MSIX appends a fourth zero component.
+
+The manifest declares Microsoft.WindowsAppRuntime.2 >= 2.4.0.0 and Windows 11 build 22000 as minimum. Portable users must install the matching-architecture [Windows App Runtime](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) separately. Framework deployment and signed package installation must be tested on a clean machine before release.
 
 Outputs in `dist/`:
 

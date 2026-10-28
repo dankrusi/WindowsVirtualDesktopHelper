@@ -1,7 +1,9 @@
 use crate::{platform::wide, settings::Settings};
 use windows_sys::Win32::{
-    Foundation::*, Graphics::Gdi::*, System::LibraryLoader::GetModuleHandleW,
-    UI::WindowsAndMessaging::*,
+    Foundation::*,
+    Graphics::Gdi::*,
+    System::LibraryLoader::GetModuleHandleW,
+    UI::{HiDpi::*, WindowsAndMessaging::*},
 };
 pub struct Overlays {
     windows: Vec<HWND>,
@@ -34,19 +36,19 @@ impl Overlays {
             } else {
                 "theme.overlay"
             };
-            let mut monitors = Vec::<RECT>::new();
+            let mut monitors = Vec::<(RECT, u32)>::new();
             EnumDisplayMonitors(
                 std::ptr::null_mut(),
                 std::ptr::null(),
                 Some(monitor),
-                (&mut monitors as *mut Vec<RECT>) as isize,
+                (&mut monitors as *mut Vec<(RECT, u32)>) as isize,
             );
             if !s.bool(&format!("{feature}.showOnAllMonitors")) {
                 let mut info: MONITORINFO = std::mem::zeroed();
                 info.cbSize = std::mem::size_of_val(&info) as u32;
                 let m = MonitorFromPoint(POINT { x: 0, y: 0 }, MONITOR_DEFAULTTOPRIMARY);
                 if GetMonitorInfoW(m, &mut info) != 0 {
-                    monitors = vec![info.rcWork];
+                    monitors = vec![(info.rcWork, monitor_dpi(m))];
                 }
             }
             let class = wide("WVDH.Overlay");
@@ -59,11 +61,11 @@ impl Overlays {
             };
             RegisterClassW(&wc);
             let theme = if super::dark(s) { "dark" } else { "light" };
-            for r in monitors {
-                let w = s.int(&format!("{section}.width")).min(r.right - r.left);
-                let h = s.int(&format!("{section}.height")).min(r.bottom - r.top);
+            for (r, dpi) in monitors {
+                let w = scale(s.int(&format!("{section}.width")), dpi).min(r.right - r.left);
+                let h = scale(s.int(&format!("{section}.height")), dpi).min(r.bottom - r.top);
                 let offset = if status {
-                    s.int("theme.status.offset")
+                    scale(s.int("theme.status.offset"), dpi)
                 } else {
                     0
                 };
@@ -80,7 +82,7 @@ impl Overlays {
                     bg: super::color(s.get(&format!("{section}.overlayBG.{theme}")), 0),
                     font: super::font(
                         s.get(&format!("{section}.font")),
-                        (s.number(&format!("{section}.fontSize")) * 96. / 72.) as i32,
+                        (s.number(&format!("{section}.fontSize")) * dpi as f64 / 72.) as i32,
                     ),
                     alpha: if animate { 0 } else { target },
                     target,
@@ -146,9 +148,20 @@ unsafe extern "system" fn monitor(m: HMONITOR, _: HDC, _: *mut RECT, data: isize
     let mut info: MONITORINFO = std::mem::zeroed();
     info.cbSize = std::mem::size_of_val(&info) as u32;
     if GetMonitorInfoW(m, &mut info) != 0 {
-        (*(data as *mut Vec<RECT>)).push(info.rcWork);
+        (*(data as *mut Vec<(RECT, u32)>)).push((info.rcWork, monitor_dpi(m)));
     }
     1
+}
+unsafe fn monitor_dpi(m: HMONITOR) -> u32 {
+    let (mut x, mut y) = (96, 96);
+    if GetDpiForMonitor(m, MDT_EFFECTIVE_DPI, &mut x, &mut y) < 0 {
+        96
+    } else {
+        x.max(96)
+    }
+}
+fn scale(value: i32, dpi: u32) -> i32 {
+    ((value as i64 * dpi as i64 + 48) / 96) as i32
 }
 pub fn position(r: RECT, w: i32, h: i32, offset: i32, pos: &str) -> (i32, i32) {
     let x = if pos.ends_with("left") {
@@ -165,7 +178,7 @@ pub fn position(r: RECT, w: i32, h: i32, offset: i32, pos: &str) -> (i32, i32) {
     } else {
         r.top + (r.bottom - r.top - h) / 2
     };
-    (x, y)
+    (x.clamp(r.left, r.right - w), y.clamp(r.top, r.bottom - h))
 }
 unsafe extern "system" fn proc(hwnd: HWND, msg: u32, w: usize, l: isize) -> isize {
     if msg == WM_NCCREATE {
@@ -236,5 +249,8 @@ mod tests {
         assert_eq!(position(r, 250, 40, 10, "topleft"), (-1910, -90));
         assert_eq!(position(r, 250, 40, 10, "bottomright"), (-260, 930));
         assert_eq!(position(r, 250, 40, 0, "middlecenter"), (-1085, 420));
+        assert_eq!(scale(100, 144), 150);
+        assert_eq!(scale(40, 192), 80);
+        assert_eq!(position(r, 250, 40, 5000, "bottomright"), (-1920, -100));
     }
 }

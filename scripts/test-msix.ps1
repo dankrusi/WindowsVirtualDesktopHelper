@@ -23,6 +23,8 @@ try {
     if($ExpectedPublisherDisplayName -and $manifest.Package.Properties.PublisherDisplayName -ne $ExpectedPublisherDisplayName) {throw 'Publisher display name mismatch'}
     if($ExpectedDisplayName -and $manifest.Package.Properties.DisplayName -ne $ExpectedDisplayName) {throw 'Display name mismatch'}
     if($manifest.Package.Applications.Application.Executable -ne 'WindowsVirtualDesktopHelper.exe') {throw 'Wrong executable'}
+    $runtime = @($manifest.Package.Dependencies.PackageDependency) | Where-Object { $_.Name -eq 'Microsoft.WindowsAppRuntime.2' }
+    if (-not $runtime -or [version]$runtime.MinVersion -lt [version]'2.4.0.0') { throw 'Missing WinUI runtime dependency' }
     $stream=$zip.GetEntry('WindowsVirtualDesktopHelper.exe').Open()
     $bytes=New-Object System.IO.MemoryStream
     try {$stream.CopyTo($bytes);$pe=$bytes.ToArray()} finally {$stream.Dispose();$bytes.Dispose()}

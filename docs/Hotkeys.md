@@ -42,7 +42,7 @@ Note: A hotkey MUST have at least one modifier key (Ctrl, Alt, Shift, Win) and o
 
 ### Most recent desktop
 
-Enable **Use hot key to jump to most recent desktop** in Settings, choose any combination of Ctrl, Alt, Shift, and Win, and select **Tab** or **Backtick**. The feature is disabled by default, with Alt + backtick preselected. Changes apply when you click Apply; registration conflicts are reported there.
+In Settings → Keyboard shortcuts, click the combination next to **Most recent desktop** and press your new shortcut, then enable its toggle. Ctrl, Alt, Shift and Win combinations are supported; Esc cancels recording. The default is Alt + backtick, disabled. Changes save immediately; invalid or occupied shortcuts show an inline error and preserve the previous settings.
 
 After moving from desktop 2 to desktop 5, each press alternates between 2 and 5. Switching normally to another desktop updates the pair. Nothing happens until another desktop has been visited during the current app session.
 

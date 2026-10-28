@@ -1,5 +1,6 @@
 // Compatibility defaults from the v2 settings contract.
 pub const DEFAULTS: &[(&str, &str)] = &[
+    ("theme.icons.transparentBackground", "true"),
     ("debug.singleInstance", "true"),
     ("general.startupWithWindows", "false"),
     ("general.theme", "auto"),
@@ -11,10 +12,10 @@ pub const DEFAULTS: &[(&str, &str)] = &[
     ("theme.icons.iconFG.dark", "white"),
     ("theme.icons.iconBG.light", "white"),
     ("theme.icons.iconFG.light", "black"),
-    ("theme.overlay.width", "900"),
-    ("theme.overlay.height", "430"),
+    ("theme.overlay.width", "480"),
+    ("theme.overlay.height", "128"),
     ("theme.overlay.font", "Segoe UI Light"),
-    ("theme.overlay.fontSize", "30"),
+    ("theme.overlay.fontSize", "20"),
     ("theme.overlay.overlayBG.dark", "black"),
     ("theme.overlay.overlayFG.dark", "white"),
     ("theme.overlay.overlayBG.light", "black"),

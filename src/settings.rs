@@ -6,7 +6,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Settings {
     pub config: BTreeMap<String, String>,
     pub arguments: BTreeMap<String, String>,
@@ -271,7 +271,7 @@ mod tests {
         assert_eq!(s.get("general.theme"), "dark");
         assert!(s.bool("feature.showDesktopNumberInIconTray"));
         assert!(s.validate().is_ok());
-        assert_eq!(DEFAULTS.len(), 61);
+        assert_eq!(DEFAULTS.len(), 62);
     }
     #[test]
     fn saving_preserves_unknown_keys_and_never_cli_overrides() {

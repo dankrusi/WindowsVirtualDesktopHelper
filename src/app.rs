@@ -14,6 +14,7 @@ use std::{
     collections::HashMap,
     sync::atomic::{AtomicIsize, Ordering},
 };
+use windows_sys::Win32::System::DataExchange::COPYDATASTRUCT;
 use windows_sys::Win32::{
     Foundation::*,
     System::{Com::*, LibraryLoader::GetModuleHandleW, Threading::*},
@@ -48,7 +49,7 @@ struct App {
     tray: ui::tray::Tray,
     status: ui::overlay::Overlays,
     overlay: ui::overlay::Overlays,
-    settings_window: HWND,
+    settings_process: Option<ui::settings_process::SettingsProcess>,
     hwnd: HWND,
     taskbar: u32,
     focused: HashMap<u128, HWND>,
@@ -178,13 +179,12 @@ impl App {
         }
     }
     fn open_settings(&mut self) {
-        unsafe {
-            if !self.settings_window.is_null() && IsWindow(self.settings_window) != 0 {
-                ShowWindow(self.settings_window, SW_RESTORE);
-                SetForegroundWindow(self.settings_window);
-            } else {
-                self.settings_window = ui::settings::open(self.hwnd, &self.settings);
-            }
+        if self.settings_process.as_mut().is_some_and(|p| p.activate()) {
+            return;
+        }
+        match ui::settings_process::SettingsProcess::open(self.hwnd, &self.settings) {
+            Ok(child) => self.settings_process = Some(child),
+            Err(e) => platform::report(&e),
         }
     }
     fn register_hotkeys(&mut self) {
@@ -203,14 +203,35 @@ impl App {
     }
     fn apply(&mut self, s: Settings) -> Result<(), String> {
         s.validate()?;
-        hotkeys::bindings(&s)?;
-        if s.bool("general.startupWithWindows") != self.settings.bool("general.startupWithWindows")
-        {
-            platform::registry::startup(s.bool("general.startupWithWindows"))?;
+        let bindings = hotkeys::bindings(&s)?;
+        let old = self
+            .hotkeys
+            .registered
+            .iter()
+            .map(|(_, b)| b.clone())
+            .collect::<Vec<_>>();
+        let errors = self.hotkeys.replace(bindings);
+        if !errors.is_empty() {
+            self.hotkeys.replace(old);
+            return Err(format!("Shortcut conflict: {}", errors.join(", ")));
         }
-        s.save()?;
+        let startup_changed = s.bool("general.startupWithWindows")
+            != self.settings.bool("general.startupWithWindows");
+        let result = (|| {
+            if startup_changed {
+                platform::registry::startup(s.bool("general.startupWithWindows"))?;
+            }
+            s.save()
+        })();
+        if let Err(e) = result {
+            self.hotkeys.replace(old);
+            if startup_changed {
+                let _ =
+                    platform::registry::startup(self.settings.bool("general.startupWithWindows"));
+            }
+            return Err(e);
+        }
         self.settings = s;
-        self.register_hotkeys();
         self.update_ui();
         Ok(())
     }
@@ -352,7 +373,7 @@ pub fn run() -> Result<(), String> {
             tray: ui::tray::Tray::new(hwnd),
             status: ui::overlay::Overlays::new(),
             overlay: ui::overlay::Overlays::new(),
-            settings_window: std::ptr::null_mut(),
+            settings_process: None,
             hwnd,
             taskbar: RegisterWindowMessageW(wide("TaskbarCreated").as_ptr()),
             focused: HashMap::new(),
@@ -398,22 +419,11 @@ pub fn run() -> Result<(), String> {
             if ret <= 0 {
                 break;
             }
-            let settings_window = app.borrow().settings_window;
-            if !settings_window.is_null()
-                && IsWindow(settings_window) != 0
-                && IsDialogMessageW(settings_window, &message) != 0
-            {
-                continue;
-            }
             TranslateMessage(&message);
             DispatchMessageW(&message);
         }
         HOST.store(0, Ordering::Release);
         drop(hook);
-        let settings_window = app.borrow().settings_window;
-        if IsWindow(settings_window) != 0 {
-            DestroyWindow(settings_window);
-        }
         SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0);
         drop(app);
         DestroyWindow(hwnd);
@@ -513,12 +523,41 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
             }
             0
         }
-        ui::settings::APPLY => {
-            let settings = *Box::from_raw(l as *mut Settings);
-            if let Err(e) = app.apply(settings) {
-                platform::report(&e);
+        WM_COPYDATA => {
+            if l == 0 {
+                return 0;
             }
-            0
+            let data = &*(l as *const COPYDATASTRUCT);
+            if data.dwData != ui::settings_process::SETTINGS_MESSAGE
+                || data.cbData > 1_048_576
+                || (data.cbData != 0 && data.lpData.is_null())
+            {
+                return 0;
+            }
+            let bytes = if data.cbData == 0 {
+                &[]
+            } else {
+                std::slice::from_raw_parts(data.lpData.cast::<u8>(), data.cbData as usize)
+            };
+            let Ok(text) = std::str::from_utf8(bytes) else {
+                return 0;
+            };
+            let Ok(config) = crate::settings::parse(text) else {
+                return 0;
+            };
+            let mut candidate = app.settings.clone();
+            candidate.config = config;
+            match app.apply(candidate) {
+                Ok(()) => 1,
+                Err(e) => {
+                    platform::log(&e);
+                    if e.starts_with("Shortcut conflict:") {
+                        2
+                    } else {
+                        0
+                    }
+                }
+            }
         }
         ui::tray::MESSAGE => {
             if l as u32 == WM_RBUTTONUP {
@@ -546,10 +585,6 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
         }
         WM_SETTINGCHANGE | WM_THEMECHANGED | WM_DISPLAYCHANGE => {
             app.update_ui();
-            let settings_window = app.settings_window;
-            if IsWindow(settings_window) != 0 {
-                PostMessageW(app.settings_window, WM_THEMECHANGED, 0, 0);
-            }
             0
         }
         WM_TIMER => {

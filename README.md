@@ -2,7 +2,7 @@
 
 A small, native Windows app for virtual desktop tray indicators, overlays and global hotkeys.
 
-Version 3 replaces the C#/.NET application with Rust and native Win32 UI. It runs as a single executable and does not require .NET or a browser runtime. Existing v2 configuration keys and command-line flags are retained.
+Version 3 replaces the C#/.NET application with Rust, with WinUI 3 Settings and a lightweight Win32 tray process. It runs from a single executable without .NET or a browser engine. Settings requires Microsoft Windows App Runtime 2.4 or later (the `Microsoft.WindowsAppRuntime.2` framework). Existing v2 configuration keys and command-line flags are retained.
 
 ## Features
 
@@ -10,15 +10,15 @@ Version 3 replaces the C#/.NET application with Rust and native Win32 UI. It run
 - Desktop-name switch notifications and a permanent, click-through status overlay, including multi-monitor placement.
 - Custom shortcuts for numbered desktops, next/previous and the two most recently visited desktops.
 - Digit, numpad and function-key shortcuts; optional restoration of the previous focused window.
-- Reusable native settings controls, light/dark themes, live vector preview and an actual overlay preview.
+- Fluent WinUI 3 settings cards, responsive navigation, light/dark themes, shortcut recording and actual overlay previews.
 - Portable autostart or Windows-managed MSIX startup.
 - Event-driven desktop/focus/theme updates, with automatic recovery after Explorer restarts.
 
-The desktop integration uses undocumented Windows interfaces. Windows 10 and Windows 11 profiles are included; new Windows/Insider builds may require an updated profile. Windows 7/8 are unsupported. See [architecture](docs/architecture.md) and [validation](docs/validation.md).
+The desktop integration uses undocumented Windows interfaces. Legacy Windows 10 desktop API profiles are retained, but this WinUI build targets Windows 11 (22000 or later). New Windows/Insider builds may require an updated desktop API profile. See [architecture](docs/architecture.md) and [validation](docs/validation.md).
 
 ## Build and run
 
-Install Rust's MSVC toolchain, Visual Studio C++ Build Tools, and a Windows 10/11 SDK.
+Install Rust 1.95 or later with the MSVC toolchain, Visual Studio C++ Build Tools, and a Windows 10/11 SDK.
 
 ```powershell
 cargo build --release --locked
@@ -29,7 +29,7 @@ cargo build --release --locked
 
 Right-click a tray icon for Settings, diagnostics/configuration access, About, Donate or Exit. Closing Settings keeps the app running. If all indicator features are disabled, a small app icon keeps the menu accessible.
 
-Release binaries statically link the CRT. The only direct dependency is Microsoft's `windows-sys` (plus its `windows-link` support crate). Build output is in `target/`; distributable artifacts are in `dist/`.
+Release binaries statically link the CRT. The two direct dependencies are Microsoft's `windows-sys` and `windows-reactor` (pinned to 0.100.0). The latter is Microsoft's early Rust binding layer over actual WinUI 3 controls; it loads only when Settings opens in a child process. Install the matching architecture of [Windows App Runtime](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) for portable builds. Build output is in `target/`; distributable artifacts are in `dist/`.
 
 ## Installers
 
@@ -46,7 +46,7 @@ Published [v2.1 releases](https://github.com/dankrusi/WindowsVirtualDesktopHelpe
 
 ## Configuration
 
-Existing files remain in `%APPDATA%\WindowsVirtualDesktopHelper\*.config`. The main file is `WindowsVirtualDesktopHelper.exe.config`. All 61 original defaults are preserved. Additional files load alphabetically before the main file. Blank lines and `#` comment lines are ignored.
+Existing files remain in `%APPDATA%\WindowsVirtualDesktopHelper\*.config`. The main file is `WindowsVirtualDesktopHelper.exe.config`. All 61 original settings are preserved. Transparent tray backgrounds are enabled by the new `theme.icons.transparentBackground` setting; set it to `false` to use the legacy background colors. Additional files load alphabetically before the main file. Blank lines and `#` comment lines are ignored.
 
 ```text
 feature.showDesktopStatusOverlay: true
@@ -60,7 +60,7 @@ Command-line settings take priority and are not saved:
 WindowsVirtualDesktopHelper.exe --general.theme dark --theme.overlay.overlayBG.dark "red"
 ```
 
-Use Settings → Advanced for the complete configuration, including arbitrary custom hotkeys. Changes take effect on Apply; Close discards unapplied changes. Hotkey registration conflicts are reported and other shortcuts continue working. Portable startup is changed when its setting is applied; MSIX startup is managed through the Windows Startup Apps settings link.
+Use Settings → Advanced for the complete configuration, including arbitrary custom hotkeys. Toggles and pickers save immediately; text fields and the configuration editor have explicit Save buttons. Invalid changes and occupied shortcuts display inline errors and leave the previous configuration active. Command-line overrides appear disabled. Portable startup changes immediately when toggled; MSIX startup is managed through the Windows Startup Apps settings link.
 
 See [settings](docs/Settings.md), [hotkeys](docs/Hotkeys.md), and [actions](docs/Actions.md). `--diagnostics --diagnostics.output path.txt` performs a read-only COM connectivity check.
 

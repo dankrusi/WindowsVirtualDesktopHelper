@@ -65,6 +65,14 @@ pub fn dark() -> bool {
     )
     .is_some_and(|v| v.first() == Some(&0))
 }
+pub fn apps_dark() -> bool {
+    bytes(
+        HKEY_CURRENT_USER,
+        r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+        "AppsUseLightTheme",
+    )
+    .is_some_and(|v| v.first() == Some(&0))
+}
 pub fn startup(enabled: bool) -> Result<(), String> {
     // Packaged startup is managed by Windows, not a versioned WindowsApps path.
     if packaged() {

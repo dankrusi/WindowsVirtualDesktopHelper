@@ -2,7 +2,7 @@ use crate::{platform::desktop::Snapshot, platform::wide, settings::Settings};
 use windows_sys::Win32::{
     Foundation::*,
     Graphics::Gdi::*,
-    UI::{Shell::*, WindowsAndMessaging::*},
+    UI::{HiDpi::*, Shell::*, WindowsAndMessaging::*},
 };
 pub const MESSAGE: u32 = 0x8003;
 pub struct Tray {
@@ -29,39 +29,12 @@ impl Tray {
         }
     }
     pub fn update(&mut self, s: &Settings, snap: &Snapshot) {
-        self.clear();
-        let index = snap.current;
-        let hide = s.bool("feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds");
-        let mut icons = Vec::new();
-        if s.bool("feature.showDesktopNumberInIconTray") {
-            icons.push((1, (index + 1).to_string(), true));
-        }
-        if s.bool("feature.showDesktopNameInIconTray") {
-            let name = snap.active().name.chars().next().unwrap_or('?').to_string();
-            icons.push((2, name, true));
-        }
-        if s.bool("feature.showPrevNextIcons") {
-            if !hide || index > 0 {
-                icons.push((
-                    3,
-                    s.get("feature.showPrevNextIcons.prevChar").into(),
-                    index > 0,
-                ));
-            }
-            if !hide || index + 1 < snap.desktops.len() {
-                icons.push((
-                    4,
-                    s.get("feature.showPrevNextIcons.nextChar").into(),
-                    index + 1 < snap.desktops.len(),
-                ));
-            }
-        }
-        if icons.is_empty() {
-            icons.push((5, "▦".into(), true));
-        } // Keep Settings/Exit reachable.
+        let mut previous = std::mem::take(&mut self.icons);
+        let icons = icon_specs(s, snap);
+        let metrics = metrics();
         for (id, label, enabled) in icons {
             unsafe {
-                let icon = icon(&label, s, enabled, id >= 3);
+                let icon = icon(&label, s, enabled, id >= 3, metrics);
                 let mut data: NOTIFYICONDATAW = std::mem::zeroed();
                 data.cbSize = std::mem::size_of_val(&data) as u32;
                 data.hWnd = self.hwnd;
@@ -72,7 +45,7 @@ impl Tray {
                 let tip = wide(&format!(
                     "{} · {} of {}",
                     snap.active().name,
-                    index + 1,
+                    snap.current + 1,
                     snap.desktops.len()
                 ));
                 let mut tooltip = [0u16; 128];
@@ -80,10 +53,28 @@ impl Tray {
                     *a = b;
                 }
                 data.szTip = tooltip;
-                if Shell_NotifyIconW(NIM_ADD, &data) == 0 {
+                let old = previous
+                    .iter()
+                    .position(|(old_id, _)| *old_id == id)
+                    .map(|i| previous.remove(i).1);
+                let updated = old.is_some() && Shell_NotifyIconW(NIM_MODIFY, &data) != 0;
+                if !updated && Shell_NotifyIconW(NIM_ADD, &data) == 0 {
                     crate::platform::log("Could not add notification icon");
                 }
+                if let Some(old) = old {
+                    DestroyIcon(old);
+                }
                 self.icons.push((id, icon));
+            }
+        }
+        for (id, icon) in previous {
+            unsafe {
+                let mut data: NOTIFYICONDATAW = std::mem::zeroed();
+                data.cbSize = std::mem::size_of_val(&data) as u32;
+                data.hWnd = self.hwnd;
+                data.uID = id;
+                Shell_NotifyIconW(NIM_DELETE, &data);
+                DestroyIcon(icon);
             }
         }
     }
@@ -93,62 +84,401 @@ impl Drop for Tray {
         self.clear();
     }
 }
-unsafe fn icon(label: &str, s: &Settings, enabled: bool, symbol: bool) -> HICON {
-    let size = GetSystemMetrics(SM_CXSMICON).max(16);
-    let screen = GetDC(std::ptr::null_mut());
-    let dc = CreateCompatibleDC(screen);
-    let bitmap = CreateCompatibleBitmap(screen, size, size);
-    let old = SelectObject(dc, bitmap);
-    let theme = if super::dark(s) { "dark" } else { "light" };
-    let bg = super::color(s.get(&format!("theme.icons.iconBG.{theme}")), 0);
-    let mut fg = super::color(s.get(&format!("theme.icons.iconFG.{theme}")), 0xffffff);
-    if !enabled {
-        let opacity = s.number("theme.icons.disabledOpacity").clamp(0., 1.);
-        let mut mixed = 0;
-        for shift in [0, 8, 16] {
-            let a = ((fg >> shift) & 255) as f64;
-            let b = ((bg >> shift) & 255) as f64;
-            mixed |= ((a * opacity + b * (1. - opacity)) as u32) << shift;
-        }
-        fg = mixed;
+/// Shared icon selection for the actual notification area and Settings preview.
+pub fn icon_specs(s: &Settings, snap: &Snapshot) -> Vec<(u32, String, bool)> {
+    let index = snap.current;
+    let hide = s.bool("feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds");
+    let mut icons = Vec::new();
+    if s.bool("feature.showDesktopNumberInIconTray") {
+        icons.push((1, (index + 1).to_string(), true));
     }
-    let r = RECT {
-        left: 0,
-        top: 0,
-        right: size,
-        bottom: size,
-    };
-    super::fill(dc, &r, bg);
-    let f = super::font(
-        s.get(if label.chars().any(|c| c as u32 > 0xffff) {
-            "theme.icons.emojiFont"
-        } else if symbol {
-            "theme.icons.symbolsFont"
+    if s.bool("feature.showDesktopNameInIconTray") {
+        let name = snap.active().name.chars().next().unwrap_or('?').to_string();
+        icons.push((2, name, true));
+    }
+    if s.bool("feature.showPrevNextIcons") {
+        if !hide || index > 0 {
+            icons.push((
+                3,
+                s.get("feature.showPrevNextIcons.prevChar").into(),
+                index > 0,
+            ));
+        }
+        if !hide || index + 1 < snap.desktops.len() {
+            icons.push((
+                4,
+                s.get("feature.showPrevNextIcons.nextChar").into(),
+                index + 1 < snap.desktops.len(),
+            ));
+        }
+    }
+    if icons.is_empty() {
+        icons.push((5, "▦".into(), true));
+    } // Keep Settings/Exit reachable.
+    icons
+}
+#[derive(Clone, Copy)]
+pub struct Metrics {
+    pub dpi: u32,
+    pub size: i32,
+    pub dark: bool,
+}
+pub fn metrics() -> Metrics {
+    unsafe {
+        let taskbar = FindWindowW(wide("Shell_TrayWnd").as_ptr(), std::ptr::null());
+        let dpi = if taskbar.is_null() {
+            96
         } else {
-            "theme.icons.font"
-        }),
-        size,
+            GetDpiForWindow(taskbar).max(96)
+        };
+        Metrics {
+            dpi,
+            size: GetSystemMetricsForDpi(SM_CXSMICON, dpi).max(16),
+            dark: crate::platform::registry::dark(),
+        }
+    }
+}
+/// Shared premultiplied BGRA artwork. Settings displays these exact icon pixels.
+pub fn pixels(
+    label: &str,
+    s: &Settings,
+    enabled: bool,
+    symbol: bool,
+    metrics: Metrics,
+) -> Vec<u32> {
+    let size = metrics.size;
+    let theme = if metrics.dark { "dark" } else { "light" };
+    let fg = super::color(s.get(&format!("theme.icons.iconFG.{theme}")), 0xffffff);
+    let bg = if s.bool("theme.icons.transparentBackground") {
+        None
+    } else {
+        Some(super::color(
+            s.get(&format!("theme.icons.iconBG.{theme}")),
+            0,
+        ))
+    };
+    let font = s.get(if label.chars().any(|c| c as u32 > 0xffff) {
+        "theme.icons.emojiFont"
+    } else if symbol {
+        "theme.icons.symbolsFont"
+    } else {
+        "theme.icons.font"
+    });
+    let opacity = if enabled {
+        1.
+    } else {
+        s.number("theme.icons.disabledOpacity").clamp(0., 1.)
+    };
+    rasterize(label, size, font, fg, bg, opacity)
+}
+/// HICON and the preview share selection, DPI, colors, opacity and glyph layout.
+unsafe fn icon(label: &str, s: &Settings, enabled: bool, symbol: bool, metrics: Metrics) -> HICON {
+    let size = metrics.size;
+    let pixels = pixels(label, s, enabled, symbol, metrics);
+    let mut bits = std::ptr::null_mut();
+    let info = bitmap_info(size);
+    let bitmap = CreateDIBSection(
+        std::ptr::null_mut(),
+        &info,
+        DIB_RGB_COLORS,
+        &mut bits,
+        std::ptr::null_mut(),
+        0,
     );
-    super::text(dc, label, r, fg, f, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-    SelectObject(dc, old);
-    let mask = CreateBitmap(size, size, 1, 1, std::ptr::null());
-    let mask_dc = CreateCompatibleDC(screen);
-    let old_mask = SelectObject(mask_dc, mask);
-    PatBlt(mask_dc, 0, 0, size, size, BLACKNESS);
-    SelectObject(mask_dc, old_mask);
-    DeleteDC(mask_dc);
-    let info = ICONINFO {
+    if bitmap.is_null() {
+        return std::ptr::null_mut();
+    }
+    std::ptr::copy_nonoverlapping(pixels.as_ptr(), bits.cast::<u32>(), pixels.len());
+    // A zero AND mask is correct when the 32-bit color bitmap carries alpha.
+    let mask_data = vec![0u8; (size as usize).div_ceil(16) * 2 * size as usize];
+    let mask = CreateBitmap(size, size, 1, 1, mask_data.as_ptr().cast());
+    let icon = CreateIconIndirect(&ICONINFO {
         fIcon: 1,
         xHotspot: 0,
         yHotspot: 0,
         hbmMask: mask,
         hbmColor: bitmap,
-    };
-    let icon = CreateIconIndirect(&info);
+    });
     DeleteObject(mask);
     DeleteObject(bitmap);
-    DeleteObject(f);
-    DeleteDC(dc);
-    ReleaseDC(std::ptr::null_mut(), screen);
     icon
+}
+fn bitmap_info(size: i32) -> BITMAPINFO {
+    BITMAPINFO {
+        bmiHeader: BITMAPINFOHEADER {
+            biSize: std::mem::size_of::<BITMAPINFOHEADER>() as u32,
+            biWidth: size,
+            biHeight: -size,
+            biPlanes: 1,
+            biBitCount: 32,
+            biCompression: BI_RGB,
+            ..unsafe { std::mem::zeroed() }
+        },
+        bmiColors: [RGBQUAD {
+            rgbBlue: 0,
+            rgbGreen: 0,
+            rgbRed: 0,
+            rgbReserved: 0,
+        }],
+    }
+}
+/// Render a grayscale coverage mask, fit its visible ink into the icon,
+/// then downsample. ClearType RGB fringes and GDI's undefined alpha never enter HICON.
+fn rasterize(
+    label: &str,
+    size: i32,
+    font_name: &str,
+    fg: u32,
+    bg: Option<u32>,
+    opacity: f64,
+) -> Vec<u32> {
+    unsafe {
+        // Draw generously first: font em size is not the visible glyph size.
+        // Small chevrons and initials must fit by their ink bounds, like digits.
+        let high = size * 4 * 3;
+        let info = bitmap_info(high);
+        let mut bits = std::ptr::null_mut();
+        let bitmap = CreateDIBSection(
+            std::ptr::null_mut(),
+            &info,
+            DIB_RGB_COLORS,
+            &mut bits,
+            std::ptr::null_mut(),
+            0,
+        );
+        let dc = CreateCompatibleDC(std::ptr::null_mut());
+        if bitmap.is_null() || dc.is_null() {
+            if !bitmap.is_null() {
+                DeleteObject(bitmap);
+            }
+            if !dc.is_null() {
+                DeleteDC(dc);
+            }
+            return vec![0; (size * size) as usize];
+        }
+        let old = SelectObject(dc, bitmap);
+        std::ptr::write_bytes(bits, 0, (high * high * 4) as usize);
+        let name = font_name.split(',').next().unwrap_or("Segoe UI");
+        let mut height = (high as f64 * 0.94) as i32;
+        let label = wide(label);
+        let mut font;
+        loop {
+            font = CreateFontW(
+                -height,
+                0,
+                0,
+                0,
+                if font_name.to_lowercase().contains("bold") {
+                    700
+                } else {
+                    400
+                },
+                u32::from(font_name.to_lowercase().contains("italic")),
+                0,
+                0,
+                DEFAULT_CHARSET as u32,
+                OUT_DEFAULT_PRECIS as u32,
+                CLIP_DEFAULT_PRECIS as u32,
+                ANTIALIASED_QUALITY as u32,
+                DEFAULT_PITCH as u32,
+                wide(name).as_ptr(),
+            );
+            let previous = SelectObject(dc, font);
+            let mut extent = SIZE { cx: 0, cy: 0 };
+            GetTextExtentPoint32W(dc, label.as_ptr(), (label.len() - 1) as i32, &mut extent);
+            SelectObject(dc, previous);
+            if extent.cx <= high - 8 || height <= 8 {
+                break;
+            }
+            DeleteObject(font);
+            height -= 2;
+        }
+        let previous_font = SelectObject(dc, font);
+        SetBkMode(dc, TRANSPARENT as i32);
+        SetTextColor(dc, 0xffffff);
+        let mut rect = RECT {
+            left: 0,
+            top: 0,
+            right: high,
+            bottom: high,
+        };
+        DrawTextW(
+            dc,
+            label.as_ptr(),
+            (label.len() - 1) as i32,
+            &mut rect,
+            DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX,
+        );
+        GdiFlush();
+        let source = std::slice::from_raw_parts(bits.cast::<u32>(), (high * high) as usize);
+        let (mut left, mut top, mut right, mut bottom) = (high, high, 0, 0);
+        for y in 0..high {
+            for x in 0..high {
+                if source[(y * high + x) as usize] & 255 > 2 {
+                    left = left.min(x);
+                    right = right.max(x + 1);
+                    top = top.min(y);
+                    bottom = bottom.max(y + 1);
+                }
+            }
+        }
+        let target = size * 4;
+        let padding = ((size as f64 * 0.08).round() as i32).max(1) * 4;
+        let available = target - 2 * padding;
+        let ink_width = (right - left).max(1);
+        let ink_height = (bottom - top).max(1);
+        let scale = available as f64 / ink_width.max(ink_height) as f64;
+        let width = ((ink_width as f64 * scale).round() as i32).max(1);
+        let height = ((ink_height as f64 * scale).round() as i32).max(1);
+        let dx = (target - width) / 2;
+        let dy = (target - height) / 2;
+        let mut result = vec![0; (size * size) as usize];
+        for y in 0..size {
+            for x in 0..size {
+                let mut sum = 0;
+                for sy in 0..4 {
+                    for sx in 0..4 {
+                        let xx = x * 4 + sx - dx;
+                        let yy = y * 4 + sy - dy;
+                        if left < right
+                            && top < bottom
+                            && xx >= 0
+                            && xx < width
+                            && yy >= 0
+                            && yy < height
+                        {
+                            let source_x =
+                                left + ((xx as f64 + 0.5) * ink_width as f64 / width as f64) as i32;
+                            let source_y = top
+                                + ((yy as f64 + 0.5) * ink_height as f64 / height as f64) as i32;
+                            sum += source[(source_y * high + source_x) as usize] & 255;
+                        }
+                    }
+                }
+                let coverage = ((sum as f64 / 16.) * opacity).round() as u32;
+                let alpha = if bg.is_some() { 255 } else { coverage };
+                let mut pixel = alpha << 24;
+                for (shift, source_shift) in [(0, 16), (8, 8), (16, 0)] {
+                    let value = ((fg >> source_shift) & 255) * coverage;
+                    let value = value
+                        + bg.map(|b| ((b >> source_shift) & 255) * (255 - coverage))
+                            .unwrap_or(0);
+                    pixel |= ((value + 127) / 255) << shift;
+                }
+                result[(y * size + x) as usize] = pixel;
+            }
+        }
+        SelectObject(dc, previous_font);
+        SelectObject(dc, old);
+        DeleteObject(font);
+        DeleteObject(bitmap);
+        DeleteDC(dc);
+        result
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn arrows_and_digits_fill_the_icon_by_visible_bounds() {
+        for size in [16, 20, 24, 32, 40, 48] {
+            for text in ["1", "W", "10", "99", "\u{2039}", "\u{203a}"] {
+                let p = rasterize(text, size, "Segoe UI Symbol", 0xffffff, None, 1.);
+                let (mut left, mut top, mut right, mut bottom) = (size, size, 0, 0);
+                for y in 0..size {
+                    for x in 0..size {
+                        if p[(y * size + x) as usize] >> 24 > 32 {
+                            left = left.min(x);
+                            right = right.max(x + 1);
+                            top = top.min(y);
+                            bottom = bottom.max(y + 1);
+                        }
+                    }
+                }
+                assert!(
+                    left >= 1 && top >= 1 && right < size && bottom < size,
+                    "clipped {text} at {size}"
+                );
+                assert!(
+                    (right - left).max(bottom - top) >= size * 3 / 4,
+                    "undersized {text} at {size}"
+                );
+            }
+        }
+    }
+    #[test]
+    fn shared_selection_tracks_desktop_options_and_boundaries() {
+        use crate::platform::desktop::Desktop;
+        let mut s = Settings {
+            config: Default::default(),
+            arguments: Default::default(),
+            path: Default::default(),
+        };
+        let mut snap = Snapshot {
+            current: 0,
+            desktops: vec![
+                Desktop {
+                    id: 1,
+                    name: "Work".into(),
+                },
+                Desktop {
+                    id: 2,
+                    name: "Home".into(),
+                },
+            ],
+        };
+        s.set("feature.showDesktopNameInIconTray", "true");
+        s.set("feature.showPrevNextIcons.prevChar", "<");
+        assert_eq!(
+            icon_specs(&s, &snap),
+            vec![
+                (1, "1".into(), true),
+                (2, "W".into(), true),
+                (3, "<".into(), false),
+                (4, "\u{203a}".into(), true)
+            ]
+        );
+        s.set(
+            "feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds",
+            "true",
+        );
+        assert!(!icon_specs(&s, &snap).iter().any(|(id, _, _)| *id == 3));
+        snap.current = 1;
+        let icons = icon_specs(&s, &snap);
+        assert_eq!(icons[0].1, "2");
+        assert_eq!(icons[1].1, "H");
+        assert!(!icons.iter().any(|(id, _, _)| *id == 4));
+        for key in [
+            "feature.showDesktopNameInIconTray",
+            "feature.showDesktopNumberInIconTray",
+            "feature.showPrevNextIcons",
+        ] {
+            s.set(key, "false");
+        }
+        assert_eq!(icon_specs(&s, &snap), vec![(5, "\u{25a6}".into(), true)]);
+    }
+    #[test]
+    fn transparent_icons_have_coverage_and_clear_corners_at_each_dpi() {
+        for size in [16, 20, 24, 32, 40, 48] {
+            for text in ["1", "10", "99", ">", "<"] {
+                let pixels = rasterize(text, size, "Segoe UI", 0xffffff, None, 1.);
+                assert_eq!(pixels.len(), (size * size) as usize);
+                assert_eq!(pixels[0], 0);
+                assert_eq!(pixels[pixels.len() - 1], 0);
+                assert!(pixels.iter().any(|p| p >> 24 > 100));
+                for p in pixels {
+                    let alpha = p >> 24;
+                    assert!(p & 255 <= alpha);
+                    assert!((p >> 8) & 255 <= alpha);
+                    assert!((p >> 16) & 255 <= alpha);
+                }
+            }
+        }
+    }
+    #[test]
+    fn disabled_opacity_changes_alpha() {
+        let p = rasterize("2", 24, "Segoe UI", 0x00ff00, None, 0.5);
+        assert!(p.iter().all(|p| p >> 24 <= 128));
+        assert!(p.iter().any(|p| p >> 24 > 50));
+    }
 }

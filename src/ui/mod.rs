@@ -1,7 +1,10 @@
 mod colors;
 pub mod overlay;
 pub mod settings;
+pub mod settings_process;
+pub mod shortcut_capture;
 pub mod tray;
+mod tray_preview;
 use crate::platform::{registry, wide};
 use crate::settings::Settings;
 use windows_sys::Win32::{
@@ -14,13 +17,6 @@ pub fn dark(s: &Settings) -> bool {
         "dark" => true,
         "light" => false,
         _ => registry::dark(),
-    }
-}
-pub fn colors(dark: bool) -> (u32, u32) {
-    if dark {
-        (0x202020, 0xf4f4f4)
-    } else {
-        (0xf8f8f8, 0x202020)
     }
 }
 pub unsafe fn theme(hwnd: HWND, dark: bool) {
