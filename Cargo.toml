@@ -1,0 +1,22 @@
+[package]
+name = "windows-virtual-desktop-helper"
+version = "3.0.0"
+edition = "2021"
+rust-version = "1.82"
+license = "GPL-3.0-only"
+description = "Native Windows virtual desktop tray icons, overlays and shortcuts"
+build = "build.rs"
+
+[[bin]]
+name = "WindowsVirtualDesktopHelper"
+path = "src/main.rs"
+
+[dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Com", "Win32_System_LibraryLoader", "Win32_System_Registry", "Win32_System_RemoteDesktop", "Win32_System_Threading", "Win32_System_Environment", "Win32_UI_Accessibility", "Win32_UI_Controls", "Win32_UI_HiDpi", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging"] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

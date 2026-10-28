@@ -9,3 +9,10 @@ The Rust code should use as few external libraries as possible, be extremely eff
 For the setup/installer - use the new Windows installer system.
 
 Also restructure the the folder/file layout to better match a Rust project as needed (capitalization, scripts folders, release folders, etc).
+
+
+## Implementation ? 2026-10-28
+
+Implemented as the Cargo project in `src/`, replacing the C# solution and MSI project. Existing settings and API profiles are preserved; desktop/focus updates are event-driven. The native settings UI has reusable rows, light/dark styling and vector/overlay previews. MSIX and portable release scripts are in `scripts/`.
+
+See [architecture](../docs/architecture.md), [packaging](../docs/msix.md), and [validation results and remaining release checks](../docs/validation.md). x64/x86 packages are built and validated; ARM64 source checks pass but its linker is unavailable locally. Signing, installation and publication were not performed.

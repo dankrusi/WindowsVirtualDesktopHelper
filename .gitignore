@@ -400,3 +400,9 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /Installer/Output
+
+# Rust and native distribution outputs
+/target/
+/dist/
+/artifacts/
+*.msixupload

@@ -1,3 +1,12 @@
+# 3.0.0 (unreleased)
+
+- Replace C#/.NET and MSI with native Rust/Win32 and MSIX packaging.
+- Preserve all 61 configuration defaults, CLI overrides, desktop actions and custom hotkeys.
+- Replace desktop/focus/theme polling with registry notifications, foreground hooks and window messages.
+- Add reusable settings rows, light/dark styling, DPI support and native vector/overlay previews.
+- Use stable desktop IDs for history; reconnect after Explorer restarts.
+- Add Cargo checks, native PE/package validation and x64/x86/ARM64 CI builds.
+
 # Unreleased
 
 ## Changes

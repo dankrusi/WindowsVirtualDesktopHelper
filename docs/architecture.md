@@ -1,0 +1,17 @@
+# Native Rust architecture
+
+The application is a single native executable with a statically linked CRT. The only direct crate dependency is Microsoft's `windows-sys`; its only transitive dependency is `windows-link`. No .NET, browser engine, async runtime, UI framework or Windows App SDK installation is needed.
+
+`src/settings.rs` preserves all 61 v2 defaults, custom `hotkeys.*` entries, quoted strings, Unicode escapes, comment lines, and `--key value` / valueless boolean flags. Files in the existing roaming configuration directory load in lexical order, with the main file last. CLI values override files and are never saved. Writes use a temporary file and `MoveFileExW` with replace/write-through. Advanced settings expose the complete file configuration.
+
+`src/platform/desktop.rs` owns apartment-bound COM pointers and releases them with RAII. `profiles.rs` preserves the nine original VirtualDesktopAPI profiles. Interfaces are selected by successful `QueryService` for a known IID, with an OS build guard for the 21H2/22H2 profiles that share an IID but differ in layout. An unsupported interface is reported rather than guessed. Previous-desktop history uses GUIDs, including after reorder/removal.
+
+`src/platform/events.rs` blocks on `RegNotifyChangeKeyValue` for Explorer's VirtualDesktops subtree and the current session's desktop key where present. The UI refreshes cached desktop data only on change or user action. A WinEvent foreground hook and the published GetWindowDesktopId API replace focus polling; `WM_SETTINGCHANGE`, `WM_THEMECHANGED`, and `WM_DISPLAYCHANGE` handle theme/display changes. Explorer's `TaskbarCreated` broadcast reconnects COM, restarts the watcher and restores tray icons. Reconnection uses at most six bounded one-shot retry timers; there is no steady-state polling. Shutdown signals and joins the watcher before destroying its target window.
+
+`src/hotkeys.rs` is the WindowsHotKeyAPI replacement: parsed and validated bindings, RegisterHotKey/WM_HOTKEY, conflict reporting and automatic unregister. `platform/input.rs` is the WindowsInputAPI replacement: SendInput chords for Task View and fallback left/right navigation, preserving held modifiers and cleaning up partial injections.
+
+`src/ui` contains native controls, reusable setting-row descriptors (toggle, choice, text/hotkey), GDI vector previews, tray icons and no-activate click-through overlays. Windows 11 DWM rounded corners and dark title bars are used where supported. Settings use per-monitor DPI; text fields, navigation and checkboxes retain native keyboard/accessibility behavior. Live vectors are drawn directly through GDI so no SVG parsing dependency or raster scaling is needed. Overlay preview uses the actual overlay renderer. All settings not on a dedicated page remain editable under Advanced.
+
+`scripts/build-msix.ps1` builds architecture-specific Cargo release binaries, validates an MSIX with MakeAppx, checks the native PE payload, and emits portable ZIP, MSIX, Store upload archive and SHA-256 files in `dist/`. Signing is explicit. Store identity files are preserved. Historical published Scoop downloads remain in `installers/scoop`.
+
+The undocumented Windows desktop interfaces still require compatibility testing on each supported Windows build. A successful build or current-machine smoke test does not establish compatibility across every Windows/Insider release. See [validation](validation.md).
