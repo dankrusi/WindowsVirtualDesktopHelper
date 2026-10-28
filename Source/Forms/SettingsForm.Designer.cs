@@ -78,6 +78,19 @@ namespace WindowsVirtualDesktopHelper {
             this.checkBoxUseFunctionKeysForJump = new System.Windows.Forms.CheckBox();
             this.labelJumpToDesktopKeysRequired = new System.Windows.Forms.Label();
             this.panelJumpToDesktopKeys.SuspendLayout();
+            this.checkBoxUsePreviousDesktopHotkey = new System.Windows.Forms.CheckBox();
+            this.panelPreviousDesktopModifiers = new System.Windows.Forms.Panel();
+            this.checkBoxPreviousDesktopCtrl = new System.Windows.Forms.CheckBox();
+            this.checkBoxPreviousDesktopAlt = new System.Windows.Forms.CheckBox();
+            this.checkBoxPreviousDesktopShift = new System.Windows.Forms.CheckBox();
+            this.checkBoxPreviousDesktopWin = new System.Windows.Forms.CheckBox();
+            this.labelPreviousDesktopHotkeyRequired = new System.Windows.Forms.Label();
+            this.labelPreviousDesktopKey = new System.Windows.Forms.Label();
+            this.panelPreviousDesktopKeys = new System.Windows.Forms.Panel();
+            this.radioButtonPreviousDesktopTab = new System.Windows.Forms.RadioButton();
+            this.radioButtonPreviousDesktopBacktick = new System.Windows.Forms.RadioButton();
+            this.panelPreviousDesktopKeys.SuspendLayout();
+            this.panelPreviousDesktopModifiers.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -106,6 +119,9 @@ namespace WindowsVirtualDesktopHelper {
             this.groupBox1.Controls.Add(this.checkBoxStatusOverlayTranslucent);
             this.groupBox1.Controls.Add(this.checkBoxStatusOverlayAnimate);
             this.groupBox1.Controls.Add(this.checkBoxShowStatusOverlay);
+            this.groupBox1.Controls.Add(this.checkBoxUsePreviousDesktopHotkey);
+            this.groupBox1.Controls.Add(this.panelPreviousDesktopModifiers);
+            this.groupBox1.Controls.Add(this.panelPreviousDesktopKeys);
             this.groupBox1.Controls.Add(this.panelJumpToDesktopKeys);
             this.groupBox1.Controls.Add(this.panel3);
             this.groupBox1.Controls.Add(this.checkBoxUseHotKeysToJumpToDesktop);
@@ -123,7 +139,7 @@ namespace WindowsVirtualDesktopHelper {
             this.groupBox1.Margin = new System.Windows.Forms.Padding(6);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(6);
-            this.groupBox1.Size = new System.Drawing.Size(801, 690);
+            this.groupBox1.Size = new System.Drawing.Size(801, 860);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Features";
@@ -487,7 +503,7 @@ namespace WindowsVirtualDesktopHelper {
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.checkBoxStartupWithWindows);
-            this.groupBox2.Location = new System.Drawing.Point(22, 724);
+            this.groupBox2.Location = new System.Drawing.Point(22, 894);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(6);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(6);
@@ -750,11 +766,141 @@ namespace WindowsVirtualDesktopHelper {
             this.labelJumpToDesktopKeysRequired.Text = "REQUIRED";
             this.labelJumpToDesktopKeysRequired.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             //
+            // checkBoxUsePreviousDesktopHotkey
+            //
+            this.checkBoxUsePreviousDesktopHotkey.AutoSize = true;
+            this.checkBoxUsePreviousDesktopHotkey.Location = new System.Drawing.Point(28, 700);
+            this.checkBoxUsePreviousDesktopHotkey.Name = "checkBoxUsePreviousDesktopHotkey";
+            this.checkBoxUsePreviousDesktopHotkey.Size = new System.Drawing.Size(720, 29);
+            this.checkBoxUsePreviousDesktopHotkey.TabIndex = 30;
+            this.checkBoxUsePreviousDesktopHotkey.Text = "Use hot key to jump to most recent desktop";
+            this.checkBoxUsePreviousDesktopHotkey.UseVisualStyleBackColor = true;
+            this.checkBoxUsePreviousDesktopHotkey.CheckedChanged += new System.EventHandler(this.checkBoxUsePreviousDesktopHotkey_CheckedChanged);
+            //
+            // panelPreviousDesktopModifiers
+            //
+            this.panelPreviousDesktopModifiers.Controls.Add(this.labelPreviousDesktopHotkeyRequired);
+            this.panelPreviousDesktopModifiers.Controls.Add(this.checkBoxPreviousDesktopWin);
+            this.panelPreviousDesktopModifiers.Controls.Add(this.checkBoxPreviousDesktopShift);
+            this.panelPreviousDesktopModifiers.Controls.Add(this.checkBoxPreviousDesktopAlt);
+            this.panelPreviousDesktopModifiers.Controls.Add(this.checkBoxPreviousDesktopCtrl);
+            this.panelPreviousDesktopModifiers.Location = new System.Drawing.Point(73, 740);
+            this.panelPreviousDesktopModifiers.Name = "panelPreviousDesktopModifiers";
+            this.panelPreviousDesktopModifiers.Size = new System.Drawing.Size(704, 46);
+            this.panelPreviousDesktopModifiers.TabIndex = 31;
+            //
+            // checkBoxPreviousDesktopCtrl
+            //
+            this.checkBoxPreviousDesktopCtrl.AutoSize = true;
+            this.checkBoxPreviousDesktopCtrl.Dock = System.Windows.Forms.DockStyle.Left;
+            this.checkBoxPreviousDesktopCtrl.Location = new System.Drawing.Point(0, 0);
+            this.checkBoxPreviousDesktopCtrl.Name = "checkBoxPreviousDesktopCtrl";
+            this.checkBoxPreviousDesktopCtrl.Size = new System.Drawing.Size(75, 46);
+            this.checkBoxPreviousDesktopCtrl.TabIndex = 0;
+            this.checkBoxPreviousDesktopCtrl.Text = "Ctrl";
+            this.checkBoxPreviousDesktopCtrl.UseVisualStyleBackColor = true;
+            this.checkBoxPreviousDesktopCtrl.CheckedChanged += new System.EventHandler(this.PreviousDesktopHotkey_Changed);
+            //
+            // checkBoxPreviousDesktopAlt
+            //
+            this.checkBoxPreviousDesktopAlt.AutoSize = true;
+            this.checkBoxPreviousDesktopAlt.Dock = System.Windows.Forms.DockStyle.Left;
+            this.checkBoxPreviousDesktopAlt.Location = new System.Drawing.Point(75, 0);
+            this.checkBoxPreviousDesktopAlt.Name = "checkBoxPreviousDesktopAlt";
+            this.checkBoxPreviousDesktopAlt.Size = new System.Drawing.Size(70, 46);
+            this.checkBoxPreviousDesktopAlt.TabIndex = 1;
+            this.checkBoxPreviousDesktopAlt.Text = "Alt";
+            this.checkBoxPreviousDesktopAlt.UseVisualStyleBackColor = true;
+            this.checkBoxPreviousDesktopAlt.CheckedChanged += new System.EventHandler(this.PreviousDesktopHotkey_Changed);
+            //
+            // checkBoxPreviousDesktopShift
+            //
+            this.checkBoxPreviousDesktopShift.AutoSize = true;
+            this.checkBoxPreviousDesktopShift.Dock = System.Windows.Forms.DockStyle.Left;
+            this.checkBoxPreviousDesktopShift.Location = new System.Drawing.Point(145, 0);
+            this.checkBoxPreviousDesktopShift.Name = "checkBoxPreviousDesktopShift";
+            this.checkBoxPreviousDesktopShift.Size = new System.Drawing.Size(86, 46);
+            this.checkBoxPreviousDesktopShift.TabIndex = 2;
+            this.checkBoxPreviousDesktopShift.Text = "Shift";
+            this.checkBoxPreviousDesktopShift.UseVisualStyleBackColor = true;
+            this.checkBoxPreviousDesktopShift.CheckedChanged += new System.EventHandler(this.PreviousDesktopHotkey_Changed);
+            //
+            // checkBoxPreviousDesktopWin
+            //
+            this.checkBoxPreviousDesktopWin.AutoSize = true;
+            this.checkBoxPreviousDesktopWin.Dock = System.Windows.Forms.DockStyle.Left;
+            this.checkBoxPreviousDesktopWin.Location = new System.Drawing.Point(231, 0);
+            this.checkBoxPreviousDesktopWin.Name = "checkBoxPreviousDesktopWin";
+            this.checkBoxPreviousDesktopWin.Size = new System.Drawing.Size(82, 46);
+            this.checkBoxPreviousDesktopWin.TabIndex = 3;
+            this.checkBoxPreviousDesktopWin.Text = "Win";
+            this.checkBoxPreviousDesktopWin.UseVisualStyleBackColor = true;
+            this.checkBoxPreviousDesktopWin.CheckedChanged += new System.EventHandler(this.PreviousDesktopHotkey_Changed);
+            //
+            // labelPreviousDesktopHotkeyRequired
+            //
+            this.labelPreviousDesktopHotkeyRequired.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelPreviousDesktopHotkeyRequired.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPreviousDesktopHotkeyRequired.ForeColor = System.Drawing.Color.Red;
+            this.labelPreviousDesktopHotkeyRequired.Location = new System.Drawing.Point(313, 0);
+            this.labelPreviousDesktopHotkeyRequired.Name = "labelPreviousDesktopHotkeyRequired";
+            this.labelPreviousDesktopHotkeyRequired.Size = new System.Drawing.Size(391, 46);
+            this.labelPreviousDesktopHotkeyRequired.TabIndex = 4;
+            this.labelPreviousDesktopHotkeyRequired.Text = "MODIFIER REQUIRED";
+            this.labelPreviousDesktopHotkeyRequired.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            //
+            // panelPreviousDesktopKeys
+            //
+            this.panelPreviousDesktopKeys.Controls.Add(this.radioButtonPreviousDesktopBacktick);
+            this.panelPreviousDesktopKeys.Controls.Add(this.radioButtonPreviousDesktopTab);
+            this.panelPreviousDesktopKeys.Controls.Add(this.labelPreviousDesktopKey);
+            this.panelPreviousDesktopKeys.Location = new System.Drawing.Point(73, 795);
+            this.panelPreviousDesktopKeys.Name = "panelPreviousDesktopKeys";
+            this.panelPreviousDesktopKeys.Size = new System.Drawing.Size(704, 46);
+            this.panelPreviousDesktopKeys.TabIndex = 32;
+            //
+            // labelPreviousDesktopKey
+            //
+            this.labelPreviousDesktopKey.Dock = System.Windows.Forms.DockStyle.Left;
+            this.labelPreviousDesktopKey.Location = new System.Drawing.Point(0, 0);
+            this.labelPreviousDesktopKey.Name = "labelPreviousDesktopKey";
+            this.labelPreviousDesktopKey.Size = new System.Drawing.Size(71, 46);
+            this.labelPreviousDesktopKey.TabIndex = 0;
+            this.labelPreviousDesktopKey.Text = "Key:";
+            this.labelPreviousDesktopKey.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            //
+            // radioButtonPreviousDesktopTab
+            //
+            this.radioButtonPreviousDesktopTab.AutoSize = true;
+            this.radioButtonPreviousDesktopTab.Dock = System.Windows.Forms.DockStyle.Left;
+            this.radioButtonPreviousDesktopTab.Location = new System.Drawing.Point(71, 0);
+            this.radioButtonPreviousDesktopTab.Name = "radioButtonPreviousDesktopTab";
+            this.radioButtonPreviousDesktopTab.Size = new System.Drawing.Size(120, 46);
+            this.radioButtonPreviousDesktopTab.TabIndex = 1;
+            this.radioButtonPreviousDesktopTab.TabStop = true;
+            this.radioButtonPreviousDesktopTab.Text = "Tab";
+            this.radioButtonPreviousDesktopTab.UseVisualStyleBackColor = true;
+            this.radioButtonPreviousDesktopTab.CheckedChanged += new System.EventHandler(this.PreviousDesktopHotkey_Changed);
+            //
+            // radioButtonPreviousDesktopBacktick
+            //
+            this.radioButtonPreviousDesktopBacktick.AutoSize = true;
+            this.radioButtonPreviousDesktopBacktick.Dock = System.Windows.Forms.DockStyle.Left;
+            this.radioButtonPreviousDesktopBacktick.Location = new System.Drawing.Point(191, 0);
+            this.radioButtonPreviousDesktopBacktick.Name = "radioButtonPreviousDesktopBacktick";
+            this.radioButtonPreviousDesktopBacktick.Size = new System.Drawing.Size(200, 46);
+            this.radioButtonPreviousDesktopBacktick.TabIndex = 2;
+            this.radioButtonPreviousDesktopBacktick.TabStop = true;
+            this.radioButtonPreviousDesktopBacktick.Text = "Backtick (`)";
+            this.radioButtonPreviousDesktopBacktick.UseVisualStyleBackColor = true;
+            this.radioButtonPreviousDesktopBacktick.CheckedChanged += new System.EventHandler(this.PreviousDesktopHotkey_Changed);
+            //
+            //
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(849, 831);
+            this.ClientSize = new System.Drawing.Size(849, 1001);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -781,6 +927,10 @@ namespace WindowsVirtualDesktopHelper {
             this.panel4.PerformLayout();
             this.panelJumpToDesktopKeys.ResumeLayout(false);
             this.panelJumpToDesktopKeys.PerformLayout();
+            this.panelPreviousDesktopModifiers.ResumeLayout(false);
+            this.panelPreviousDesktopModifiers.PerformLayout();
+            this.panelPreviousDesktopKeys.ResumeLayout(false);
+            this.panelPreviousDesktopKeys.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -812,6 +962,17 @@ namespace WindowsVirtualDesktopHelper {
 		private System.Windows.Forms.CheckBox checkBoxShowDesktopNameInitial;
 		private System.Windows.Forms.CheckBox checkBoxOverlayShowOnAllMonitors;
 		private System.Windows.Forms.Panel panel3;
+		private System.Windows.Forms.CheckBox checkBoxUsePreviousDesktopHotkey;
+		private System.Windows.Forms.Panel panelPreviousDesktopModifiers;
+		private System.Windows.Forms.CheckBox checkBoxPreviousDesktopCtrl;
+		private System.Windows.Forms.CheckBox checkBoxPreviousDesktopAlt;
+		private System.Windows.Forms.CheckBox checkBoxPreviousDesktopShift;
+		private System.Windows.Forms.CheckBox checkBoxPreviousDesktopWin;
+		private System.Windows.Forms.Label labelPreviousDesktopHotkeyRequired;
+		private System.Windows.Forms.Label labelPreviousDesktopKey;
+		private System.Windows.Forms.Panel panelPreviousDesktopKeys;
+		private System.Windows.Forms.RadioButton radioButtonPreviousDesktopTab;
+		private System.Windows.Forms.RadioButton radioButtonPreviousDesktopBacktick;
 		private System.Windows.Forms.Panel panelJumpToDesktopKeys;
 		private System.Windows.Forms.CheckBox checkBoxUseDigitsForJump;
 		private System.Windows.Forms.CheckBox checkBoxUseNumpadDigitsForJump;

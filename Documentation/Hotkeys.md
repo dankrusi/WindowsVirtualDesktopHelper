@@ -40,6 +40,14 @@ for how to change the custom configuration.
 
 Note: A hotkey MUST have at least one modifier key (Ctrl, Alt, Shift, Win) and one regular key (A-Z, 0-9, etc). This is due to the nature of the Windows API for global key bindings (for obvious reasons it should not be possible to globally bind just the A key...).
 
+### Most recent desktop
+
+Enable **Use hot key to jump to most recent desktop** in Settings, choose any combination of Ctrl, Alt, Shift, and Win, and select **Tab** or **Backtick**. The feature is disabled by default, with Alt + backtick preselected. Changes apply when Settings closes; registration conflicts are reported there.
+
+After moving from desktop 2 to desktop 5, each press alternates between 2 and 5. Switching normally to another desktop updates the pair. Nothing happens until another desktop has been visited during the current app session.
+
+The configuration file also supports other keys through `feature.useHotKeyToJumpToPreviousDesktop.hotkey`, or through a custom hotkey with the `PreviousDesktop` action. Opening Settings preserves such custom shortcuts; editing this feature's shortcut controls replaces them with a UI selection.
+
 ### Hotkeys
 
 #### Modifiers

@@ -53,6 +53,7 @@ namespace WindowsVirtualDesktopHelper {
 		public IntPtr LastForegroundhWnd = IntPtr.Zero; //TODO: this should be private
 		public List<string> FGWindowHistory = new List<string>(); //TODO: this should be private // needed to detect if Task View was open
 		private List<int> _desktopNumberHistory = new List<int>(); // stores a list of most recent desktop numbers used
+		private readonly object _desktopHistoryLock = new object();
 
 		#endregion
 
@@ -75,6 +76,7 @@ namespace WindowsVirtualDesktopHelper {
 			try {
 				this.LoadVDAPI();
 				this.LoadVDDisplayInfo();
+				RecordDesktopVisit((int)this.CurrentVDDisplayNumber);
 				//throw new Exception("Test error", new Exception("Test inner error"));
 			} catch (Exception e) {
 				throw e;
@@ -216,6 +218,8 @@ namespace WindowsVirtualDesktopHelper {
 				Action safeAction = delegate { VDSwitchedSafe(); };
 				this.AppForm.Invoke(safeAction);
 			} else {
+				// Record the actual desktop before updating UI, even if an overlay update fails.
+				RecordCurrentDesktop();
 				// Update icons
 				this.UIUpdateIconForVDDisplayNumber(this.CurrentSystemThemeName, this.CurrentVDDisplayNumber, this.CurrentVDDisplayName);
 				this.UIUpdateIconForVDDisplayName(this.CurrentSystemThemeName, this.CurrentVDDisplayName);
@@ -249,13 +253,25 @@ namespace WindowsVirtualDesktopHelper {
 						Util.Logging.WriteLine("App: Error: SwitchDesktopForward (restorePrevWinFocus()): " + e.Message);
 					}
 				}
-				// Log this desktop number in _desktopNumberHistory, only keeping the last 20
-				if(_desktopNumberHistory.Count == 0 || _desktopNumberHistory[_desktopNumberHistory.Count - 1] != this.CurrentVDDisplayNumber) {
-					_desktopNumberHistory.Add((int)this.CurrentVDDisplayNumber);
+			}
+		}
+
+		private void RecordDesktopVisit(int number) {
+			lock(_desktopHistoryLock) {
+				if(_desktopNumberHistory.Count == 0 || _desktopNumberHistory[_desktopNumberHistory.Count - 1] != number) {
+					_desktopNumberHistory.Add(number);
 				}
 				if(_desktopNumberHistory.Count > 20) {
 					_desktopNumberHistory.RemoveRange(0, _desktopNumberHistory.Count - 20);
 				}
+			}
+		}
+
+		private void RecordCurrentDesktop() {
+			try {
+				RecordDesktopVisit((int)GetVDDisplayNumber(true));
+			} catch(Exception e) {
+				Util.Logging.WriteLine("App: Error: recording desktop history: " + e.Message);
 			}
 		}
 
@@ -280,6 +296,7 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		public void SwitchToDesktop(int number) {
+			RecordCurrentDesktop();
 			// Explicitly store the last focused window
 			try {
 				_storeLastWinFocused();
@@ -289,6 +306,8 @@ namespace WindowsVirtualDesktopHelper {
 			// We try the virtual desktop implementation API
 			try {
 				VDAPI.SwitchToDesktop(number);
+				// Do not wait for the polling thread: the next hotkey press may arrive first.
+				RecordCurrentDesktop();
 			} catch(Exception e) {
 				Util.Logging.WriteLine("App: Error: SwitchToDesktop (VDAPI.SwitchToDesktop(number)): " + e.Message);
 				return;
@@ -296,13 +315,20 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		public void SwitchToPreviousDesktop() {
-			// Switch to the previous desktop number from _desktopNumberHistory which is not the current desktop number
-			for(var i = _desktopNumberHistory.Count - 1; i >= 0; i--) {
-				if(_desktopNumberHistory[i] != this.CurrentVDDisplayNumber) {
-					this.SwitchToDesktop(_desktopNumberHistory[i]);
-					return;
+			var currentDesktop = (int)GetVDDisplayNumber(true);
+			RecordDesktopVisit(currentDesktop);
+			var desktopCount = GetVDDisplayCount();
+			int? previousDesktop = null;
+			lock(_desktopHistoryLock) {
+				for(var i = _desktopNumberHistory.Count - 1; i >= 0; i--) {
+					var candidate = _desktopNumberHistory[i];
+					if(candidate != currentDesktop && candidate >= 0 && candidate < desktopCount) {
+						previousDesktop = candidate;
+						break;
+					}
 				}
 			}
+			if(previousDesktop.HasValue) SwitchToDesktop(previousDesktop.Value);
 		}
 
 		public void UpdateStatusOverlayWindows() {

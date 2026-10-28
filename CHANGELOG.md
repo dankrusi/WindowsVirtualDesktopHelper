@@ -1,11 +1,13 @@
 # Unreleased
 
 ## Changes
+* Configure a hotkey to jump to the most recent desktop in Settings, with Ctrl/Alt/Shift/Win modifiers and Tab/backtick radio buttons. Repeated presses toggle between the two most recent desktops.
 * Choose any combination of Ctrl, Alt, Shift, and Win for Jump to Desktop hotkeys (#192).
 * Restore the `+#` suffix on each hotkey modifier label.
 * Choose keyboard digits, numpad digits, and/or F1-F9 for Jump to Desktop hotkeys (#193). Keyboard and numpad digits remain enabled by default.
 
 ## Fixes
+* Track the starting desktop and update desktop history immediately after a jump so toggling also works on the first switch and with rapid repeated presses.
 * Display hotkey registration errors while keeping other shortcuts working.
 * Preserve saved hotkey modifiers while the feature is disabled and clear old hotkeys when no modifier or key group is selected.
 

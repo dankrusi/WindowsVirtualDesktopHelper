@@ -8,6 +8,7 @@ namespace WindowsVirtualDesktopHelper {
 	public partial class SettingsForm : Form {
 
 		private bool IsLoading;
+		private string _previousDesktopCustomHotkey;
 
 		public SettingsForm() {
 			IsLoading = true;
@@ -80,6 +81,7 @@ namespace WindowsVirtualDesktopHelper {
 			checkBoxShowStatusOverlay_CheckedChanged(this, null);
 			EnableDisableModifierCheckboxes(checkBoxUseHotKeysToJumpToDesktop.Checked);
 			ValidateHotkeys();
+			LoadPreviousDesktopHotkey();
 		}
 
 		private void SaveSettingsFromUI() {
@@ -107,6 +109,8 @@ namespace WindowsVirtualDesktopHelper {
 
 				var useHotkeys = this.checkBoxUseHotKeysToJumpToDesktop.Checked && ValidateHotkeys() && ValidateJumpToDesktopKeys();
 				Settings.SetBool("feature.useHotKeyToJumpToDesktopNumber", useHotkeys);
+				var usePreviousDesktopHotkey = checkBoxUsePreviousDesktopHotkey.Checked && ValidatePreviousDesktopHotkey();
+				Settings.SetBool("feature.useHotKeyToJumpToPreviousDesktop", usePreviousDesktopHotkey);
 				SaveSettingsFromUI();
 				App.Instance.SetupHotKeys();
 
@@ -362,6 +366,85 @@ namespace WindowsVirtualDesktopHelper {
 		}
 
 		#endregion
+
+		private void LoadPreviousDesktopHotkey() {
+			checkBoxUsePreviousDesktopHotkey.Checked = Settings.GetBool("feature.useHotKeyToJumpToPreviousDesktop");
+			var hotkey = Settings.GetString("feature.useHotKeyToJumpToPreviousDesktop.hotkey");
+			var parts = hotkey.Split('+');
+			KeyModifiers modifiers = KeyModifiers.None;
+			for(int i = 0; i < parts.Length - 1; i++) {
+				var part = parts[i].Trim();
+				if(part.Equals("Control", StringComparison.OrdinalIgnoreCase)) part = "Ctrl";
+				if(Enum.TryParse(part, true, out KeyModifiers modifier)) modifiers |= modifier;
+			}
+			checkBoxPreviousDesktopCtrl.Checked = modifiers.HasFlag(KeyModifiers.Ctrl);
+			checkBoxPreviousDesktopAlt.Checked = modifiers.HasFlag(KeyModifiers.Alt);
+			checkBoxPreviousDesktopShift.Checked = modifiers.HasFlag(KeyModifiers.Shift);
+			checkBoxPreviousDesktopWin.Checked = modifiers.HasFlag(KeyModifiers.Win);
+
+			var key = parts[parts.Length - 1].Trim();
+			if(key.Equals("Tab", StringComparison.OrdinalIgnoreCase)) {
+				radioButtonPreviousDesktopTab.Checked = true;
+			} else if(key.Equals("Tilde", StringComparison.OrdinalIgnoreCase)
+				|| (Enum.TryParse(key, true, out Keys parsedKey) && parsedKey == Keys.Oemtilde)) {
+				radioButtonPreviousDesktopBacktick.Checked = true;
+			} else if(modifiers != KeyModifiers.None && key.Length > 0) {
+				// Keep advanced shortcuts from the config file until the user edits these controls.
+				_previousDesktopCustomHotkey = hotkey;
+			}
+			UpdatePreviousDesktopHotkeyControls();
+		}
+
+		private KeyModifiers GetPreviousDesktopModifiers() {
+			KeyModifiers modifiers = KeyModifiers.None;
+			if(checkBoxPreviousDesktopCtrl.Checked) modifiers |= KeyModifiers.Ctrl;
+			if(checkBoxPreviousDesktopAlt.Checked) modifiers |= KeyModifiers.Alt;
+			if(checkBoxPreviousDesktopShift.Checked) modifiers |= KeyModifiers.Shift;
+			if(checkBoxPreviousDesktopWin.Checked) modifiers |= KeyModifiers.Win;
+			return modifiers;
+		}
+
+		private bool ValidatePreviousDesktopHotkey() {
+			bool enabled = checkBoxUsePreviousDesktopHotkey.Checked;
+			bool valid = _previousDesktopCustomHotkey != null
+				|| (GetPreviousDesktopModifiers() != KeyModifiers.None
+					&& (radioButtonPreviousDesktopTab.Checked || radioButtonPreviousDesktopBacktick.Checked));
+			labelPreviousDesktopHotkeyRequired.Text = _previousDesktopCustomHotkey
+				?? (GetPreviousDesktopModifiers() == KeyModifiers.None ? "MODIFIER REQUIRED" : "SELECT A KEY");
+			labelPreviousDesktopHotkeyRequired.ForeColor = _previousDesktopCustomHotkey == null ? Color.Red : SystemColors.GrayText;
+			labelPreviousDesktopHotkeyRequired.Visible = enabled && (!valid || _previousDesktopCustomHotkey != null);
+			return !enabled || valid;
+		}
+
+		private void UpdatePreviousDesktopHotkeyControls() {
+			bool enabled = checkBoxUsePreviousDesktopHotkey.Checked;
+			checkBoxPreviousDesktopCtrl.Enabled = enabled;
+			checkBoxPreviousDesktopAlt.Enabled = enabled;
+			checkBoxPreviousDesktopShift.Enabled = enabled;
+			checkBoxPreviousDesktopWin.Enabled = enabled;
+			radioButtonPreviousDesktopTab.Enabled = enabled;
+			radioButtonPreviousDesktopBacktick.Enabled = enabled;
+			labelPreviousDesktopKey.Enabled = enabled;
+			ValidatePreviousDesktopHotkey();
+		}
+
+		private void checkBoxUsePreviousDesktopHotkey_CheckedChanged(object sender, EventArgs e) {
+			if(IsLoading) return;
+			Settings.SetBool("feature.useHotKeyToJumpToPreviousDesktop", checkBoxUsePreviousDesktopHotkey.Checked);
+			UpdatePreviousDesktopHotkeyControls();
+		}
+
+		private void PreviousDesktopHotkey_Changed(object sender, EventArgs e) {
+			if(IsLoading) return;
+			if(sender is RadioButton radioButton && !radioButton.Checked) return;
+			_previousDesktopCustomHotkey = null;
+			var modifiers = GetPreviousDesktopModifiers();
+			var key = radioButtonPreviousDesktopTab.Checked ? "Tab" : "Tilde";
+			var hotkey = modifiers != KeyModifiers.None && (radioButtonPreviousDesktopTab.Checked || radioButtonPreviousDesktopBacktick.Checked)
+				? modifiers.ToString().Replace(", ", " + ") + " + " + key : "";
+			Settings.SetString("feature.useHotKeyToJumpToPreviousDesktop.hotkey", hotkey);
+			ValidatePreviousDesktopHotkey();
+		}
 
 		private void checkBoxShowStatusOverlay_CheckedChanged(object sender, EventArgs e) {
 			if(IsLoading) return;

@@ -94,8 +94,8 @@ namespace WindowsVirtualDesktopHelper {
 			RegisterDefault("feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys", false, "If enabled, the Jump To Desktop feature registers the corresponding Function keys");
 
 			// Feature: useHotKeyToJumpToPreviousDesktop
-			RegisterDefault("feature.useHotKeyToJumpToPreviousDesktop", false);
-			RegisterDefault("feature.useHotKeyToJumpToPreviousDesktop.hotkey", "Alt + Tilde");
+			RegisterDefault("feature.useHotKeyToJumpToPreviousDesktop", false, "Enable a hotkey to return to the most recently used desktop. Repeated presses toggle between the two most recent desktops.");
+			RegisterDefault("feature.useHotKeyToJumpToPreviousDesktop.hotkey", "Alt + Tilde", "Shortcut for the most recent desktop. The Settings UI offers Tab or backtick (Tilde); custom keys can be set here.");
 
 			// Feature: useHotKeyToSwitchDesktopForward
 			RegisterDefault("feature.useHotKeyToSwitchDesktopForward", false);

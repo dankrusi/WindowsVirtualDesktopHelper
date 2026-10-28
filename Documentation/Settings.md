@@ -61,8 +61,8 @@ Back to [Home](https://github.com/dankrusi/WindowsVirtualDesktopHelper)
 | feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits | ``true`` | If enabled, the Jump To Desktop feature registers the Numpad digits |
 | feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys | ``false`` | If enabled, the Jump To Desktop feature registers the corresponding Function keys |
 | feature.useHotKeyToJumpToDesktopNumber.hotkey | ``"Alt"`` |  |
-| feature.useHotKeyToJumpToPreviousDesktop | ``false`` |  |
-| feature.useHotKeyToJumpToPreviousDesktop.hotkey | ``"Alt + Tilde"`` |  |
+| feature.useHotKeyToJumpToPreviousDesktop | ``false`` | Enable a hotkey to return to the most recently used desktop. Repeated presses toggle between the two most recent desktops. |
+| feature.useHotKeyToJumpToPreviousDesktop.hotkey | ``"Alt + Tilde"`` | Shortcut for the most recent desktop. The Settings UI offers Tab or backtick (Tilde); custom keys can be set here. |
 | feature.useHotKeyToSwitchDesktopForward | ``false`` |  |
 | feature.useHotKeyToSwitchDesktopForward.hotkey | ``"Alt + Right"`` |  |
 | feature.useHotKeyToSwitchDesktopBackward | ``false`` |  |
