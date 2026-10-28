@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Open Source Developer, Daniel Krüsi")]
 [assembly: AssemblyProduct("Windows Virtual Desktop Helper")]
-[assembly: AssemblyCopyright("Copyright © Dan Krusi 2022-2024")]
+[assembly: AssemblyCopyright("Copyright © Dan Krusi 2022-2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

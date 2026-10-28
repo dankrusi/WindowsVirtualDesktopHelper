@@ -4,8 +4,8 @@ Simple and lightweight app to help with Virtual Desktops for Windows 10 and Wind
 
 ![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-[Download v2.0 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Setup.v2.0.msi) | 
-[Download v2.0 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.0.zip)
+[Download v2.1 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Setup.v2.1.msi) |
+[Download v2.1 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Executable.v2.1.zip)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
@@ -13,9 +13,7 @@ fix some of these missing features.
 
 Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop number
 
-Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as untrusted by Windows
-Defender or other anti-virus applications. Typically, after enough users download, install, and report
-the software as okay/safe, this warning will go away.
+Note: The v2.1 executable and MSI installer are unsigned. Windows SmartScreen or antivirus software may display an untrusted publisher warning. SHA-256 checksums are provided with the release downloads.
 
 
 
@@ -23,9 +21,12 @@ the software as okay/safe, this warning will go away.
 
 * Show desktop number in notification area
 * Show desktop name when switching desktops
+* Show desktop name in a permanent status overlay
 * Show prev/next desktop by clicking icons in notification area
 * Show desktop initial in notification area
 * Custom hot keys for virtual desktop actions
+* Jump between the two most recently used desktops with a configurable hotkey
+* Jump to desktop numbers using keyboard digits, numpad digits, or function keys
 * Autostart with Windows
 * Simple and lightweight
 * Configurable
@@ -39,23 +40,21 @@ the software as okay/safe, this warning will go away.
 
 ### Requirements
 
-Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7 or higher in order to run. Most likely you already have this installed, otherwise you can get it from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download/dotnet-framework)
+Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7.2 or higher in order to run. Most likely you already have this installed, otherwise you can get it from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download/dotnet-framework)
 
 ### Setup
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v2.0.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Setup.v2.0.msi)
+[Download WindowsVirtualDesktopHelper Setup v2.1.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Setup.v2.1.msi)
 
-Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
-Defender or other anti-virus applications. Typically, after enough users download, install, and report
-the software as okay/safe, this malware warning will go away. If you prefer to avoid some of these issues, use the Zip version of the executable instead.
+The v2.1 MSI installer is unsigned. Windows may display an untrusted publisher warning during installation. The executable in the portable ZIP is also unsigned.
 
 ### Executable
 
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
-[Download WindowsVirtualDesktopHelper Executable v2.0.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.0.zip)
+[Download WindowsVirtualDesktopHelper Executable v2.1.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Executable.v2.1.zip)
 
 ### Scoop
 
@@ -132,12 +131,11 @@ Windows automatically organizes and orders the notification area icons. You can 
 
 ### Why is this app is being reported by Windows Defender as untrusted?
 
-Currently Windows Virtual Desktop Helper is not code-signed, and thus may be reported as untrusted. With USD 70 donations per year, the app will be signed.
+The v2.1 release is unsigned, so Windows may display an untrusted publisher warning. The release includes SHA-256 checksums to verify that downloaded files match the published artifacts.
 
 ### Why is this app is being reported by Windows Defender as malware?
 
-Currently Windows Virtual Desktop Helper is not code-signed, and due to its installation option for installing to autostart, may be flagged as malware. Typically, after enough users download, install, and report
-the software as okay/safe, this malware warning will go away. With USD 70 donations per year, the app will be signed.
+Unsigned applications can trigger antivirus detections. Both v2.1 download formats are unsigned. If you believe a detection is a false positive, report it to your antivirus vendor.
 
 ### Why is the app based on the older .NET 4.7?
 
@@ -209,7 +207,7 @@ Install Visual Studio 2022 or later with ".NET desktop development" feature set,
 
 Note: The Setup project which creates the MSI installer will require the following extension to be installed: [Microsoft Visual Studio Installer Projects 2022](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2022InstallerProjects)
 
-Note: Building in Release mode will automatically sign the executable with the designated code-signing certificate, which will not work on your machine. If you really must build your own release, you can remove the post-build event.
+Release builds are unsigned by default. Code signing is opt-in with the MSBuild property `/p:SignReleaseBuild=true` and requires the certificate and tools configured in `Scripts/codesign-release-build.ps1`. The v2.1 official release is unsigned.
 
 ### Depencencies
 

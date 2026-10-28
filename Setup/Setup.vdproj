@@ -150,7 +150,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:WindowsVirtualDesktopHelper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:WindowsVirtualDesktopHelper, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_AE1F8E6D4E254F138CC68001DCFA8FFE"
@@ -241,7 +241,7 @@
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.1"
+        "ProductVersion" = "8:2.1.0"
         "Manufacturer" = "8:Open Source Developer, Daniel Krüsi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/dankrusi/WindowsVirtualDesktopHelper"

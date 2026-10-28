@@ -1,35 +1,32 @@
-# Unreleased
+# v2.1 - 2026-10-28
 
-## Changes
-* Configure a hotkey to jump to the most recent desktop in Settings, with Ctrl/Alt/Shift/Win modifiers and Tab/backtick radio buttons. Repeated presses toggle between the two most recent desktops.
-* Choose any combination of Ctrl, Alt, Shift, and Win for Jump to Desktop hotkeys (#192).
-* Restore the `+#` suffix on each hotkey modifier label.
-* Choose keyboard digits, numpad digits, and/or F1-F9 for Jump to Desktop hotkeys (#193). Keyboard and numpad digits remain enabled by default.
-
-## Fixes
-* Track the starting desktop and update desktop history immediately after a jump so toggling also works on the first switch and with rapid repeated presses.
-* Display hotkey registration errors while keeping other shortcuts working.
-* Preserve saved hotkey modifiers while the feature is disabled and clear old hotkeys when no modifier or key group is selected.
-
-
-# v2.1
+The v2.1 executable and MSI installer are unsigned. Windows may display an untrusted publisher warning.
 
 ## Features
-* Show desktop number in notification area
-* Show desktop name when switching desktops
-* Show desktop name as permanent overlay
-* Show prev/next desktop by clicking icons in notification area
-* Show desktop initial in notification area
-* Custom hot keys for virtual desktop actions
-* Autostart with Windows
-* Simple and lightweight
-* Fully configurable
-* Free
+
+* Show the current desktop name in a permanent status overlay, with configurable position, font, transparency, animation, and monitor selection.
+* Configure a hotkey to jump to the most recent desktop, with Ctrl/Alt/Shift/Win modifiers and Tab/backtick radio buttons. Repeated presses toggle between the two most recent desktops (#132).
+* Choose any combination of Ctrl, Alt, Shift, and Win for numbered Jump to Desktop hotkeys (#192).
+* Choose keyboard digits, numpad digits, and/or F1-F9 for Jump to Desktop hotkeys (#193). Keyboard and numpad digits remain enabled by default.
 
 ## Changes
-* New permanent status overlay feature
-* Font configurations can have styles
 
+* Support font styles in tray icon and overlay font configuration.
+* Keep a single app instance by default; advanced configurations can override this with `debug.singleInstance`.
+* Add a virtual desktop API implementation for Windows Server 2022 and improve fallback between API implementations.
+* Make previous-window focus restoration opt-in through `feature.restorePreviousWindowFocus` (disabled by default).
+* Restore the `+#` suffix on each numbered hotkey modifier label.
+* Update the license to GNU GPL v3 or later.
+
+## Fixes
+
+* Prevent the hidden tray host window from appearing on the desktop or in Alt+Tab.
+* Fix tray icon GDI handle leaks and event-handler leaks in desktop notification and permanent status overlays.
+* Recover the virtual desktop API connection after Windows Explorer restarts.
+* Preserve configuration values containing colons and backslashes, and consistently parse and save numbers across regional settings.
+* Report hotkey registration conflicts while keeping other shortcuts working.
+* Preserve saved hotkey modifiers while the feature is disabled and clear old hotkeys when no modifier or key group is selected.
+* Remember the starting desktop and update history immediately after a jump so toggling works on the first switch and with rapid repeated presses.
 
 
 # v2.0

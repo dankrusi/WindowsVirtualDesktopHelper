@@ -27,8 +27,8 @@
     <ErrorReportUrl>https://github.com/dankrusi/WindowsVirtualDesktopHelper</ErrorReportUrl>
     <ProductName>Windows Virtual Desktop Helper</ProductName>
     <PublisherName>Dan Krusi</PublisherName>
-    <ApplicationRevision>8</ApplicationRevision>
-    <ApplicationVersion>1.6.0.%2a</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>2.1.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -214,7 +214,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(SignReleaseBuild)' == 'true'">
     <PostBuildEvent>if $(ConfigurationName) == Release (
   powershell -ExecutionPolicy Unrestricted $(SolutionDir)\Scripts\codesign-release-build.ps1
 )</PostBuildEvent>
