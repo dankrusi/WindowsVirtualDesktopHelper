@@ -1,11 +1,7 @@
 //! Settings uses the same selection and pixels as the tray, with event-driven desktop updates.
 use super::tray;
 use crate::{
-    platform::{
-        desktop::{DesktopManager, Snapshot},
-        events::{Watcher, DESKTOP_CHANGED},
-        wide,
-    },
+    platform::{desktop::Snapshot, events::DESKTOP_CHANGED, recovery::DesktopConnection, wide},
     settings::Settings,
 };
 use windows_reactor::*;
@@ -14,38 +10,42 @@ use windows_sys::Win32::{
     UI::WindowsAndMessaging::*,
 };
 
+const PREVIEW_RETRY: usize = 7;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Refresh {
+    Change,
+    Restart,
+    Retry,
+}
 pub struct Preview {
-    manager: Option<DesktopManager>,
     snapshot: Option<Snapshot>,
     observer: Option<Observer>,
     images: Vec<(u32, EncodedImage)>,
     metrics: tray::Metrics,
 }
 impl Preview {
-    pub fn new(settings: &Settings, changed: impl Fn(Option<bool>) + 'static) -> Self {
+    pub fn new(settings: &Settings, changed: impl Fn(Option<Refresh>) + 'static) -> Self {
         let mut result = Self {
-            manager: None,
             snapshot: None,
             observer: Observer::new(changed).ok(),
             images: Vec::new(),
             metrics: tray::metrics(),
         };
-        result.refresh(settings, false);
+        result.refresh(settings, Refresh::Change);
         result
     }
-    pub fn refresh(&mut self, settings: &Settings, reconnect: bool) {
-        if reconnect {
-            self.manager = None;
-            if let Some(observer) = &mut self.observer {
-                observer.restart();
+    pub fn refresh(&mut self, settings: &Settings, reason: Refresh) {
+        if let Some(connection) = self
+            .observer
+            .as_mut()
+            .and_then(|observer| observer.connection.as_mut())
+        {
+            match reason {
+                Refresh::Restart => connection.restart(),
+                Refresh::Retry if !connection.retry_due(PREVIEW_RETRY) => return,
+                _ => {}
             }
-        }
-        if self.manager.is_none() {
-            self.manager = DesktopManager::connect().ok();
-        }
-        self.snapshot = self.manager.as_ref().and_then(|m| m.snapshot().ok());
-        if self.snapshot.is_none() {
-            self.manager = None;
+            self.snapshot = connection.snapshot().ok();
         }
         self.render(settings);
     }
@@ -417,12 +417,19 @@ fn bitmap_rect(width: i32, height: i32, pixels: &[u32]) -> Vec<u8> {
 
 struct Observer {
     hwnd: HWND,
-    watcher: Option<Watcher>,
+    connection: Option<DesktopConnection>,
 }
-struct Callback(Box<dyn Fn(Option<bool>)>);
+struct Callback {
+    changed: Box<dyn Fn(Option<Refresh>)>,
+    taskbar: u32,
+}
 impl Observer {
-    fn new(changed: impl Fn(Option<bool>) + 'static) -> Result<Self, String> {
+    fn new(changed: impl Fn(Option<Refresh>) + 'static) -> Result<Self, String> {
         unsafe {
+            let taskbar = RegisterWindowMessageW(wide("TaskbarCreated").as_ptr());
+            if taskbar == 0 {
+                return Err(std::io::Error::last_os_error().to_string());
+            }
             let class = wide("WVDH.SettingsPreviewObserver");
             let instance = GetModuleHandleW(std::ptr::null());
             RegisterClassW(&WNDCLASSW {
@@ -452,22 +459,25 @@ impl Observer {
             SetWindowLongPtrW(
                 hwnd,
                 GWLP_USERDATA,
-                Box::into_raw(Box::new(Callback(Box::new(changed)))) as _,
+                Box::into_raw(Box::new(Callback {
+                    changed: Box::new(changed),
+                    taskbar,
+                })) as _,
             );
             Ok(Self {
                 hwnd,
-                watcher: Watcher::start(hwnd).ok(),
+                connection: Some(DesktopConnection::new(
+                    hwnd,
+                    PREVIEW_RETRY,
+                    "Settings preview connection",
+                )),
             })
         }
-    }
-    fn restart(&mut self) {
-        self.watcher = None;
-        self.watcher = Watcher::start(self.hwnd).ok();
     }
 }
 impl Drop for Observer {
     fn drop(&mut self) {
-        self.watcher = None;
+        self.connection = None;
         unsafe {
             DestroyWindow(self.hwnd);
         }
@@ -476,11 +486,20 @@ impl Drop for Observer {
 unsafe extern "system" fn window_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM) -> LRESULT {
     let ptr = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Callback;
     if !ptr.is_null() {
+        if msg == (*ptr).taskbar {
+            ((*ptr).changed)(Some(Refresh::Restart));
+            return 0;
+        }
         match msg {
             DESKTOP_CHANGED | WM_SETTINGCHANGE | WM_THEMECHANGED | WM_DISPLAYCHANGE => {
-                ((*ptr).0)(Some(msg == DESKTOP_CHANGED && w != 0))
+                ((*ptr).changed)(Some(if msg == DESKTOP_CHANGED && w != 0 {
+                    Refresh::Restart
+                } else {
+                    Refresh::Change
+                }))
             }
-            super::settings_process::SHOW_ABOUT => ((*ptr).0)(None),
+            WM_TIMER if w == PREVIEW_RETRY => ((*ptr).changed)(Some(Refresh::Retry)),
+            super::settings_process::SHOW_ABOUT => ((*ptr).changed)(None),
             WM_NCDESTROY => {
                 SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0);
                 drop(Box::from_raw(ptr));
@@ -494,6 +513,30 @@ unsafe extern "system" fn window_proc(hwnd: HWND, msg: u32, w: WPARAM, l: LPARAM
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn preview_observer_handles_shell_restart_watcher_failure_and_retry() {
+        use std::{cell::RefCell, rc::Rc};
+        let events = Rc::new(RefCell::new(Vec::new()));
+        let recorded = events.clone();
+        let observer = Observer::new(move |event| recorded.borrow_mut().push(event)).unwrap();
+        unsafe {
+            // Only our own invisible test window receives these messages.
+            let taskbar = RegisterWindowMessageW(wide("TaskbarCreated").as_ptr());
+            SendMessageW(observer.hwnd, taskbar, 0, 0);
+            SendMessageW(observer.hwnd, DESKTOP_CHANGED, 1, 0);
+            SendMessageW(observer.hwnd, WM_TIMER, PREVIEW_RETRY, 0);
+            SendMessageW(observer.hwnd, DESKTOP_CHANGED, 0, 0);
+        }
+        assert_eq!(
+            *events.borrow(),
+            vec![
+                Some(Refresh::Restart),
+                Some(Refresh::Restart),
+                Some(Refresh::Retry),
+                Some(Refresh::Change)
+            ]
+        );
+    }
     #[test]
     fn preview_encoding_preserves_alpha_and_color() {
         let bytes = bitmap(2, &[0, 0x80402010, 0xffffffff, 0xff000000]);

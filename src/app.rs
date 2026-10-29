@@ -2,8 +2,8 @@ use crate::{
     hotkeys::{self, Action, Hotkeys},
     platform::{
         self,
-        desktop::{DesktopManager, History, Snapshot},
-        events::Watcher,
+        desktop::{Desktop, DesktopManager, History, Snapshot},
+        recovery::{DesktopConnection, RetryTimer},
         wide,
     },
     settings::Settings,
@@ -23,6 +23,8 @@ use windows_sys::Win32::{
 thread_local! { static PENDING: RefCell<Vec<(u32,usize,isize)>> = const { RefCell::new(Vec::new()) }; }
 static HOST: AtomicIsize = AtomicIsize::new(0);
 const FOCUS: u32 = 0x8002;
+const CONNECTION_RETRY: usize = 7;
+const TRAY_RETRY: usize = 8;
 struct Apartment;
 impl Drop for Apartment {
     fn drop(&mut self) {
@@ -41,10 +43,9 @@ impl Drop for Hook {
 }
 struct App {
     settings: Settings,
-    manager: Option<DesktopManager>,
+    connection: DesktopConnection,
     snapshot: Snapshot,
     history: History,
-    watcher: Option<Watcher>,
     hotkeys: Hotkeys,
     tray: ui::tray::Tray,
     status: ui::overlay::Overlays,
@@ -53,17 +54,23 @@ struct App {
     hwnd: HWND,
     taskbar: u32,
     focused: HashMap<u128, HWND>,
-    retry: u32,
+    tray_retry: RetryTimer,
 }
 impl App {
     fn refresh(&mut self) -> Result<(), String> {
-        let next = self
-            .manager
-            .as_ref()
-            .ok_or("Desktop connection is unavailable")?
-            .snapshot()?;
-        let switched = next.active().id != self.snapshot.active().id;
-        let changed = switched
+        let connected = self.connection.manager().is_some();
+        let next = match self.connection.snapshot() {
+            Ok(next) => next,
+            Err(error) => {
+                self.update_ui();
+                return Err(error);
+            }
+        };
+        // Recovery isn't a user desktop switch: don't steal focus or show a
+        // switching notification just because Explorer recreated its desktops.
+        let switched = connected && next.active().id != self.snapshot.active().id;
+        let changed = !connected
+            || switched
             || next.desktops != self.snapshot.desktops
             || next.current != self.snapshot.current;
         self.history.record(&next);
@@ -89,7 +96,7 @@ impl App {
                     if let Some(h) = self.focused.get(&self.snapshot.active().id) {
                         unsafe {
                             if IsWindow(*h) != 0
-                                && self.manager.as_ref().is_some_and(|m| {
+                                && self.connection.manager().is_some_and(|m| {
                                     m.window_desktop(*h).ok() == Some(self.snapshot.active().id)
                                 })
                             {
@@ -103,51 +110,39 @@ impl App {
         Ok(())
     }
     fn update_ui(&mut self) {
-        if !self.settings.bool("feature.showDesktopSwitchOverlay") {
+        let connected = self.connection.manager().is_some();
+        if !connected || !self.settings.bool("feature.showDesktopSwitchOverlay") {
             self.overlay.clear();
         }
-        self.tray.update(&self.settings, &self.snapshot);
-        if self.settings.bool("feature.showDesktopStatusOverlay") {
+        self.update_tray();
+        if connected && self.settings.bool("feature.showDesktopStatusOverlay") {
             self.status
                 .show(&self.settings, &self.snapshot.active().name, true, None);
         } else {
             self.status.clear();
         }
     }
-    fn reconnect(&mut self) {
-        self.watcher = None;
-        self.manager = None;
-        match DesktopManager::connect().and_then(|m| Watcher::start(self.hwnd).map(|w| (m, w))) {
-            Ok((manager, watcher)) => {
-                self.manager = Some(manager);
-                self.watcher = Some(watcher);
-                let _ = self.refresh();
-                self.update_ui();
-                self.retry = 0;
-                unsafe {
-                    KillTimer(self.hwnd, 7);
-                }
-            }
-            Err(e) => {
-                platform::log(&e);
-                self.retry += 1;
-                if self.retry <= 6 {
-                    unsafe {
-                        SetTimer(self.hwnd, 7, 500 * self.retry, None);
-                    }
-                } else {
-                    unsafe {
-                        KillTimer(self.hwnd, 7);
-                    }
-                    platform::report("Could not reconnect after Explorer restarted. Use Retry connection from the tray menu.");
-                }
-            }
+    fn update_tray(&mut self) {
+        if self.tray.update(
+            &self.settings,
+            &self.snapshot,
+            self.connection.manager().is_some(),
+        ) {
+            self.tray_retry.reset();
+        } else {
+            self.tray_retry.failed();
         }
     }
+    fn reconnect(&mut self) {
+        self.connection.restart();
+        self.tray_retry.reset();
+        // Restore Settings/Retry/Exit access before making any COM calls.
+        self.update_ui();
+        let _ = self.refresh();
+    }
     fn execute(&mut self, action: Action) {
-        if let Err(e) = self.refresh() {
-            platform::log(&e);
-            self.reconnect();
+        if self.refresh().is_err() {
+            return;
         }
         let i = self.snapshot.current;
         let target = match action {
@@ -160,19 +155,20 @@ impl App {
             return;
         };
         let result = self
-            .manager
-            .as_ref()
+            .connection
+            .manager()
             .ok_or("Desktop connection is unavailable".into())
             .and_then(|m| m.switch(n));
         if let Err(e) = result {
-            platform::log(&e);
+            self.connection.failed(&e);
+            self.update_ui();
             let result = match action {
                 Action::Forward => platform::input::chord(&[0x11, 0x5b], 0x27),
                 Action::Backward => platform::input::chord(&[0x11, 0x5b], 0x25),
                 _ => Err(e),
             };
             if let Err(e) = result {
-                platform::report(&e);
+                platform::log(&e);
             }
         } else {
             let _ = self.refresh();
@@ -305,9 +301,9 @@ pub fn run() -> Result<(), String> {
             return Err(format!("COM initialization failed: {hr:X}"));
         }
         let _apartment = Apartment;
-        let manager = DesktopManager::connect()?;
-        let snapshot = manager.snapshot()?;
         if diagnostics {
+            let manager = DesktopManager::connect()?;
+            let snapshot = manager.snapshot()?;
             let text = format!(
                 "{}\nCurrent: {}\nDesktops: {}\n",
                 manager.profile(),
@@ -365,24 +361,34 @@ pub fn run() -> Result<(), String> {
         if hwnd.is_null() {
             return Err(std::io::Error::last_os_error().to_string());
         }
-        let mut history = History::default();
-        history.record(&snapshot);
-        let watcher = Watcher::start(hwnd)?;
+        let taskbar = RegisterWindowMessageW(wide("TaskbarCreated").as_ptr());
+        if taskbar == 0 {
+            let error = std::io::Error::last_os_error().to_string();
+            DestroyWindow(hwnd);
+            return Err(error);
+        }
         let app = Box::new(RefCell::new(App {
             settings,
-            manager: Some(manager),
-            snapshot,
-            history,
-            watcher: Some(watcher),
+            connection: DesktopConnection::new(hwnd, CONNECTION_RETRY, "Desktop connection"),
+            // Used only for cached icon selection before the first connection.
+            // Disconnected icons show '?' and never use this for desktop actions.
+            snapshot: Snapshot {
+                desktops: vec![Desktop {
+                    id: 0,
+                    name: "Desktop".into(),
+                }],
+                current: 0,
+            },
+            history: History::default(),
             hotkeys: Hotkeys::new(hwnd),
             tray: ui::tray::Tray::new(hwnd),
             status: ui::overlay::Overlays::new(),
             overlay: ui::overlay::Overlays::new(),
             settings_process: None,
             hwnd,
-            taskbar: RegisterWindowMessageW(wide("TaskbarCreated").as_ptr()),
+            taskbar,
             focused: HashMap::new(),
-            retry: 0,
+            tray_retry: RetryTimer::new(hwnd, TRAY_RETRY),
         }));
         SetWindowLongPtrW(hwnd, GWLP_USERDATA, (&*app as *const RefCell<App>) as _);
         HOST.store(hwnd as isize, Ordering::Release);
@@ -398,14 +404,12 @@ pub fn run() -> Result<(), String> {
         let mut app_ref = app.borrow_mut();
         let app_state = &mut *app_ref;
 
-        if let Err(e) = app_state.refresh() {
-            platform::log(&e);
-            app_state.reconnect();
-        }
         app_state.register_hotkeys();
         app_state.update_ui();
+        let _ = app_state.refresh();
         if app_state.settings.bool("feature.showSplashScreen")
             && app_state.settings.bool("feature.showDesktopSwitchOverlay")
+            && app_state.connection.manager().is_some()
         {
             app_state.overlay.show(
                 &app_state.settings,
@@ -471,8 +475,14 @@ unsafe extern "system" fn proc(hwnd: HWND, msg: u32, w: usize, l: isize) -> isiz
             msg,
             0x8001..=0x8004 | WM_HOTKEY | WM_SETTINGCHANGE | WM_THEMECHANGED | WM_DISPLAYCHANGE
         ) || msg >= 0xc000
+            || (msg == WM_TIMER && matches!(w, CONNECTION_RETRY | TRAY_RETRY))
         {
-            PENDING.with(|p| p.borrow_mut().push((msg, w, l)));
+            PENDING.with(|p| {
+                let mut pending = p.borrow_mut();
+                if !pending.contains(&(msg, w, l)) {
+                    pending.push((msg, w, l));
+                }
+            });
             return 0;
         }
         return DefWindowProcW(hwnd, msg, w, l);
@@ -496,10 +506,7 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
                 app.reconnect();
                 return 0;
             }
-            if let Err(e) = app.refresh() {
-                platform::log(&e);
-                app.reconnect();
-            }
+            let _ = app.refresh();
             0
         }
         FOCUS => {
@@ -516,7 +523,7 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
                         && !name.starts_with("Progman")
                         && !name.starts_with("WorkerW")
                     {
-                        if let Some(manager) = &app.manager {
+                        if let Some(manager) = app.connection.manager() {
                             if let Ok(id) = manager.window_desktop(h) {
                                 app.focused.insert(id, h);
                             }
@@ -594,7 +601,9 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
                     3 => app.execute(Action::Backward),
                     4 => app.execute(Action::Forward),
                     1 | 2 => {
-                        if app
+                        if app.connection.manager().is_none() {
+                            app.open_settings();
+                        } else if app
                             .settings
                             .bool("feature.showDesktopNumberInIconTray.clickToOpenTaskView")
                         {
@@ -615,8 +624,10 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
             0
         }
         WM_TIMER => {
-            if w == 7 {
-                app.reconnect();
+            if app.connection.retry_due(w) {
+                let _ = app.refresh();
+            } else if app.tray_retry.due(w) {
+                app.update_tray();
             }
             0
         }

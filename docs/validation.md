@@ -81,3 +81,11 @@ cargo test live_switch_and_registry_notification -- --ignored --nocapture
 
 - Fixed native edits being reverted because the TextBox still declared its initial text. The draft now retains the exact native string; normalization is used only for dirty comparisons and parsing, never for the textbox binding.
 - Added a headless test using Reactor's real Pump and RecordingRuntime, with the production textbox, draft-edit and Save paths. It injects successive keystrokes, multiline LF/CRLF/CR text, Unicode and undo, verifies no Text set/clear commands and no file writes while typing, and verifies that the Save button writes the final draft. The test feature is a development dependency only.
+
+## Explorer recovery hardening on 2026-10-29
+
+- Formatting and Clippy with warnings denied pass; 31 tests pass, with the live desktop-switch integration test still opt-in.
+- Recovery tests simulate 100 consecutive failures, capped backoff, repeated notifications, timer consumption and stale timer messages after a restart. Resource-lifetime tests cover watcher creation failure, a failed first snapshot, connection loss and subsequent recovery.
+- A fake Shell_NotifyIcon implementation verifies partial registration failures, re-adding every icon after Explorer loses them while COM remains unavailable, unique reconnecting tooltips, and returning to normal icons without changing their IDs. It does not register icons in the user's taskbar.
+- A native integration test sends TaskbarCreated, watcher-failure and retry messages only to its own invisible Settings observer window, verifying that each reaches the correct recovery path. No Explorer process is stopped by automated tests.
+- Interactive testing remains assigned to the user: restart Windows Explorer from Task Manager with Settings open, confirm icons/overlays/preview recover, then test tray navigation and configured hotkeys. Also check repeated restarts and an outage longer than 30 seconds. A real Explorer crash/restart has not yet been verified in this session.

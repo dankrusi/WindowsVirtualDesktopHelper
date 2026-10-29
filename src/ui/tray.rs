@@ -32,10 +32,29 @@ impl Tray {
             }
         }
     }
-    pub fn update(&mut self, s: &Settings, snap: &Snapshot) {
+    pub fn update(&mut self, s: &Settings, snap: &Snapshot, connected: bool) -> bool {
+        self.update_with(s, snap, connected, |operation, data| unsafe {
+            let success = Shell_NotifyIconW(operation, data) != 0;
+            if operation == NIM_ADD && !success {
+                crate::platform::log(&format!(
+                    "Could not add notification icon: {}",
+                    icon_name(data.uID)
+                ));
+            }
+            success
+        })
+    }
+    fn update_with(
+        &mut self,
+        s: &Settings,
+        snap: &Snapshot,
+        connected: bool,
+        mut notify: impl FnMut(NOTIFY_ICON_MESSAGE, &NOTIFYICONDATAW) -> bool,
+    ) -> bool {
         let mut previous = std::mem::take(&mut self.icons);
-        let icons = icon_specs(s, snap);
+        let icons = recovery_icon_specs(s, snap, connected);
         let metrics = metrics();
+        let mut complete = true;
         for (id, label, enabled) in icons {
             unsafe {
                 let icon = icon(&label, s, enabled, id >= 3, metrics);
@@ -43,24 +62,34 @@ impl Tray {
                 data.uFlags |= NIF_ICON | NIF_MESSAGE | NIF_TIP;
                 data.uCallbackMessage = MESSAGE;
                 data.hIcon = icon;
-                data.szTip = tooltip(id, snap);
+                data.szTip = if connected {
+                    tooltip(id, snap)
+                } else {
+                    shell_text(&format!(
+                        "{} \u{b7} Virtual Desktop Helper\nReconnecting to Windows...",
+                        icon_name(id)
+                    ))
+                };
                 let old = previous
                     .iter()
                     .position(|(old_id, _)| *old_id == id)
                     .map(|i| previous.remove(i).1);
                 // Also replace an orphaned icon after an unclean shutdown.
-                let updated = Shell_NotifyIconW(NIM_MODIFY, &data) != 0
-                    || Shell_NotifyIconW(NIM_ADD, &data) != 0;
+                if icon.is_null() {
+                    complete = false;
+                    if let Some(old) = old {
+                        self.icons.push((id, old));
+                    }
+                    continue;
+                }
+                let updated = notify(NIM_MODIFY, &data) || notify(NIM_ADD, &data);
                 if let Some(old) = old {
                     DestroyIcon(old);
                 }
                 if updated {
                     self.icons.push((id, icon));
                 } else {
-                    crate::platform::log(&format!(
-                        "Could not add notification icon: {}",
-                        icon_name(id)
-                    ));
+                    complete = false;
                     DestroyIcon(icon);
                 }
             }
@@ -68,10 +97,11 @@ impl Tray {
         for (id, icon) in previous {
             unsafe {
                 let data = identity(self.hwnd, &self.identity_scope, id);
-                Shell_NotifyIconW(NIM_DELETE, &data);
+                notify(NIM_DELETE, &data);
                 DestroyIcon(icon);
             }
         }
+        complete
     }
     pub fn notify(&self, title: &str, message: &str) -> bool {
         let Some((id, _)) = self.icons.first() else {
@@ -172,6 +202,18 @@ pub fn icon_specs(s: &Settings, snap: &Snapshot) -> Vec<(u32, String, bool)> {
     if icons.is_empty() {
         icons.push((5, "▦".into(), true));
     } // Keep Settings/Exit reachable.
+    icons
+}
+fn recovery_icon_specs(s: &Settings, snap: &Snapshot, connected: bool) -> Vec<(u32, String, bool)> {
+    let mut icons = icon_specs(s, snap);
+    if !connected {
+        for (id, label, enabled) in &mut icons {
+            if matches!(*id, 1 | 2) {
+                *label = "?".into();
+            }
+            *enabled = *id == 5;
+        }
+    }
     icons
 }
 #[derive(Clone, Copy)]
@@ -436,6 +478,97 @@ fn rasterize(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn tray_restores_partial_failures_and_shell_restarts_without_a_desktop_connection() {
+        use std::collections::HashSet;
+        let mut settings = Settings {
+            config: Default::default(),
+            arguments: Default::default(),
+            path: Default::default(),
+        };
+        settings.set("feature.showDesktopNameInIconTray", "true");
+        let snap = Snapshot {
+            current: 0,
+            desktops: vec![crate::platform::desktop::Desktop {
+                id: 1,
+                name: "Work".into(),
+            }],
+        };
+        let mut tray = Tray::new(std::ptr::null_mut());
+        let mut registered = HashSet::new();
+        let mut operations = Vec::new();
+        let mut fail_initial = true;
+        // Inject shell outcomes; no icons are registered with the user's Explorer.
+        let mut notify = |operation, data: &NOTIFYICONDATAW| {
+            let id = data.uID;
+            operations.push((operation, id));
+            match operation {
+                NIM_MODIFY => registered.contains(&id),
+                NIM_ADD if id == 2 && fail_initial => {
+                    fail_initial = false;
+                    false
+                }
+                NIM_ADD => {
+                    registered.insert(id);
+                    true
+                }
+                NIM_DELETE => {
+                    registered.remove(&id);
+                    true
+                }
+                _ => unreachable!(),
+            }
+        };
+        assert!(!tray.update_with(&settings, &snap, false, &mut notify));
+        assert!(tray.update_with(&settings, &snap, false, &mut notify));
+        assert_eq!(registered, HashSet::from([1, 2, 3, 4]));
+        assert_eq!(
+            operations.iter().filter(|(op, _)| *op == NIM_ADD).count(),
+            5
+        );
+        registered.clear(); // Explorer lost every icon while COM remains down.
+        let mut restored_tips = Vec::new();
+        assert!(
+            tray.update_with(&settings, &snap, false, |operation, data| {
+                let id = data.uID;
+                if operation == NIM_MODIFY {
+                    return registered.contains(&id);
+                }
+                assert_eq!(operation, NIM_ADD);
+                registered.insert(id);
+                let tip = data.szTip;
+                restored_tips.push(String::from_utf16_lossy(
+                    &tip[..tip.iter().position(|ch| *ch == 0).unwrap()],
+                ));
+                true
+            })
+        );
+        assert_eq!(registered.len(), 4);
+        assert!(restored_tips
+            .iter()
+            .all(|tip| tip.contains("Reconnecting to Windows")));
+        assert_eq!(restored_tips.iter().collect::<HashSet<_>>().len(), 4);
+        let offline = recovery_icon_specs(&settings, &snap, false);
+        assert_eq!(offline[0], (1, "?".into(), false));
+        assert_eq!(offline[1], (2, "?".into(), false));
+        assert!(offline.iter().all(|(_, _, enabled)| !enabled));
+        let ids = tray.icons.iter().map(|(id, _)| *id).collect::<Vec<_>>();
+        assert!(tray.update_with(&settings, &snap, true, |operation, data| {
+            assert_eq!(operation, NIM_MODIFY);
+            let id = data.uID;
+            registered.contains(&id)
+        }));
+        assert_eq!(
+            tray.icons.iter().map(|(id, _)| *id).collect::<Vec<_>>(),
+            ids
+        );
+        // These HICONs were never sent to the shell; release them locally.
+        for (_, icon) in tray.icons.drain(..) {
+            unsafe {
+                DestroyIcon(icon);
+            }
+        }
+    }
     fn guid_value(guid: GUID) -> u128 {
         ((guid.data1 as u128) << 96)
             | ((guid.data2 as u128) << 80)

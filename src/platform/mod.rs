@@ -2,6 +2,7 @@ pub mod desktop;
 pub mod events;
 pub mod input;
 mod profiles;
+pub mod recovery;
 pub mod registry;
 use windows_sys::Win32::{Foundation::*, UI::WindowsAndMessaging::*};
 pub fn wide(s: &str) -> Vec<u16> {

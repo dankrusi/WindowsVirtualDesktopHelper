@@ -54,7 +54,7 @@ enum Message {
     Size(WindowSize),
     Pane(bool),
     Caption,
-    RefreshTray(bool),
+    RefreshTray(super::tray_preview::Refresh),
 }
 struct SettingsUi {
     sender: LocalSender<Message>,
@@ -115,7 +115,8 @@ impl Component for SettingsUi {
             Message::RefreshTray(reconnect) => self.tray_preview.refresh(&self.settings, reconnect),
             Message::Page(Some(page)) => {
                 self.flush();
-                self.tray_preview.refresh(&self.settings, false);
+                self.tray_preview
+                    .refresh(&self.settings, super::tray_preview::Refresh::Change);
                 self.page = page;
                 if self.narrow {
                     self.pane_open = false;

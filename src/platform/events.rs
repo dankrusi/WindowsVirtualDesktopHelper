@@ -73,11 +73,16 @@ impl Watcher {
                 loop {
                     let result =
                         WaitForMultipleObjects(handles.len() as u32, handles.as_ptr(), 0, INFINITE);
-                    if result == WAIT_OBJECT_0 || result == WAIT_FAILED {
+                    if result == WAIT_OBJECT_0 {
+                        break;
+                    }
+                    if result == WAIT_FAILED {
+                        PostMessageW(hwnd as HWND, DESKTOP_CHANGED, 1, 0);
                         break;
                     }
                     let index = (result - WAIT_OBJECT_0 - 1) as usize;
                     let Some((key, event)) = watches.get(index) else {
+                        PostMessageW(hwnd as HWND, DESKTOP_CHANGED, 1, 0);
                         break;
                     };
                     let code = RegNotifyChangeKeyValue(

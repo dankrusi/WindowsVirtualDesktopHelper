@@ -44,6 +44,10 @@ Advanced → Configuration editor → Open editor opens a separate, resizable Wi
 
 Saving does not replace the textbox contents, preserving its native selection and undo history. The editor shows file values and defaults, excluding command-line overrides. Changes made through other Settings controls while the editor is open are retained; conflicting changes to the same key are reported rather than silently overwritten.
 
+### Explorer recovery
+
+If Explorer restarts or its desktop service is temporarily unavailable, the helper stays running and retries automatically. Retry delays increase from half a second to a maximum of 30 seconds and continue until recovery succeeds. Tray icons recover independently of the desktop connection; their menu provides Settings, Retry connection and Exit. While disconnected, desktop indicators show `?`, arrows are dimmed, tooltips say Reconnecting to Windows, and stale overlays are hidden. The Settings preview reconnects automatically as well. Existing settings and registered hotkeys are retained.
+
 ### Settings
 
 |Config|Default|Description|
