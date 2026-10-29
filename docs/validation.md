@@ -70,3 +70,14 @@ cargo test live_switch_and_registry_notification -- --ignored --nocapture
 - Formatting and Clippy with warnings denied pass; 21 tests pass and the live desktop-switch test remains opt-in. Preview routing coverage checks switching settings, unchanged values, unrelated status settings, editor-only state and CLI precedence.
 - The x64 release package passes MakeAppx and native-payload validation. The updated portable app was relaunched with the existing configuration preserved; Windows confirmed displaying the completion notification.
 - Interactive checks for Custom width/height, Reset, persistence and the 500 ms preview debounce are handed to the user at their request. Automated UI testing is no longer part of the workflow unless requested.
+
+## Dedicated configuration editor
+
+- Formatting and Clippy with warnings denied pass; 25 tests pass and the live desktop-switch test remains opt-in. New document tests cover explicit saves, Windows newline normalization, invalid drafts and correction, multiple saves, key removal/default restoration, Unicode, CLI precedence, unrelated concurrent changes and same-key conflicts.
+- The editor now has its own resizable WinUI window, matching icon and styling, Save/Ctrl+S, inline validation and a Save/Discard/Keep editing close prompt. Text is initialized after the multiline control mounts; subsequent state updates retain the exact native draft.
+- Interactive verification is assigned to the user: multiline editing/paste/undo, Save and Ctrl+S, invalid-save recovery, the native close button with unsaved changes, reopening the editor, and window resizing.
+
+### Configuration text reconciliation regression
+
+- Fixed native edits being reverted because the TextBox still declared its initial text. The draft now retains the exact native string; normalization is used only for dirty comparisons and parsing, never for the textbox binding.
+- Added a headless test using Reactor's real Pump and RecordingRuntime, with the production textbox, draft-edit and Save paths. It injects successive keystrokes, multiline LF/CRLF/CR text, Unicode and undo, verifies no Text set/clear commands and no file writes while typing, and verifies that the Save button writes the final draft. The test feature is a development dependency only.

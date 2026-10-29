@@ -65,29 +65,47 @@ impl Drop for SettingsProcess {
             return;
         }
         unsafe {
-            let hwnd = window_for_process(self.0.id());
-            if !hwnd.is_null() {
-                PostMessageW(hwnd, WM_CLOSE, 0, 0);
-            } else if matches!(self.0.try_wait(), Ok(None)) {
+            let windows = windows_for_process(self.0.id());
+            if windows.is_empty() && matches!(self.0.try_wait(), Ok(None)) {
                 let _ = self.0.kill();
+            }
+            for hwnd in windows {
+                // Let the editor's native close handler protect an unsaved draft.
+                PostMessageW(hwnd, WM_CLOSE, 0, 0);
             }
         }
     }
 }
 unsafe fn window_for_process(pid: u32) -> HWND {
+    let windows = windows_for_process(pid);
+    windows
+        .iter()
+        .copied()
+        .find(|hwnd| {
+            let mut title = [0u16; 128];
+            let len = GetWindowTextW(*hwnd, title.as_mut_ptr(), title.len() as i32);
+            String::from_utf16_lossy(&title[..len as usize])
+                == "Settings \u{b7} Virtual Desktop Helper"
+        })
+        .or_else(|| windows.first().copied())
+        .unwrap_or(std::ptr::null_mut())
+}
+unsafe fn windows_for_process(pid: u32) -> Vec<HWND> {
     unsafe extern "system" fn find(hwnd: HWND, data: isize) -> i32 {
-        let (pid, result) = &mut *(data as *mut (u32, HWND));
+        let (pid, result) = &mut *(data as *mut (u32, Vec<HWND>));
         let mut owner = 0;
         GetWindowThreadProcessId(hwnd, &mut owner);
-        if owner == *pid && IsWindowVisible(hwnd) != 0 && GetWindow(hwnd, GW_OWNER).is_null() {
-            *result = hwnd;
-            0
-        } else {
-            1
+        if owner == *pid
+            && IsWindowVisible(hwnd) != 0
+            && GetWindow(hwnd, GW_OWNER).is_null()
+            && GetWindowLongPtrW(hwnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW as isize == 0
+        {
+            result.push(hwnd);
         }
+        1
     }
-    let mut data = (pid, std::ptr::null_mut());
-    EnumWindows(Some(find), (&mut data as *mut (u32, HWND)) as isize);
+    let mut data = (pid, Vec::<HWND>::new());
+    EnumWindows(Some(find), (&mut data as *mut (u32, Vec<HWND>)) as isize);
     data.1
 }
 pub fn publish(settings: &Settings, parent: HWND) -> Result<(), String> {
@@ -158,14 +176,29 @@ pub fn startup_settings() {
 // Apply the native caption theme as well as WinUI's content theme.
 // AppWindow PreferredTheme alone does not update classic caption colors on all builds.
 pub fn update_caption(settings: &Settings) {
+    update_caption_for("Settings \u{b7} Virtual Desktop Helper", settings);
+}
+pub(super) fn window_named(title: &str) -> HWND {
     unsafe {
-        let hwnd = FindWindowW(
-            std::ptr::null(),
-            wide("Settings \u{b7} Virtual Desktop Helper").as_ptr(),
-        );
-        let mut pid = 0;
-        GetWindowThreadProcessId(hwnd, &mut pid);
-        if !hwnd.is_null() && pid == windows_sys::Win32::System::Threading::GetCurrentProcessId() {
+        let title = wide(title);
+        let mut hwnd = std::ptr::null_mut();
+        loop {
+            hwnd = FindWindowExW(std::ptr::null_mut(), hwnd, std::ptr::null(), title.as_ptr());
+            if hwnd.is_null() {
+                return hwnd;
+            }
+            let mut pid = 0;
+            GetWindowThreadProcessId(hwnd, &mut pid);
+            if pid == windows_sys::Win32::System::Threading::GetCurrentProcessId() {
+                return hwnd;
+            }
+        }
+    }
+}
+pub(super) fn update_caption_for(title: &str, settings: &Settings) {
+    unsafe {
+        let hwnd = window_named(title);
+        if !hwnd.is_null() {
             let dark = match settings.get("general.theme") {
                 "dark" => true,
                 "light" => false,

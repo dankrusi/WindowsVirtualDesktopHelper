@@ -36,7 +36,13 @@ Both `theme.overlay` and `theme.status` accept `offset` (default `0`), `border` 
 
 The previous/next symbol picker updates both existing `prevChar` and `nextChar` settings together. Custom symbol pairs remain supported through configuration. Tray icons are transparent by default; the legacy `theme.icons.transparentBackground: false` setting remains available in configuration only.
 
-All UI changes save automatically. Changes to the switching-desktop overlay automatically preview on the desktop after 500 ms without further changes. The preview follows the configured display time; a display time of zero uses a temporary 2.2-second preview. Disabling the feature cancels pending previews and clears the current one. The Preview button is also available for both overlays. Invalid configuration edits keep the previous settings active and show an inline error. Command-line overrides are never written into the configuration file.
+Settings controls save automatically. Changes to the switching-desktop overlay automatically preview on the desktop after 500 ms without further changes. The preview follows the configured display time; a display time of zero uses a temporary 2.2-second preview. Disabling the feature cancels pending previews and clears the current one. The Preview button is also available for both overlays. Command-line overrides are never written into the configuration file.
+
+### Configuration editor
+
+Advanced → Configuration editor → Open editor opens a separate, resizable WinUI window. Its multiline draft is independent of the live settings. Use **Save** or **Ctrl+S** to validate and apply the complete edit. Errors leave the draft and previous settings intact; closing an unsaved document offers Save, Discard or Keep editing. Repeatedly choosing Open editor activates the existing window.
+
+Saving does not replace the textbox contents, preserving its native selection and undo history. The editor shows file values and defaults, excluding command-line overrides. Changes made through other Settings controls while the editor is open are retained; conflicting changes to the same key are reported rather than silently overwritten.
 
 ### Settings
 

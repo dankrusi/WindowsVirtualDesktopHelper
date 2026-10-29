@@ -44,9 +44,8 @@ enum Message {
     Preview(bool),
     SchedulePreview(u64),
     AutoPreview(u64),
-    Advanced(String),
-    Editor(bool),
-    EditorReady,
+    OpenEditor,
+    EditorSaved(Settings),
     Folder,
     Startup,
     Dismiss,
@@ -64,10 +63,7 @@ struct SettingsUi {
     page: String,
     error: String,
     edits: BTreeMap<String, String>,
-    advanced: String,
-    advanced_dirty: bool,
-    editor_open: bool,
-    editor_ready: bool,
+    editor: super::config_editor::Session,
     pending: Option<ComponentTask>,
     generation: u64,
     pending_preview: Option<ComponentTask>,
@@ -102,10 +98,7 @@ impl Component for SettingsUi {
             .into(),
             error: String::new(),
             edits: BTreeMap::new(),
-            advanced: config_text(input),
-            advanced_dirty: false,
-            editor_open: false,
-            editor_ready: false,
+            editor: super::config_editor::Session::new(input),
             pending: None,
             generation: 0,
             pending_preview: None,
@@ -123,7 +116,6 @@ impl Component for SettingsUi {
             Message::Page(Some(page)) => {
                 self.flush();
                 self.tray_preview.refresh(&self.settings, false);
-                self.editor_ready = false;
                 self.page = page;
                 if self.narrow {
                     self.pane_open = false;
@@ -143,7 +135,7 @@ impl Component for SettingsUi {
             }
             Message::Reset(keys) => {
                 self.flush();
-                if self.advanced_dirty || !self.edits.is_empty() {
+                if !self.edits.is_empty() {
                     return;
                 }
                 let mut candidate = self.settings.clone();
@@ -218,22 +210,22 @@ impl Component for SettingsUi {
                     );
                 }
             }
-            Message::Editor(open) => {
-                self.editor_open = open;
-                self.editor_ready = false;
-            }
-            Message::EditorReady => self.editor_ready = self.page == "advanced" && self.editor_open,
-            Message::Advanced(text) => {
-                if !self.editor_ready {
+            Message::OpenEditor => {
+                self.flush();
+                if !self.edits.is_empty() || !self.editor.begin_open() {
                     return;
                 }
-                let text = text.replace("\r\n", "\n").replace('\r', "\n");
-                if text != self.advanced {
-                    self.advanced = text;
-                    self.advanced_dirty = true;
-                    self.schedule(context);
+                let input = super::config_editor::Input {
+                    session: self.editor.clone(),
+                    parent: self.parent,
+                    saved: context.sender().callback(Message::EditorSaved),
+                };
+                if !context.open_window(View::component::<super::config_editor::Editor>(input)) {
+                    self.editor.closed();
+                    self.error = "Couldn't open the configuration editor. Try again.".into();
                 }
             }
+            Message::EditorSaved(settings) => self.accept(settings),
             Message::Link(url) => unsafe {
                 super::open_url(std::ptr::null_mut(), url);
             },
@@ -321,16 +313,6 @@ impl Component for SettingsUi {
                 None
             },
         );
-        // Reactor 0.100 sets Text before AcceptsReturn on first mount. Populate
-        // the multiline editor after mounting so WinUI cannot truncate to line one.
-        let editor_active = self.page == "advanced" && self.editor_open;
-        let editor_sender = context.sender();
-        context.use_effect("multiline-editor", editor_active, move || {
-            if editor_active {
-                editor_sender.send(Message::EditorReady);
-            }
-            None
-        });
         let nav = PAGES.iter().map(|(key, title, icon)| {
             (
                 *key,
@@ -446,9 +428,7 @@ impl SettingsUi {
         self.settings = candidate;
         self.tray_preview.render(&self.settings);
         super::settings_process::update_caption(&self.settings);
-        if !self.advanced_dirty {
-            self.advanced = config_text(&self.settings);
-        }
+        self.editor.update(&self.settings);
         self.error.clear();
     }
     fn cancel_auto_preview(&mut self) {
@@ -472,25 +452,15 @@ impl SettingsUi {
         if let Some(task) = self.pending.take() {
             task.cancel();
         }
-        if !self.advanced_dirty && self.edits.is_empty() {
+        if self.edits.is_empty() {
             return;
         }
         let mut candidate = self.settings.clone();
-        if self.advanced_dirty {
-            match crate::settings::parse(&self.advanced) {
-                Ok(config) => candidate.config = config,
-                Err(error) => {
-                    self.error = error;
-                    return;
-                }
-            }
-        }
         for (key, value) in &self.edits {
             candidate.set(key, value.clone());
         }
         if self.commit(candidate) {
             self.edits.clear();
-            self.advanced_dirty = false;
         }
     }
     fn enabled(&self, key: &str) -> bool {
@@ -1241,34 +1211,15 @@ impl SettingsUi {
                 "Status font",
                 "The font used for the permanent label.",
             ),
-            Expander::new()
-                .is_expanded(self.editor_open)
-                .on_is_expanded_changed(c.callback(Message::Editor))
-                .horizontal_alignment(HorizontalAlignment::Stretch)
-                .slots([
-                    SlotView::new(
-                        ExpanderSlot::Header,
-                        StackPanel::new().spacing(4.).children((
-                            TextBlock::new().text("Configuration editor"),
-                            description_text("All settings, colors and custom hotkeys."),
-                        )),
-                    ),
-                    SlotView::new(
-                        ExpanderSlot::Content,
-                        StackPanel::new().spacing(12.).children((TextBox::new()
-                            .text(if self.editor_ready {
-                                &self.advanced
-                            } else {
-                                ""
-                            })
-                            .width(if self.narrow { 450. } else { 650. })
-                            .accepts_return(true)
-                            .text_wrapping(TextWrapping::NoWrap)
-                            .height(350.)
-                            .automation_name("Configuration editor")
-                            .on_text_changed(c.callback(Message::Advanced)),)),
-                    ),
-                ]),
+            self.row(
+                "\u{E943}",
+                "Configuration editor",
+                "Edit all settings, colors and custom hotkeys in a separate window.",
+                "",
+                Button::new()
+                    .on_click(c.callback(|()| Message::OpenEditor))
+                    .content("Open editor"),
+            ),
         ])
     }
     fn about(&self, c: &ViewContext<Self>) -> View {
@@ -1356,17 +1307,6 @@ fn section(views: Vec<View>) -> View {
     StackPanel::new()
         .spacing(4.)
         .keyed_children(views.into_iter().enumerate().map(|(i, v)| (i as u64, v)))
-}
-fn config_text(settings: &Settings) -> String {
-    let mut values: BTreeMap<String, String> = DEFAULTS
-        .iter()
-        .map(|(k, v)| (k.to_string(), v.to_string()))
-        .collect();
-    values.extend(settings.config.clone());
-    values
-        .iter()
-        .map(|(k, v)| format!("{k}: {}\n", crate::settings::quote(v)))
-        .collect()
 }
 pub fn run() -> Result<(), String> {
     let settings = Settings::load()?;

@@ -1,4 +1,5 @@
 mod colors;
+mod config_editor;
 pub mod overlay;
 pub mod settings;
 pub mod settings_process;
