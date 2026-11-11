@@ -1,77 +1,258 @@
 ﻿# Windows Virtual Desktop Helper
 
-A small, native Windows app for virtual desktop tray indicators, overlays and global hotkeys.
+Simple and lightweight app to help with Virtual Desktops for Windows 10 and Windows 11.
 
-Version 3 replaces the C#/.NET application with Rust, with WinUI 3 Settings and a lightweight Win32 tray process. It runs from a single executable without .NET or a browser engine. Settings requires Microsoft Windows App Runtime 2.4 or later (the `Microsoft.WindowsAppRuntime.2` framework). Existing v2 configuration keys and command-line flags are retained.
+![Screenshot](Images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
-## Features
+[Download v2.1 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Setup.v2.1.msi) |
+[Download v2.1 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Executable.v2.1.zip)
 
-- Desktop number and name initial in the tray, with previous/next arrows and Task View access.
-- Desktop-name switch notifications and a permanent, click-through status overlay, including multi-monitor placement.
-- Custom shortcuts for numbered desktops, next/previous and the two most recently visited desktops.
-- Digit, numpad and function-key shortcuts; optional restoration of the previous focused window.
-- Fluent WinUI 3 settings cards, responsive navigation, light/dark themes, shortcut recording and actual overlay previews.
-- Portable autostart or Windows-managed MSIX startup.
-- Event-driven desktop/focus/theme updates, with automatic recovery after Explorer restarts.
+Windows comes builtin with virtual desktops, however some important features are missing, such
+as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
+fix some of these missing features.
 
-The desktop integration uses undocumented Windows interfaces. Legacy Windows 10 desktop API profiles are retained, but this WinUI build targets Windows 11 (22000 or later). New Windows/Insider builds may require an updated desktop API profile. See [architecture](docs/architecture.md) and [validation](docs/validation.md).
+Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop number
 
-## Build and run
+Note: The v2.1 executable and MSI installer are unsigned. Windows SmartScreen or antivirus software may display an untrusted publisher warning. SHA-256 checksums are provided with the release downloads.
 
-Install Rust 1.95 or later with the MSVC toolchain, Visual Studio C++ Build Tools, and a Windows 10/11 SDK.
 
-```powershell
-cargo build --release --locked
-.\target\release\WindowsVirtualDesktopHelper.exe
-.\target\release\WindowsVirtualDesktopHelper.exe --settings
-.\scripts\check.ps1
-```
 
-Right-click a tray icon for Settings, diagnostics/configuration access, About, Donate or Exit. Closing Settings keeps the app running. If all indicator features are disabled, a small app icon keeps the menu accessible.
+## ⚡ Features
 
-Release binaries statically link the CRT. The two direct dependencies are Microsoft's `windows-sys` and `windows-reactor` (pinned to 0.100.0). The latter is Microsoft's early Rust binding layer over actual WinUI 3 controls; it loads only when Settings opens in a child process. Install the matching architecture of [Windows App Runtime](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads) for portable builds. Build output is in `target/`; distributable artifacts are in `dist/`.
+* Show desktop number in notification area
+* Show desktop name when switching desktops
+* Show desktop name in a permanent status overlay
+* Show prev/next desktop by clicking icons in notification area
+* Show desktop initial in notification area
+* Custom hot keys for virtual desktop actions
+* Jump between the two most recently used desktops with a configurable hotkey
+* Jump to desktop numbers using keyboard digits, numpad digits, or function keys
+* Autostart with Windows
+* Simple and lightweight
+* Configurable
+* Free
 
-## Installers
+![Settings](Images/WindowsVirtualDeskopHelper%20Settings.png)
 
-The new installer format is MSIX, opened by Windows App Installer:
 
-```powershell
-.\scripts\build-msix.ps1 -Architecture x64
-# Also supports x86 and arm64.
-```
 
-This produces an unsigned development MSIX, portable ZIP, Store upload archive and SHA-256 checksums. Local MSIX installation requires signing with a trusted certificate whose subject matches the package Publisher. Building does not install or trust certificates. See [MSIX packaging and signing](docs/msix.md).
+## 🚀 Installation
 
-Published [v2.1 releases](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/tag/v2.1) and the historical Scoop manifest refer to the previous .NET application. A v3 build in this repository is not a published release.
+### Requirements
 
-## Configuration
+Windows Virtual Desktop Helper needs the Microsoft .NET Framework 4.7.2 or higher in order to run. Most likely you already have this installed, otherwise you can get it from [dotnet.microsoft.com](https://dotnet.microsoft.com/en-us/download/dotnet-framework)
 
-Existing files remain in `%APPDATA%\WindowsVirtualDesktopHelper\*.config`. The main file is `WindowsVirtualDesktopHelper.exe.config`. All 61 original settings are preserved. Transparent tray backgrounds are enabled by the new `theme.icons.transparentBackground` setting; set it to `false` to use the legacy background colors. Additional files load alphabetically before the main file. Blank lines and `#` comment lines are ignored.
+### Setup
 
-```text
-feature.showDesktopStatusOverlay: true
-hotkeys.work: "Ctrl + Alt + D1 = Desktop1"
-hotkeys.previous: "Alt + Tilde = PreviousDesktop"
-```
+You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-Command-line settings take priority and are not saved:
+[Download WindowsVirtualDesktopHelper Setup v2.1.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Setup.v2.1.msi)
 
-```powershell
-WindowsVirtualDesktopHelper.exe --general.theme dark --theme.overlay.overlayBG.dark "red"
-```
+The v2.1 MSI installer is unsigned. Windows may display an untrusted publisher warning during installation. The executable in the portable ZIP is also unsigned.
 
-Use Settings → Advanced for the complete configuration, including arbitrary custom hotkeys. Toggles and pickers apply immediately. Text fields and valid configuration edits apply automatically after a short typing pause, and pending edits are flushed when navigating or closing Settings. Invalid changes and occupied shortcuts display inline errors and leave the previous configuration active. Command-line overrides and values outside the available presets appear in a shared information box showing their exact values, with the corresponding controls disabled. Each custom-value notice includes Reset to restore defaults and unlock the control. Turning off a feature disables its related controls. The desktop appearance preview enlarges overlays and tray details for readability. Portable startup changes immediately when toggled; MSIX startup is managed through the Windows Startup Apps settings link.
+### Executable
 
-See [settings](docs/Settings.md), [hotkeys](docs/Hotkeys.md), and [actions](docs/Actions.md). `--diagnostics --diagnostics.output path.txt` performs a read-only COM connectivity check.
+You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
-## Contributing
+[Download WindowsVirtualDesktopHelper Executable v2.1.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Executable.v2.1.zip)
 
-Run `scripts/check.ps1` before submitting changes. CI runs format/lint/tests and builds MSIX packages for x64, x86 and ARM64. Follow the [manual compatibility checks](docs/validation.md) for Windows integration changes.
+### Scoop
 
-The original C# implementation remains available in Git history. Third-party notices are retained in `licenses/`. See [CHANGELOG.md](CHANGELOG.md), [LICENSE.md](LICENSE.md) and [PRIVACY.md](PRIVACY.md).
+A command-line installer for Windows
 
-Thanks to Dan Krusi, MScholtes, Flaflo, zgdump, and all [contributors](https://github.com/dankrusi/WindowsVirtualDesktopHelper/graphs/contributors).
+[https://scoop.sh/](https://scoop.sh/)
+
+```scoop bucket add extras```
+
+```scoop install windows-virtualdesktop-helper```
+
+
+
+## 🎁 Donate
+
+Do you like Windows Virtual Desktop Helper? 
 
 [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6)
 
-For an explicit completion notification after launching an updated build, use `--notify "Update complete"`. This sends one Windows tray notification; ordinary launches remain quiet apart from the configured welcome overlay.
+
+
+## 💻 Compatibility
+
+Currently this app is compatible with Windows 10 and Windows 11. 
+Microsoft is constantly changing their API for the Virtual Desktops, so it appears not all builds of Windows are fully working yet.
+Please note that if you use bleeding-edge insider buildes, this app may not yet be compatible.
+
+The following versions are not supported:
+
+* Windows 7
+* Windows 8
+* Windows Server
+  
+If you know of a working version or non-working version, please report it.
+
+
+
+## 🗺️ Roadmap
+
+While the goal of this app is to remain simple and lightweight, there are some features that will still be added:
+
+* Settings: more configuration options ✔️
+* Console-Mode: allow a console-mode which can be used by scripts
+
+Technical Roadmap:
+
+- Refactor settings from .net settings loader to own system (the .net system is so bloated and crappy) ✔️
+- Add support for setting settings via command line ✔️
+- Split out settings UI and app UI ✔️
+- =============
+- Make features more modular
+
+ 
+
+## 📜 Changelog
+
+See [CHANGELOG.md](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/CHANGELOG.md)
+
+
+
+## 🤔 Frequently Asked Questions
+
+### Help! This App doesn't work on my version of Windows 11
+
+Microsoft is constantly changing the Windows APIs for managing virtual desktops - thus usually with each new version we have to write a new API wrapper to interface with Windows. This takes time, and sometimes is not easy to integrate with. Don't expect immediate support for un-released versions of Windows (like Insider).
+
+### Where is the icon showing the screen number?
+
+Windows automatically organizes the notification area icons, and places new ones in the icons menu under the ^ chevron. You can drag the screen number into the main icon area from there to have it always showing.
+
+### Why are the prev/next screen icons in the wrong order?
+
+Windows automatically organizes and orders the notification area icons. You can drag prev/next screen icons to organize them accordingly.
+
+### Why is this app is being reported by Windows Defender as untrusted?
+
+The v2.1 release is unsigned, so Windows may display an untrusted publisher warning. The release includes SHA-256 checksums to verify that downloaded files match the published artifacts.
+
+### Why is this app is being reported by Windows Defender as malware?
+
+Unsigned applications can trigger antivirus detections. Both v2.1 download formats are unsigned. If you believe a detection is a false positive, report it to your antivirus vendor.
+
+### Why is the app based on the older .NET 4.7?
+
+The idea is to make the app as easy and lightweight to run as possible. Most systems have some version of .NET installed, thus we use a low version to cover as many users as possible. 
+
+
+
+## ⚙️ Configuration
+
+The most common and basic settings can be configured using the GUI Settings. 
+
+For more advanced configurations and features you can use the config file or command line arguments (as of v2.0):
+
+For example, one can set a hotkey to jump to a specific desktop by setting the following setting:
+
+```
+hotkeys.myCustomHotkey1 = "Ctrl + Alt + Shift + D1 = Desktop1"
+hotkeys.myCustomHotkey2 = "Ctrl + Alt + Shift + D2 = Desktop2"
+```
+
+or use a custom shortcut for prev/next desktop:
+
+```
+hotkeys.myCustomKey1: "Alt + W = DesktopForward"
+hotkeys.myCustomKey2: "Alt + Q = DesktopBackward"
+```
+
+See [Hotkeys Documentation](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/Documentation/Hotkeys.md) for more info.
+
+### Settings
+
+See [Settings Documentation](https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/Documentation/Settings.md)
+for a full list of all settings.
+
+### Config File
+
+This is located in ``%appdata%\WindowsVirtualDesktopHelper`` (for example ``C:\Users\<USER>\AppData\Roaming\WindowsVirtualDesktopHelper``)
+as a ``.config`` file, and can be edited with any text editor.
+
+Note: configuration lines that start with ``#`` are comments and ignored by the configuration system.
+
+### Command Line Arguments
+
+The app can be run with command line arguments to specificy any configuration setting. For example, one could
+run the app with the following command line arguments:
+
+```
+WindowsVirtualDesktopHelper.exe --theme.overlay.overlayBG.dark "red" --feature.showPrevNextIcons.nextChar "]" --feature.showPrevNextIcons.prevChar "["
+```
+
+Command line arguments take precedence over the config file settings.
+
+
+
+## 🔧 How it works
+
+This program works by using some unofficial/undocumented Windows APIs which Windows uses internally to manage the desktop.
+The unofficial nature of these APIs is very unfortunate, because it means that each time Windows 11 makes an update, we have
+to reverse engineer the APIs and their undocumented COM CLSIDs - which is tedious and wastes a lot of time.
+
+This is why the maintainers are reluctant to add too many other features, because its enough of a task to keep
+up with all the Windows updates for the basic features.
+
+
+
+## ⚒ Building & Contributing
+
+Install Visual Studio 2022 or later with ".NET desktop development" feature set, and open the solution file WindowsVirtualDesktopHelper.sln. You can then build the project.
+
+Note: The Setup project which creates the MSI installer will require the following extension to be installed: [Microsoft Visual Studio Installer Projects 2022](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2022InstallerProjects)
+
+Release builds are unsigned by default. Code signing is opt-in with the MSBuild property `/p:SignReleaseBuild=true` and requires the certificate and tools configured in `Scripts/codesign-release-build.ps1`. The v2.1 official release is unsigned.
+
+For unsigned APPX packages and Microsoft Store upload archives, see [APPX packaging](Documentation/AppxPackaging.md). The included GitHub Actions workflow builds and validates x64 and x86 packages.
+
+### Depencencies
+
+This project doesn't have any dependencies or external libraries, and we expect it to stay this way. We want the app
+to remain a single .exe file which can be run without any installation or dependencies.
+
+### The Hunt for CLSIDs
+
+TODO
+
+### Your help is wanted!
+
+TODO
+
+
+
+## 🙏 Thanks
+
+Many thanks for the original API work done by [MScholtes](https://github.com/MScholtes) and contributions by [Flaflo](https://github.com/Flaflo).
+
+Thanks to the following contributors:
+ - [y2nd66](https://github.com/y2nd66)
+ - [SleepyBag](https://github.com/SleepyBag)
+ - [yossdev](https://github.com/yossdev)
+ - [MadoScientist97](https://github.com/MadoScientist97)
+ - [...and more](https://github.com/dankrusi/WindowsVirtualDesktopHelper/pulls?q=is%3Apr+is%3Aclosed)
+
+
+	 
+## 🤩 You might also like...
+
+### Windows Taskbar Helpers
+
+A free utility to make the Windows 11 Taskbar just a little bit more useful by allowing you to pin quick launchers that always open a new folder, app or anything.
+
+[![Screenshot](https://raw.githubusercontent.com/dankrusi/WindowsTaskbarHelpers/main/Images/WindowsTaskbarHelpers_Screenshots_v1.png)](https://github.com/dankrusi/WindowsTaskbarHelpers)
+
+[github.com/dankrusi/WindowsTaskbarHelpers](https://github.com/dankrusi/WindowsTaskbarHelpers)
+
+### LitePDF
+
+A free and lightweight no-BS PDF viewer. And no, it doesn't have AI.
+
+[![Screenshot](https://raw.githubusercontent.com/dankrusi/LitePDF/main/Images/Screenshots/Win11/LtiePDF_Screenshot_Win11_A.png)](https://github.com/dankrusi/LitePDF)
+
+[github.com/dankrusi/LitePDF](https://github.com/dankrusi/LitePDF)
