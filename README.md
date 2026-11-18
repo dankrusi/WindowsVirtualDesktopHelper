@@ -35,7 +35,19 @@ Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop numbe
 * Configurable
 * Free
 
-![Settings](assets/images/WindowsVirtualDeskopHelper%20Settings.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-02-tray-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-02-tray-light.png">
+  <img alt="Settings: Tray icons" src="screenshots/WindowsVirtualDesktopHelper-Screenshot-02-tray-light.png">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-03-overlays-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-03-overlays-light.png">
+  <img alt="Settings: Desktop overlays" src="screenshots/WindowsVirtualDesktopHelper-Screenshot-03-overlays-light.png">
+</picture>
+
+[See all screenshots](screenshots/screenshots.md)
 
 
 
