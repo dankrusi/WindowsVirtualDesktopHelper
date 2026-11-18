@@ -7,6 +7,8 @@ Built with Rust, with a lightweight native Windows tray app and a modern Setting
 ![Screenshot](assets/images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
 [Get it from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc) |
+[Download v2.1 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Setup.v2.1.msi) | 
+[Download v2.1 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.1.zip) | 
 [GitHub Releases](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
@@ -36,13 +38,14 @@ Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop numbe
 
 
 
+
 ## 🚀 Installation
 
 ### Requirements
 
 Windows Virtual Desktop Helper requires Windows 10 or Windows 11.
 
-Settings requires Microsoft Windows App Runtime 2.4 or later. For portable builds, install the matching architecture of [Windows App Runtime](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads).
+On Windows 10 you may need to install Microsoft Windows App Runtime 2.4 or later [Windows App Runtime](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads).
 
 ### Microsoft Store
 
@@ -50,11 +53,34 @@ You can install Windows Virtual Desktop Helper from the Microsoft Store.
 
 [Get Windows Virtual Desktop Helper from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc)
 
+### Setup
+
+You can install Windows Virtual Desktop Helper to your system using the setup program.
+
+[Download WindowsVirtualDesktopHelper Setup v2.2.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.2/WindowsVirtualDesktopHelper.Setup.v2.2.msi)
+
+Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
+Defender or other anti-virus applications. Typically, after enough users download, install, and report
+the software as okay/safe, this malware warning will go away. If you prefer to avoid some of these issues, use the Zip version of the executable instead.
+
 ### Executable
 
-To use a portable build, extract its ZIP archive and run WindowsVirtualDesktopHelper.exe.
+You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
-Check [GitHub Releases](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases) for downloadable builds. You can also build the executable yourself using the instructions below.
+[Download WindowsVirtualDesktopHelper Executable v2.2.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.2.zip)
+
+### Scoop
+
+A command-line installer for Windows
+
+[https://scoop.sh/](https://scoop.sh/)
+
+```scoop bucket add extras```
+
+```scoop install windows-virtualdesktop-helper```
+
+
+
 
 
 
