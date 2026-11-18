@@ -8,7 +8,7 @@ Built with Rust, with a lightweight native Windows tray app and a modern Setting
 
 <!-- release-links:start -->
 [Get it from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc) |
-[Download v3.0.0 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.0/WindowsVirtualDesktopHelper.Executable.v3.0.0.zip) |
+[Download v3.0.1 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.1/WindowsVirtualDesktopHelper.Executable.v3.0.1.zip) |
 [GitHub Releases](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases)
 <!-- release-links:end -->
 
@@ -64,9 +64,9 @@ You can install Windows Virtual Desktop Helper from the Microsoft Store.
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
 <!-- release-executable:start -->
-[Download WindowsVirtualDesktopHelper Executable v3.0.0.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.0/WindowsVirtualDesktopHelper.Executable.v3.0.0.zip) (x64)
+[Download WindowsVirtualDesktopHelper Executable v3.0.1.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.1/WindowsVirtualDesktopHelper.Executable.v3.0.1.zip) (x64)
 
-Also available for [ARM64](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.0/WindowsVirtualDesktopHelper.Executable.v3.0.0.arm64.zip) and [x86](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.0/WindowsVirtualDesktopHelper.Executable.v3.0.0.x86.zip).
+Also available for [ARM64](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.1/WindowsVirtualDesktopHelper.Executable.v3.0.1.arm64.zip) and [x86](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.1/WindowsVirtualDesktopHelper.Executable.v3.0.1.x86.zip).
 <!-- release-executable:end -->
 
 ### Scoop
