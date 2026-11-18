@@ -7,8 +7,8 @@ Built with Rust, with a lightweight native Windows tray app and a modern Setting
 ![Screenshot](assets/images/WindowsVirtualDeskopHelper%20Screenshot.png)
 
 [Get it from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc) |
-[Download v2.1 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Setup.v2.1.msi) | 
-[Download v2.1 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.1.zip) | 
+[Download v2.1 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Setup.v2.1.msi) | 
+[Download v2.1 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Executable.v2.1.zip) | 
 [GitHub Releases](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases)
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
@@ -57,7 +57,7 @@ You can install Windows Virtual Desktop Helper from the Microsoft Store.
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
 
-[Download WindowsVirtualDesktopHelper Setup v2.2.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.2/WindowsVirtualDesktopHelper.Setup.v2.2.msi)
+[Download WindowsVirtualDesktopHelper Setup v2.1.msi](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Setup.v2.1.msi)
 
 Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be reported as malware by Windows
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
@@ -67,7 +67,7 @@ the software as okay/safe, this malware warning will go away. If you prefer to a
 
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
-[Download WindowsVirtualDesktopHelper Executable v2.2.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.0/WindowsVirtualDesktopHelper.Executable.v2.2.zip)
+[Download WindowsVirtualDesktopHelper Executable v2.1.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Executable.v2.1.zip)
 
 ### Scoop
 
