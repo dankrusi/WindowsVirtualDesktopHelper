@@ -90,12 +90,11 @@ impl Component for SettingsUi {
             }),
             settings: input.clone(),
             parent: input.get("ui-parent").parse().unwrap_or(0),
-            page: if input.get("ui-page") == "about" {
-                "about"
-            } else {
-                "general"
-            }
-            .into(),
+            page: PAGES
+                .iter()
+                .find(|p| p.0 == input.get("ui-page"))
+                .map_or("general", |p| p.0)
+                .into(),
             error: String::new(),
             edits: BTreeMap::new(),
             editor: super::config_editor::Session::new(input),
@@ -289,7 +288,11 @@ impl Component for SettingsUi {
                         .parse::<f64>()
                         .unwrap_or(1080.)
                         .clamp(680., 1600.),
-                    780.,
+                    self.settings
+                        .get("ui-height")
+                        .parse::<f64>()
+                        .unwrap_or(780.)
+                        .clamp(540., 2400.),
                 )
                 .constraints(WindowConstraints {
                     min_width: Some(680.),

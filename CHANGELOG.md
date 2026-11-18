@@ -9,6 +9,8 @@
 - Require Windows 11 and Microsoft Windows App Runtime 2.4+ for the modern WinUI build.
 - Use stable desktop IDs for history; reconnect after Explorer restarts.
 - Add Cargo checks, native PE/package validation and x64/x86/ARM64 CI builds.
+- Add `scripts/screenshot-settings.ps1` to capture every Settings page in light and dark themes into `screenshots/`, using a throwaway `APPDATA`; windows are centered on the primary screen and captured over a solid backdrop. It also writes `screenshots/screenshots.md` listing every image in the folder (overview first, light/dark side by side); `--index-only` refreshes just that page.
+- `--settings-ui` accepts any page for `--ui-page` (`general`, `tray`, `overlays`, `hotkeys`, `advanced`, `about`) and a `--ui-height` window height.
 
 # Unreleased
 
