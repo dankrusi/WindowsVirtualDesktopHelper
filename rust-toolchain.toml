@@ -1,0 +1,5 @@
+# Pinned so new Rust/clippy releases cannot break CI unexpectedly. Bump deliberately.
+[toolchain]
+channel = "1.95.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

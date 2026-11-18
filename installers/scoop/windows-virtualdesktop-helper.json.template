@@ -1,6 +1,6 @@
 {
     "version": "{version}",
-    "description": "Simple and lightweight app to help with Virtual Desktops for Windows 10 and Windows 11.",
+    "description": "Simple and lightweight app to help with Virtual Desktops for Windows 11.",
     "homepage": "https://github.com/dankrusi/WindowsVirtualDesktopHelper",
     "license": "GPL-3.0-or-later",
     "architecture": {

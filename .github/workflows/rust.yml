@@ -1,7 +1,10 @@
-﻿name: Rust and MSIX
+﻿name: Build
+# Free: GitHub-hosted runners cost nothing for public repositories.
+# Releases: run .\scripts\release.ps1 [--version x.y.z], which pushes a v* tag. See docs/releasing.md.
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -10,8 +13,8 @@ jobs:
   check:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - run: rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup toolchain install
       - run: ./scripts/check.ps1
         shell: powershell
   package:
@@ -22,11 +25,14 @@ jobs:
       matrix:
         architecture: [x64, x86, arm64]
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - run: rustup toolchain install stable --profile minimal
-      - run: ./scripts/build-msix.ps1 -Architecture ${{ matrix.architecture }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup toolchain install
+      # Tag builds use the Partner Center identity so they can be submitted to the Store.
+      - run: |
+          if ('${{ github.ref_type }}' -eq 'tag') { ./scripts/build-msix.ps1 --architecture ${{ matrix.architecture }} --store }
+          else { ./scripts/build-msix.ps1 --architecture ${{ matrix.architecture }} }
         shell: powershell
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: WindowsVirtualDesktopHelper-${{ matrix.architecture }}
           path: |
@@ -35,3 +41,60 @@ jobs:
             dist/*.zip
             dist/*.sha256
           if-no-files-found: error
+  release:
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    needs: package
+    runs-on: windows-2022
+    permissions:
+      contents: write
+    env:
+      STORE_PRODUCT_ID: 9N4HNXPRTSDC
+      STORE_CONFIGURED: ${{ secrets.PARTNER_CENTER_CLIENT_SECRET != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: dist
+          merge-multiple: true
+      - run: ./scripts/package-release.ps1 --version '${{ github.ref_name }}' --input-directory dist --output-directory dist/release
+        shell: powershell
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: WindowsVirtualDesktopHelper-release
+          path: dist/release
+          if-no-files-found: error
+      - name: Publish GitHub Release
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $files = Get-ChildItem dist/release/github | ForEach-Object { $_.FullName }
+          if ((Get-Item dist/release/notes.md).Length -gt 0) {
+            gh release create '${{ github.ref_name }}' @files --title '${{ github.ref_name }}' --notes-file dist/release/notes.md
+          } else {
+            gh release create '${{ github.ref_name }}' @files --title '${{ github.ref_name }}' --generate-notes
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'Creating the GitHub Release failed.' }
+      - name: Store credentials not configured
+        if: env.STORE_CONFIGURED != 'true'
+        run: echo "::notice::Upload the Store package with .\scripts\get-store-upload.ps1 (see docs/releasing.md)."
+      - uses: microsoft/microsoft-store-apppublisher@cc9910a8d59f2eb55cbb83df0a3800cf3b5300e0 # v1.4
+        if: env.STORE_CONFIGURED == 'true'
+      - name: Submit to Microsoft Store
+        if: env.STORE_CONFIGURED == 'true'
+        shell: powershell
+        env:
+          TENANT_ID: ${{ secrets.PARTNER_CENTER_TENANT_ID }}
+          SELLER_ID: ${{ secrets.PARTNER_CENTER_SELLER_ID }}
+          CLIENT_ID: ${{ secrets.PARTNER_CENTER_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.PARTNER_CENTER_CLIENT_SECRET }}
+          # Set the repository variable STORE_DRAFT to true to leave the submission as a draft.
+          STORE_DRAFT: ${{ vars.STORE_DRAFT }}
+        run: |
+          msstore reconfigure --tenantId $env:TENANT_ID --sellerId $env:SELLER_ID --clientId $env:CLIENT_ID --clientSecret $env:CLIENT_SECRET
+          if ($LASTEXITCODE -ne 0) { throw 'msstore reconfigure failed.' }
+          $upload = (Get-ChildItem dist/release/store/*.msixupload | Select-Object -First 1).FullName
+          $arguments = @('publish', (Split-Path $upload), '--inputFile', $upload, '--appId', $env:STORE_PRODUCT_ID)
+          if ($env:STORE_DRAFT -eq 'true') { $arguments += '--noCommit' }
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) { throw 'Microsoft Store submission failed.' }

@@ -1,39 +1,46 @@
-# 3.0.0 (unreleased)
-
-- Replace C#/.NET and MSI with native Rust/Win32 and MSIX packaging.
-- Preserve all 61 original configuration keys, CLI overrides, desktop actions and custom hotkeys.
-- Replace desktop/focus/theme polling with registry notifications, foreground hooks and window messages.
-- Replace the hand-drawn Settings window with actual WinUI 3 navigation and cards, automatic saving, inline errors, shortcut recording and overlay previews.
-- Use a compact 480 x 128 DIP switch notification by default; preserve explicitly configured sizes.
-- Render transparent, antialiased tray icons at taskbar DPI, update them in place, and scale overlays per monitor.
-- Require Windows 11 and Microsoft Windows App Runtime 2.4+ for the modern WinUI build.
-- Use stable desktop IDs for history; reconnect after Explorer restarts.
-- Add Cargo checks, native PE/package validation and x64/x86/ARM64 CI builds.
-- Add `scripts/screenshot-settings.ps1` to capture every Settings page in light and dark themes into `screenshots/`, using a throwaway `APPDATA`; windows are centered on the primary screen and captured over a solid backdrop. It also writes `screenshots/screenshots.md` listing every image in the folder (overview first, light/dark side by side); `--index-only` refreshes just that page.
-- `--settings-ui` accepts any page for `--ui-page` (`general`, `tray`, `overlays`, `hotkeys`, `advanced`, `about`) and a `--ui-height` window height.
-
-# Unreleased
-
-## Changes
-
-* Add unsigned x64/x86 APPX packaging, Store upload archives, build/validation scripts, and a GitHub Actions pipeline.
-* Apply and validate the reserved Store app name across package, tile, and startup-task display names.
-* Use the manifest startup task and Windows startup settings in packaged builds.
-
-
-# v2.1 - 2026-10-28
-
-The v2.1 executable and MSI installer are unsigned. Windows may display an untrusted publisher warning.
+# v3.0.0
 
 ## Features
+* Rebuilt from the ground up as a small native app that no longer needs .NET.
+* New modern Settings window with light and dark themes, automatic saving, shortcut recording and live previews of the overlays.
+* New configuration editor window with Save (Ctrl+S), input checks, hotkey conflict warnings and a reminder before closing with unsaved changes.
+* More ways to customize the desktop name overlays.
+* Crisp, transparent tray icons at any display scaling, and overlays that size correctly on every monitor.
+* A more compact desktop-switch notification by default.
+* Recovers automatically when Windows Explorer restarts or the tray icons disappear.
+* Available for x64, x86 and ARM64 PCs, from the Microsoft Store or as a portable ZIP.
+* Existing settings, hotkeys and command-line options keep working.
+* Requires Windows 11. Windows 10 users should keep using v2.1.
 
+## Changes
+* Replace C#/.NET and MSI with native Rust/Win32 and MSIX packaging (single executable, statically linked CRT).
+* Settings and the configuration editor use WinUI 3 through `windows-reactor` 0.100 in a separate `--settings-ui` process; requires Microsoft Windows App Runtime 2.4+ (`Microsoft.WindowsAppRuntime.2`).
+* Minimum OS is Windows 11 build 22000: the Windows App Runtime bootstrap uses Windows 11 dynamic package dependency APIs.
+* Preserve all 61 original configuration keys, CLI overrides, desktop actions and custom hotkeys.
+* Replace desktop/focus/theme polling with registry notifications, foreground hooks and window messages.
+* Use a 480 x 128 DIP switch notification by default; explicitly configured sizes are preserved.
+* Render antialiased tray icons at taskbar DPI and update them in place; scale overlays per monitor.
+* Use stable desktop IDs for desktop history and keep a consistent tray icon identity.
+* Use the manifest startup task and Windows Startup Apps settings in MSIX builds; portable builds keep the per-user Run entry.
+* Add Cargo checks, native PE/package validation and x64/x86/ARM64 CI builds; pin the Rust toolchain in `rust-toolchain.toml`.
+* Add `scripts/release.ps1` to version, tag and publish releases, and `scripts/get-store-upload.ps1` to fetch the Store upload (one `.msixupload` bundling all architectures). `VERSION.md` holds the app version.
+* Build scripts take Linux-style arguments (for example `--architecture x64 --store`).
+* Add `scripts/screenshot-settings.ps1` to capture every Settings page in light and dark themes into `screenshots/`, using a throwaway `APPDATA`; windows are centered on the primary screen and captured over a solid backdrop. It also writes `screenshots/screenshots.md` listing every image in the folder (overview first, light/dark side by side); `--index-only` refreshes just that page.
+* `--settings-ui` accepts any page for `--ui-page` (`general`, `tray`, `overlays`, `hotkeys`, `advanced`, `about`) and a `--ui-height` window height.
+
+## Fixes
+* Fix the x86 build (`GetWindowLongPtrW` returns `i32` on 32-bit Windows).
+* Fix the CI check failing on newer Rust releases (clippy `chunks_exact_to_as_chunks`).
+
+# v2.1
+
+## Features
 * Show the current desktop name in a permanent status overlay, with configurable position, font, transparency, animation, and monitor selection.
 * Configure a hotkey to jump to the most recent desktop, with Ctrl/Alt/Shift/Win modifiers and Tab/backtick radio buttons. Repeated presses toggle between the two most recent desktops (#132).
 * Choose any combination of Ctrl, Alt, Shift, and Win for numbered Jump to Desktop hotkeys (#192).
 * Choose keyboard digits, numpad digits, and/or F1-F9 for Jump to Desktop hotkeys (#193). Keyboard and numpad digits remain enabled by default.
 
 ## Changes
-
 * Support font styles in tray icon and overlay font configuration.
 * Keep a single app instance by default; advanced configurations can override this with `debug.singleInstance`.
 * Add a virtual desktop API implementation for Windows Server 2022 and improve fallback between API implementations.
@@ -42,7 +49,6 @@ The v2.1 executable and MSI installer are unsigned. Windows may display an untru
 * Update the license to GNU GPL v3 or later.
 
 ## Fixes
-
 * Prevent the hidden tray host window from appearing on the desktop or in Alt+Tab.
 * Fix tray icon GDI handle leaks and event-handler leaks in desktop notification and permanent status overlays.
 * Recover the virtual desktop API connection after Windows Explorer restarts.

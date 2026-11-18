@@ -1,15 +1,17 @@
 ﻿# Windows Virtual Desktop Helper
 
-Simple and lightweight app to help with Virtual Desktops for Windows 10 and Windows 11.
+Simple and lightweight app to help with Virtual Desktops for Windows 11.
 
 Built with Rust, with a lightweight native Windows tray app and a modern Settings interface.
 
-![Screenshot](assets/images/WindowsVirtualDeskopHelper%20Screenshot.png)
+![Screenshot](screenshots/WindowsVirtualDesktopHelper-overview-dark.png)
 
+<!-- release-links:start -->
 [Get it from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc) |
 [Download v2.1 Setup (.msi)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Setup.v2.1.msi) | 
 [Download v2.1 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Executable.v2.1.zip) | 
 [GitHub Releases](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases)
+<!-- release-links:end -->
 
 Windows comes builtin with virtual desktops, however some important features are missing, such
 as displaying which desktop you are on when switching. Windows Virtual Desktop Helper helps
@@ -43,9 +45,11 @@ Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop numbe
 
 ### Requirements
 
-Windows Virtual Desktop Helper requires Windows 10 or Windows 11.
+Windows Virtual Desktop Helper requires Windows 11.
 
-On Windows 10 you may need to install Microsoft Windows App Runtime 2.4 or later [Windows App Runtime](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads).
+On Windows 10, use [version 2.1](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/tag/v2.1) or earlier. Version 3 and later do not run on Windows 10.
+
+Settings requires Microsoft Windows App Runtime 2.4 or later. The Microsoft Store installs it automatically; for the portable executable, install the matching architecture of [Windows App Runtime](https://learn.microsoft.com/windows/apps/windows-app-sdk/downloads).
 
 ### Microsoft Store
 
@@ -53,6 +57,7 @@ You can install Windows Virtual Desktop Helper from the Microsoft Store.
 
 [Get Windows Virtual Desktop Helper from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc)
 
+<!-- release-setup:start -->
 ### Setup
 
 You can install Windows Virtual Desktop Helper to your system using the setup program.
@@ -63,11 +68,15 @@ Note: Currently Windows Virtual Desktop Helper is not code-signed, and may be re
 Defender or other anti-virus applications. Typically, after enough users download, install, and report
 the software as okay/safe, this malware warning will go away. If you prefer to avoid some of these issues, use the Zip version of the executable instead.
 
+<!-- release-setup:end -->
+
 ### Executable
 
 You can just run the executable file WindowsVirtualDesktopHelper.exe to use Windows Virtual Desktop Helper.
 
+<!-- release-executable:start -->
 [Download WindowsVirtualDesktopHelper Executable v2.1.zip](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v2.1/WindowsVirtualDesktopHelper.Executable.v2.1.zip)
+<!-- release-executable:end -->
 
 ### Scoop
 
@@ -94,7 +103,7 @@ Do you like Windows Virtual Desktop Helper?
 
 ## 💻 Compatibility
 
-Currently this app is compatible with Windows 10 and Windows 11.
+Currently this app is compatible with Windows 11. For Windows 10, use [version 2.1](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/tag/v2.1) or earlier.
 Microsoft is constantly changing their API for the Virtual Desktops, so it appears not all builds of Windows are fully working yet.
 Please note that if you use bleeding-edge Insider builds, this app may not yet be compatible.
 
@@ -232,7 +241,7 @@ Run the automated checks before submitting changes:
 .\scripts\check.ps1
 ```
 
-For MSIX packages, portable ZIP archives, and Microsoft Store upload archives, see [MSIX packaging and signing](docs/msix.md). The included GitHub Actions workflow runs the checks and builds packages for x64, x86, and ARM64. Distributable artifacts are written to ``dist/``.
+For MSIX packages, portable ZIP archives, and Microsoft Store upload archives, see [MSIX packaging and signing](docs/msix.md). The included GitHub Actions workflow runs the checks and builds packages for x64, x86, and ARM64. To publish a release, see [Releasing](docs/releasing.md). Distributable artifacts are written to ``dist/``.
 
 ### Dependencies
 

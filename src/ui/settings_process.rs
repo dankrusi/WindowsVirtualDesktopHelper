@@ -98,7 +98,8 @@ unsafe fn windows_for_process(pid: u32) -> Vec<HWND> {
         if owner == *pid
             && IsWindowVisible(hwnd) != 0
             && GetWindow(hwnd, GW_OWNER).is_null()
-            && GetWindowLongPtrW(hwnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW as isize == 0
+            // GetWindowLongPtrW returns isize on 64-bit and i32 on 32-bit Windows.
+            && (GetWindowLongPtrW(hwnd, GWL_EXSTYLE) as u32) & WS_EX_TOOLWINDOW == 0
         {
             result.push(hwnd);
         }

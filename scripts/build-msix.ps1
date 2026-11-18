@@ -3,32 +3,43 @@
 .SYNOPSIS
 Builds and validates an unsigned desktop MSIX package and a Store upload archive.
 .EXAMPLE
-.\scripts\build-msix.ps1 -Architecture x64
+.\scripts\build-msix.ps1 --architecture x64
 .EXAMPLE
-.\scripts\build-msix.ps1 -Store -Architecture x64 -IdentityFile .\packaging\msix\StoreIdentity.json
+.\scripts\build-msix.ps1 --store --architecture x64 --identity-file .\packaging\msix\StoreIdentity.json
 #>
-[CmdletBinding()]
-param(
-    [ValidateSet('x64', 'x86', 'arm64')]
-    [string]$Architecture = 'x64',
-    [string]$Version,
-    [string]$OutputDirectory,
-    [string]$IdentityFile,
-    [string]$IdentityName,
-    [string]$Publisher,
-    [string]$PublisherDisplayName,
-    [string]$DisplayName,
-    [string]$WindowsSdkVersion,
-    [switch]$Store
-)
-
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'lib\arguments.ps1')
+. (Join-Path $PSScriptRoot 'lib\version.ps1')
+$names = @('architecture','version','output-directory','identity-file','identity-name','publisher','publisher-display-name','display-name','windows-sdk-version')
+$spec = @{ 'store' = 'switch' }; foreach ($name in $names) { $spec[$name] = 'string' }
+$options = Read-Arguments $args $spec @'
+Usage: build-msix.ps1 [--architecture x64|x86|arm64] [--store] [options]
+  --architecture            Target architecture (default: x64).
+  --store                   Use the Partner Center identity (packaging\msix\StoreIdentity.json).
+  --version                 Package version; must be the VERSION.md version plus .0.
+  --output-directory        Output folder (default: dist).
+  --identity-file           JSON file with Name, Publisher, PublisherDisplayName, DisplayName.
+  --identity-name, --publisher, --publisher-display-name, --display-name
+                            Override single identity values.
+  --windows-sdk-version     Windows SDK version folder to use (default: newest installed).
+'@
+$Architecture = if ($options['architecture']) { $options['architecture'] } else { 'x64' }
+Assert-Choice 'architecture' @($Architecture) @('x64', 'x86', 'arm64')
+$Store = $options['store']
+$Version = $options['version']
+$OutputDirectory = $options['output-directory']
+$IdentityFile = $options['identity-file']
+$IdentityName = $options['identity-name']
+$Publisher = $options['publisher']
+$PublisherDisplayName = $options['publisher-display-name']
+$DisplayName = $options['display-name']
+$WindowsSdkVersion = $options['windows-sdk-version']
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 
-$cargoVersion = [regex]::Match((Get-Content -LiteralPath (Join-Path $repoRoot 'Cargo.toml') -Raw), '(?m)^version = "([^"]+)"').Groups[1].Value
-if (-not $Version) { $Version = "$cargoVersion.0" }
-if ($Version -ne "$cargoVersion.0") { throw 'MSIX version must match Cargo.toml plus a fourth zero component.' }
+$appVersion = Get-AppVersion
+if (-not $Version) { $Version = "$appVersion.0" }
+if ($Version -ne "$appVersion.0") { throw 'MSIX version must match VERSION.md plus a fourth zero component.' }
 if ($Version -notmatch '^\d+\.\d+\.\d+\.\d+$') { throw 'MSIX version must contain four numbers, for example 3.0.0.0.' }
 $packageVersion = [version]$Version
 if ($packageVersion.Major -lt 1 -or @($packageVersion.Major, $packageVersion.Minor, $packageVersion.Build, $packageVersion.Revision | Where-Object { $_ -gt 65535 }).Count -gt 0) {
@@ -80,7 +91,7 @@ $buildDirectory = Join-Path $workRoot 'build'
 $stageDirectory = Join-Path $workRoot 'package'
 New-Item -ItemType Directory -Path $outputRoot, $buildDirectory, $stageDirectory -Force | Out-Null
 
-& (Join-Path $PSScriptRoot 'build.ps1') -Architecture $Architecture -Release
+& (Join-Path $PSScriptRoot 'build.ps1') --architecture $Architecture --release
 $target = @{x64='x86_64-pc-windows-msvc';x86='i686-pc-windows-msvc';arm64='aarch64-pc-windows-msvc'}[$Architecture]
 $exePath = Join-Path $repoRoot "target\$target\release\WindowsVirtualDesktopHelper.exe"
 if (-not (Test-Path -LiteralPath $exePath)) { throw 'Native executable not found.' }
@@ -127,7 +138,7 @@ $manifest.Save($manifestPath)
 $packagePath = Join-Path $outputRoot ($artifactName + '.msix')
 & $makeAppx pack /d $stageDirectory /p $packagePath /h SHA256 /o
 if ($LASTEXITCODE -ne 0) { throw "MakeAppx validation/packing failed with exit code $LASTEXITCODE." }
-& (Join-Path $PSScriptRoot 'test-msix.ps1') -PackagePath $packagePath -ExpectedVersion $Version -ExpectedArchitecture $Architecture -ExpectedIdentityName $IdentityName -ExpectedPublisher $Publisher -ExpectedPublisherDisplayName $PublisherDisplayName -ExpectedDisplayName $DisplayName
+& (Join-Path $PSScriptRoot 'test-msix.ps1') --package-path $packagePath --expected-version $Version --expected-architecture $Architecture --expected-identity-name $IdentityName --expected-publisher $Publisher --expected-publisher-display-name $PublisherDisplayName --expected-display-name $DisplayName
 
 # Partner Center accepts .msixupload archives containing an MSIX; symbols are optional.
 # Do not include PDBs in the installable package or claim crash symbols are supplied.
@@ -149,5 +160,5 @@ foreach ($artifact in @($packagePath, $uploadPath, $portablePath)) {
 }
 Write-Host "Unsigned $mode MSIX: $packagePath"
 Write-Host "Unsigned $mode upload archive (no symbols): $uploadPath"
-if (-not $Store) { Write-Warning 'Development identity only. Rebuild with -Store and the Partner Center identity before submission.' }
+if (-not $Store) { Write-Warning 'Development identity only. Rebuild with --store and the Partner Center identity before submission.' }
 [pscustomobject]@{ PackagePath = $packagePath; UploadPath = $uploadPath; Version = $Version; Architecture = $Architecture; StoreIdentity = [bool]$Store }

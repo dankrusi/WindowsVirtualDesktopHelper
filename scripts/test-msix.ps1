@@ -1,15 +1,22 @@
 ﻿#requires -Version 5.1
-[CmdletBinding()]
-param(
-    [Parameter(Mandatory)][string]$PackagePath,
-    [string]$ExpectedVersion,
-    [string]$ExpectedArchitecture,
-    [string]$ExpectedIdentityName,
-    [string]$ExpectedPublisher,
-    [string]$ExpectedPublisherDisplayName,
-    [string]$ExpectedDisplayName
-)
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot 'lib\arguments.ps1')
+$names = @('package-path','expected-version','expected-architecture','expected-identity-name','expected-publisher','expected-publisher-display-name','expected-display-name')
+$spec = @{}; foreach ($name in $names) { $spec[$name] = 'string' }
+$options = Read-Arguments $args $spec @'
+Usage: test-msix.ps1 --package-path <file.msix> [--expected-version <v>] [--expected-architecture <arch>]
+                     [--expected-identity-name <name>] [--expected-publisher <CN=...>]
+                     [--expected-publisher-display-name <name>] [--expected-display-name <name>]
+Validates package contents, manifest identity, runtime dependency and the executable's PE header.
+'@
+$PackagePath = $options['package-path']
+if (-not $PackagePath) { throw '--package-path is required. Use --help for usage.' }
+$ExpectedVersion = $options['expected-version']
+$ExpectedArchitecture = $options['expected-architecture']
+$ExpectedIdentityName = $options['expected-identity-name']
+$ExpectedPublisher = $options['expected-publisher']
+$ExpectedPublisherDisplayName = $options['expected-publisher-display-name']
+$ExpectedDisplayName = $options['expected-display-name']
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip=[System.IO.Compression.ZipFile]::OpenRead((Resolve-Path -LiteralPath $PackagePath))
 try {
