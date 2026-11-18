@@ -956,6 +956,20 @@ impl SettingsUi {
     fn tray(&self, c: &ViewContext<Self>) -> View {
         section(vec![
             self.hero(),
+            card(
+                StackPanel::new()
+                    .spacing(12.)
+                    .children((
+                        TextBlock::new()
+                            .text("Arrange your tray icons")
+                            .font_size(20.)
+                            .font_weight(FontWeight::SEMI_BOLD),
+                        TextBlock::new()
+                            .text("Windows decides where new tray icons appear, so these icons may start out hidden or in an unexpected order. To move them, select the Show hidden icons arrow (^) next to the clock, then drag each icon onto the taskbar. Putting Previous on the left and Next on the right works well.")
+                            .text_wrapping(TextWrapping::Wrap),
+                        self.tray_preview.animation(&self.settings),
+                    )),
+            ),
             group_title("Indicators"),
             self.toggle(
                 c,
@@ -1181,6 +1195,14 @@ impl SettingsUi {
     fn hotkeys(&self, c: &ViewContext<Self>) -> View {
         section(vec![
         description_text("Click a shortcut to record a new key combination. Use Ctrl, Alt, Shift or Win with another key. Press Esc to cancel."),
+        InfoBar::new()
+            .is_open(true)
+            .is_closable(false)
+            .severity(InfoBarSeverity::Informational)
+            .title("Some shortcuts belong to Windows")
+            .message("Windows reserves some key combinations for itself, such as Win + L or Ctrl + Alt + Delete, and won't let other apps use them. Shortcuts that Windows or another app already uses may not work either. If a shortcut doesn't respond, try a different one.")
+            .margin(Thickness::new(0., 8., 0., 0.))
+            .into(),
         group_title("Switch desktops"),self.shortcut(c,"feature.useHotKeyToJumpToPreviousDesktop","feature.useHotKeyToJumpToPreviousDesktop.hotkey","Most recent desktop","Toggle between the two desktops you used most recently."),self.shortcut(c,"feature.useHotKeyToSwitchDesktopForward","feature.useHotKeyToSwitchDesktopForward.hotkey","Next desktop","Move one desktop to the right."),self.shortcut(c,"feature.useHotKeyToSwitchDesktopBackward","feature.useHotKeyToSwitchDesktopBackward.hotkey","Previous desktop","Move one desktop to the left."),
         group_title("Jump to a desktop number"),self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber","\u{E8EF}","Number shortcuts","Jump directly to desktops 1–9."),self.choice(c,"feature.useHotKeyToJumpToDesktopNumber.hotkey","\u{E765}","Modifier keys","Hold these keys while pressing a desktop number.",&[("Alt","Alt"),("Ctrl + Alt","Ctrl + Alt"),("Ctrl + Shift","Ctrl + Shift"),("Win + Alt","Win + Alt"),("Ctrl + Alt + Shift","Ctrl + Alt + Shift")]),
         self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber.useDigits","\u{E765}","Number row","Use the 1–9 keys above the letters."),self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits","\u{E765}","Number pad","Use the 1–9 keys on the number pad."),self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys","\u{E765}","Function keys","Use F1–F9 to select the corresponding desktop."),

@@ -5,6 +5,7 @@ pub mod settings;
 pub mod settings_process;
 pub mod shortcut_capture;
 pub mod tray;
+mod tray_animation;
 mod tray_preview;
 use crate::platform::{registry, wide};
 use crate::settings::Settings;

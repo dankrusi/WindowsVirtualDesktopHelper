@@ -1,3 +1,19 @@
+# v3.0.1
+
+## Features
+* The Tray icons page explains how to bring hidden tray icons onto the taskbar and put them in order, with a short animation showing how.
+* The Keyboard shortcuts page notes that some key combinations are reserved by Windows and can't be used.
+* The tray icon previews show Previous on the left and Next on the right, with the desktop number and initial in between.
+* The desktop preview has a plain background, so the overlay stands out.
+
+## Changes
+* `app.log` lines start with a readable local timestamp (`2026-11-18 14:05:09.123`) and the process that wrote them (`[app]` or `[settings]`).
+* The tray arrange animation is a separate WinUI component that redraws only itself, pauses while nothing moves, and shows a still image when Windows animations are turned off.
+* Enable the `Win32_System_SystemInformation` feature of `windows-sys`.
+
+## Fixes
+* Fix unreadable timestamps such as `SystemTime { intervals: 134376789134260356 }` in `app.log`.
+
 # v3.0.0
 
 ## Features

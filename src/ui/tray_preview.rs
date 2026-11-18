@@ -11,6 +11,17 @@ use windows_sys::Win32::{
 };
 
 const PREVIEW_RETRY: usize = 7;
+pub const DESKTOP_BLUE: Color = Color::rgb(28, 57, 89);
+/// Previews show Previous on the left and Next on the right, with the desktop number and
+/// initial between them. Windows decides the real tray order; this is the suggested layout.
+fn preview_order(id: u32) -> u32 {
+    match id {
+        3 => 0,
+        4 => 3,
+        5 => 4,
+        id => id,
+    }
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Refresh {
     Change,
@@ -61,9 +72,10 @@ impl Preview {
                         let pixels = tray::pixels(&label, settings, enabled, id >= 3, self.metrics);
                         (id, EncodedImage::new(bitmap(self.metrics.size, &pixels)))
                     })
-                    .collect()
+                    .collect::<Vec<_>>()
             })
             .unwrap_or_default();
+        self.images.sort_by_key(|(id, _)| preview_order(*id));
     }
     pub fn desktop_name(&self) -> &str {
         self.snapshot
@@ -154,6 +166,46 @@ impl Preview {
                 })),
         ))
     }
+    /// Example icons for the arrange demo, styled like the real ones: Previous, number,
+    /// initial, Next. They show all four even when some are turned off.
+    pub fn animation(&self, settings: &Settings) -> View {
+        // Match the Settings window theme: the demo's glyphs can only follow that theme.
+        let dark = match settings.get("general.theme") {
+            "dark" => true,
+            "light" => false,
+            _ => crate::platform::registry::apps_dark(),
+        };
+        let metrics = tray::Metrics {
+            dark,
+            ..self.metrics
+        };
+        let (number, initial) = self
+            .snapshot
+            .as_ref()
+            .map(|s| {
+                (
+                    (s.current + 1).to_string(),
+                    s.active().name.chars().next().unwrap_or('W').to_string(),
+                )
+            })
+            .unwrap_or(("2".into(), "W".into()));
+        let icons = [
+            (settings.get("feature.showPrevNextIcons.prevChar"), true),
+            (number.as_str(), false),
+            (initial.as_str(), false),
+            (settings.get("feature.showPrevNextIcons.nextChar"), true),
+        ]
+        .into_iter()
+        .map(|(label, symbol)| {
+            let pixels = tray::pixels(label, settings, true, symbol, metrics);
+            EncodedImage::new(bitmap(metrics.size, &pixels))
+        })
+        .collect();
+        View::component::<super::tray_animation::TrayAnimation>(super::tray_animation::Input {
+            dark,
+            icons,
+        })
+    }
     pub fn desktop_view(&self, settings: &Settings) -> View {
         // The primary monitor's real work area anchors both previews and overlays.
         let (screen, mut work) = unsafe {
@@ -191,21 +243,11 @@ impl Preview {
         work.right = screen.right - edge(screen.right - work.right, screen.right - screen.left);
         work.top = screen.top + edge(work.top - screen.top, screen.bottom - screen.top);
         work.bottom = screen.bottom - edge(screen.bottom - work.bottom, screen.bottom - screen.top);
-        let mut layers: Vec<View> = vec![
-            Border::new()
-                .width(width)
-                .height(height)
-                .background(Color::rgb(28, 57, 89))
-                .into(),
-            Border::new()
-                .width(width * 0.6)
-                .height(height * 0.7)
-                .corner_radius(height * 0.25)
-                .canvas_left(width * 0.2)
-                .canvas_top(height * 0.15)
-                .background(Color::rgb(38, 87, 139))
-                .into(),
-        ];
+        let mut layers: Vec<View> = vec![Border::new()
+            .width(width)
+            .height(height)
+            .background(DESKTOP_BLUE)
+            .into()];
         // Keep the taskbar on its real edge, enlarged with its icons for readability.
         let taskbar = if work.bottom < screen.bottom {
             RECT {
@@ -381,7 +423,7 @@ impl Preview {
 fn bitmap(size: i32, pixels: &[u32]) -> Vec<u8> {
     bitmap_rect(size, size, pixels)
 }
-fn bitmap_rect(width: i32, height: i32, pixels: &[u32]) -> Vec<u8> {
+pub(super) fn bitmap_rect(width: i32, height: i32, pixels: &[u32]) -> Vec<u8> {
     let mut bytes = vec![0u8; 138];
     bytes[..2].copy_from_slice(b"BM");
     let mut field =

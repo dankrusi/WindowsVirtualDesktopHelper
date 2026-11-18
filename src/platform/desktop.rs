@@ -116,7 +116,10 @@ impl DesktopManager {
                         {
                             result.public = Com::new(public).ok();
                         }
-                        super::log(&format!("Connected {}", profile.name));
+                        super::log(&format!(
+                            "Connected to the virtual desktop interface ({})",
+                            profile.name
+                        ));
                         return Ok(result);
                     }
                 }

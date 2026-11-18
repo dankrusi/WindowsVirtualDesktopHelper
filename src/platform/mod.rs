@@ -34,8 +34,28 @@ pub fn log(s: &str) {
             .append(true)
             .open(path)
         {
-            let _ = writeln!(f, "{:?} {s}", std::time::SystemTime::now());
+            let _ = writeln!(f, "{} [{}] {s}", timestamp(), process_role());
         }
+    }
+}
+/// Local time as `2026-11-18 14:05:09.123`, readable without converting FILETIME intervals.
+fn timestamp() -> String {
+    let mut t: SYSTEMTIME = unsafe { std::mem::zeroed() };
+    unsafe { windows_sys::Win32::System::SystemInformation::GetLocalTime(&mut t) };
+    format_time(&t)
+}
+fn format_time(t: &SYSTEMTIME) -> String {
+    format!(
+        "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:03}",
+        t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, t.wMilliseconds
+    )
+}
+/// Settings runs in its own process and logs to the same file.
+fn process_role() -> &'static str {
+    if std::env::args().any(|a| a == "--settings-ui") {
+        "settings"
+    } else {
+        "app"
     }
 }
 pub struct Handle(pub HANDLE);
@@ -46,5 +66,23 @@ impl Drop for Handle {
                 CloseHandle(self.0);
             }
         }
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn log_timestamps_are_readable_local_time() {
+        let t = SYSTEMTIME {
+            wYear: 2026,
+            wMonth: 11,
+            wDayOfWeek: 3,
+            wDay: 8,
+            wHour: 9,
+            wMinute: 5,
+            wSecond: 7,
+            wMilliseconds: 42,
+        };
+        assert_eq!(format_time(&t), "2026-11-08 09:05:07.042");
     }
 }
