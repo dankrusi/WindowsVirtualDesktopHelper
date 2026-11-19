@@ -89,7 +89,7 @@ Install the Microsoft Store edition:
 winget install --id 9N4HNXPRTSDC --exact --source msstore
 ```
 
-Portable WinGet manifests for x64, x86 and ARM64 are generated with each release. See [WinGet packaging](installers/winget/README.md) for local installation and the community repository submission process; the portable package is not yet listed in that repository.
+Portable WinGet manifests for x64, x86 and ARM64 are generated with each release. After the community submission is accepted, install with `winget install windows-virtualdesktop-helper --source winget`. See [WinGet packaging](installers/winget/README.md) for local installation and the community repository submission process; the portable package is not yet listed in that repository.
 
 ### Scoop
 

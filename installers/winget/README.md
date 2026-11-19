@@ -32,6 +32,12 @@ Check Settings, tray icons, upgrading from an earlier version and uninstalling. 
 
 Generating manifests does **not** publish the portable package to WinGet. Copy the generated `manifests/d/DanKrusi/WindowsVirtualDesktopHelper/<version>/` directory into a fork of [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs), commit it, and open a pull request. Microsoft validates and reviews it. Repeat for subsequent releases; unlike Scoop's autoupdate, committing this folder alone does not update the community source.
 
-Once the initial submission is accepted, users can install with `winget install --id DanKrusi.WindowsVirtualDesktopHelper --exact --source winget`. Until then, use the Store command or a local manifest.
+Once the initial submission is accepted, users can install using the friendly moniker:
+
+```powershell
+winget install windows-virtualdesktop-helper --source winget
+```
+
+The formal package identifier remains `DanKrusi.WindowsVirtualDesktopHelper`, following WinGet's publisher/package naming convention. To select the friendly moniker explicitly, use `winget install --moniker windows-virtualdesktop-helper --exact --source winget`. Until the submission is accepted, use the Store command or a local manifest.
 
 References: [manifest format](https://learn.microsoft.com/windows/package-manager/package/manifest), [submission process](https://learn.microsoft.com/windows/package-manager/package/repository).
