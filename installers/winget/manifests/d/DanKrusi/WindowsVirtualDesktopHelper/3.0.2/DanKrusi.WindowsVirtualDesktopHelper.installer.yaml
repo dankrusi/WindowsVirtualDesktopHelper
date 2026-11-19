@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.9.0.schema.json
+PackageIdentifier: DanKrusi.WindowsVirtualDesktopHelper
+PackageVersion: 3.0.2
+MinimumOSVersion: 10.0.22000.0
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+  - RelativeFilePath: WindowsVirtualDesktopHelper.exe
+    PortableCommandAlias: WindowsVirtualDesktopHelper
+UpgradeBehavior: uninstallPrevious
+Commands:
+  - WindowsVirtualDesktopHelper
+Dependencies:
+  PackageDependencies:
+    - PackageIdentifier: Microsoft.WindowsAppRuntime.2
+      MinimumVersion: 2.4.0
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.2/WindowsVirtualDesktopHelper.Executable.v3.0.2.zip
+    InstallerSha256: 9DBF562CE26AF772394CC1E29DDFFE9C338BFB1867D3122225E50221D3078071
+  - Architecture: x86
+    InstallerUrl: https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.2/WindowsVirtualDesktopHelper.Executable.v3.0.2.x86.zip
+    InstallerSha256: 472AD58E2AA1D98D183D1B95A5952B899089CDB78757433520CE337D2D1B06A4
+  - Architecture: arm64
+    InstallerUrl: https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.2/WindowsVirtualDesktopHelper.Executable.v3.0.2.arm64.zip
+    InstallerSha256: FD143FA39D342E49E28053BBF3BC54386BA0D5477EDBA6C74A7C579F30C90F0F
+ManifestType: installer
+ManifestVersion: 1.9.0
