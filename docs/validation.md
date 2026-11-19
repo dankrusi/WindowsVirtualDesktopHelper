@@ -1,5 +1,13 @@
 # Validation
 
+## Localization validation on 2026-11-18
+
+* Six embedded catalogs contain 231 messages each. Formatting, Clippy with warnings denied, and catalog/placeholder checks pass.
+* 47 automated tests pass on x64 and x86. The opt-in test that switches the user's desktop remains ignored. ARM64 source checking passes; no ARM64 Store package was built locally.
+* New coverage includes locale/script matching, config and CLI precedence/reset, missing-message fallback, plural selection, complete catalog formatting, grapheme-safe initials and tooltips, distinct Simplified/Traditional Chinese rasterization at four taskbar sizes, and hidden native window identity after caption translation.
+* External translation discovery is covered using isolated temporary config/executable directories: Esperanto selection, placeholders, partial fallback, config-folder precedence, UTF-8 BOM, malformed/duplicate files, and removal. The previous debug-only override mechanism has been replaced by this release-build feature.
+* Interactive validation remains for the user: switch all six languages, inspect narrow/high-DPI layouts, try Chinese desktop names and overlays, and change language while an unsaved configuration draft is open. Native-speaker review of the new translations is welcome.
+
 Run `scripts/check.ps1` for formatting, Clippy and unit tests. The tests cover legacy strings/escaping, CLI parsing, setting precedence, hotkey parsing and stable desktop history.
 
 Read-only current-machine COM smoke test:

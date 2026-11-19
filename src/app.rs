@@ -41,6 +41,15 @@ impl Drop for Hook {
         }
     }
 }
+enum ApplyError {
+    ShortcutConflict(String),
+    Other(String),
+}
+impl From<String> for ApplyError {
+    fn from(value: String) -> Self {
+        Self::Other(value)
+    }
+}
 struct App {
     settings: Settings,
     connection: DesktopConnection,
@@ -157,7 +166,7 @@ impl App {
         let result = self
             .connection
             .manager()
-            .ok_or("Desktop connection is unavailable".into())
+            .ok_or(crate::i18n::text("desktop-connection-is-unavailable").into())
             .and_then(|m| m.switch(n));
         if let Err(e) = result {
             self.connection.failed(&e);
@@ -195,16 +204,16 @@ impl App {
             Ok(bindings) => {
                 let errors = self.hotkeys.replace(bindings);
                 if !errors.is_empty() {
-                    platform::report(&format!(
-                        "These shortcuts are already in use by Windows or another app:\n{}",
-                        errors.join("\n")
+                    platform::report(&crate::i18n::format(
+                        "shortcuts-in-use",
+                        &[("shortcuts", (errors.join("\n")).to_string().into())],
                     ));
                 }
             }
             Err(e) => platform::report(&e),
         }
     }
-    fn apply(&mut self, s: Settings) -> Result<(), String> {
+    fn apply(&mut self, s: Settings) -> Result<(), ApplyError> {
         s.validate()?;
         let bindings = hotkeys::bindings(&s)?;
         let old = self
@@ -216,11 +225,14 @@ impl App {
         let errors = self.hotkeys.replace(bindings);
         if !errors.is_empty() {
             self.hotkeys.replace(old);
-            return Err(format!("Shortcut conflict: {}", errors.join(", ")));
+            return Err(ApplyError::ShortcutConflict(crate::i18n::format(
+                "shortcut-conflict",
+                &[("shortcuts", errors.join(", ").into())],
+            )));
         }
         let startup_changed = s.bool("general.startupWithWindows")
             != self.settings.bool("general.startupWithWindows");
-        let result = (|| {
+        let result: Result<(), String> = (|| {
             if startup_changed {
                 platform::registry::startup(s.bool("general.startupWithWindows"))?;
             }
@@ -232,24 +244,26 @@ impl App {
                 let _ =
                     platform::registry::startup(self.settings.bool("general.startupWithWindows"));
             }
-            return Err(e);
+            return Err(e.into());
         }
+        crate::i18n::configure(s.get("general.language"));
         self.settings = s;
+        let _ = self.refresh();
         self.update_ui();
         Ok(())
     }
     unsafe fn menu(&mut self) {
         let menu = CreatePopupMenu();
         for (id, label) in [
-            (1, "Settings…"),
-            (2, "Previous desktop"),
-            (3, "Next desktop"),
-            (4, "Most recent desktop"),
-            (5, "Retry connection"),
-            (6, "Open configuration folder"),
-            (7, "About"),
-            (8, "Donate"),
-            (9, "Exit"),
+            (1, crate::i18n::text("settings")),
+            (2, crate::i18n::text("previous-desktop")),
+            (3, crate::i18n::text("next-desktop")),
+            (4, crate::i18n::text("most-recent-desktop")),
+            (5, crate::i18n::text("retry-connection")),
+            (6, crate::i18n::text("open-configuration-folder")),
+            (7, crate::i18n::text("about")),
+            (8, crate::i18n::text("donate")),
+            (9, crate::i18n::text("exit")),
         ] {
             AppendMenuW(menu, MF_STRING, id, wide(label).as_ptr());
         }
@@ -298,7 +312,10 @@ pub fn run() -> Result<(), String> {
         let diagnostics = settings.bool("diagnostics");
         let hr = CoInitializeEx(std::ptr::null(), COINIT_APARTMENTTHREADED as u32);
         if hr < 0 {
-            return Err(format!("COM initialization failed: {hr:X}"));
+            return Err(crate::i18n::format(
+                "com-init-error",
+                &[("code", format!("{hr:X}").into())],
+            ));
         }
         let _apartment = Apartment;
         if diagnostics {
@@ -326,7 +343,9 @@ pub fn run() -> Result<(), String> {
             return Err(std::io::Error::last_os_error().to_string());
         }
         if settings.bool("debug.singleInstance") && GetLastError() == ERROR_ALREADY_EXISTS {
-            return Err("Windows Virtual Desktop Helper is already running.".into());
+            return Err(
+                crate::i18n::text("windows-virtual-desktop-helper-is-already-running").into(),
+            );
         }
         SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
         let controls = INITCOMMONCONTROLSEX {
@@ -375,7 +394,7 @@ pub fn run() -> Result<(), String> {
             snapshot: Snapshot {
                 desktops: vec![Desktop {
                     id: 0,
-                    name: "Desktop".into(),
+                    name: crate::i18n::text("desktop").into(),
                 }],
                 current: 0,
             },
@@ -424,7 +443,7 @@ pub fn run() -> Result<(), String> {
         if let Some(message) = app_state.settings.arguments.get("notify") {
             if app_state
                 .tray
-                .notify("Virtual Desktop Helper updated", message)
+                .notify(crate::i18n::text("virtual-desktop-helper-updated"), message)
             {
                 platform::log("Completion notification sent to Windows");
             } else {
@@ -581,14 +600,16 @@ unsafe fn dispatch(app: &mut App, hwnd: HWND, msg: u32, w: usize, l: isize) -> i
             }
             match app.apply(candidate) {
                 Ok(()) => 1,
-                Err(e) => {
-                    platform::log(&e);
-                    if e.starts_with("Shortcut conflict:") {
+                Err(e) => match e {
+                    ApplyError::ShortcutConflict(message) => {
+                        platform::log(&message);
                         2
-                    } else {
+                    }
+                    ApplyError::Other(message) => {
+                        platform::log(&message);
                         0
                     }
-                }
+                },
             }
         }
         ui::tray::MESSAGE => {

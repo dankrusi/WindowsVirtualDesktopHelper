@@ -5,7 +5,7 @@ Build a native MSIX and portable ZIP with the Windows SDK's MakeAppx tool:
 ```powershell
 .\scripts\build-msix.ps1 --architecture x64
 .\scripts\build-msix.ps1 --architecture arm64
-.\scripts\build-msix.ps1 --store --architecture x64 --identity-file packaging\msix\StoreIdentity.json
+.\scripts\build-msix.ps1 --store --architecture x64 --identity-file installers\microsoftstore\StoreIdentity.json
 ```
 
 Requirements: Rust 1.95+ MSVC toolchain, Visual Studio C++ Build Tools (including the target architecture tools), Windows SDK, PowerShell 5.1 or later. No Visual Studio Installer Projects extension or .NET development workload is needed. `VERSION.md` is the version source (`Cargo.toml` must match; `scripts\check.ps1` verifies it); MSIX appends a fourth zero component.
@@ -24,7 +24,7 @@ Each build stages files in a fresh `dist/.work/<id>/` directory; the script neve
 For local distribution, use a certificate already trusted by the target machine. Its subject must exactly match the manifest Publisher. Sign explicitly:
 
 ```powershell
-.\scripts\sign-msix.ps1 --package-path dist\WindowsVirtualDesktopHelper_3.0.0.0_x64_development.msix --certificate-thumbprint YOUR_CERTIFICATE_THUMBPRINT
+.\scripts\sign-msix.ps1 --package-path dist\WindowsVirtualDesktopHelper_3.0.2.0_x64_development.msix --certificate-thumbprint YOUR_CERTIFICATE_THUMBPRINT
 ```
 
 Signing verifies the signature and regenerates the MSIX checksum. Rebuild the upload archive separately if you need a signed archive; the generated Store upload intentionally contains the unsigned package. No certificate is created, imported or trusted by these scripts. The Microsoft Store signs packages distributed through the Store.

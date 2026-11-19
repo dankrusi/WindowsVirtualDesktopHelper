@@ -81,27 +81,31 @@ impl Preview {
         self.snapshot
             .as_ref()
             .map(|s| s.active().name.as_str())
-            .unwrap_or("Desktop preview")
+            .unwrap_or(crate::i18n::text("desktop-preview"))
     }
     pub fn view(&self) -> View {
         let Some(snapshot) = &self.snapshot else {
             return TextBlock::new()
-                .text("Tray preview is unavailable until the desktop connection is restored.")
+                .text(crate::i18n::text(
+                    "tray-preview-is-unavailable-until-the-desktop-connection-is-restored",
+                ))
                 .text_wrapping(TextWrapping::Wrap)
                 .into();
         };
         let size = self.metrics.size as f64 * 96. / self.metrics.dpi as f64;
         StackPanel::new().spacing(12.).children((
             TextBlock::new()
-                .text("Current tray icons")
+                .text(crate::i18n::text("current-tray-icons"))
                 .font_size(20.)
                 .font_weight(FontWeight::SEMI_BOLD),
             TextBlock::new()
-                .text(format!(
-                    "Desktop {} of {} · {}",
-                    snapshot.current + 1,
-                    snapshot.desktops.len(),
-                    snapshot.active().name
+                .text(crate::i18n::format(
+                    "tray-preview-summary",
+                    &[
+                        ("number", (snapshot.current + 1).into()),
+                        ("total", (snapshot.desktops.len()).into()),
+                        ("name", (snapshot.active().name).to_string().into()),
+                    ],
                 ))
                 .text_wrapping(TextWrapping::Wrap),
             Border::new()
@@ -137,7 +141,7 @@ impl Preview {
     fn enlarged_icons(&self) -> View {
         StackPanel::new().spacing(8.).children((
             TextBlock::new()
-                .text("Icon detail")
+                .text(crate::i18n::text("icon-detail"))
                 .font_size(12.)
                 .opacity(0.65),
             StackPanel::new()
@@ -381,7 +385,7 @@ impl Preview {
         }
         StackPanel::new().spacing(14.).children((
             TextBlock::new()
-                .text("Desktop appearance")
+                .text(crate::i18n::text("desktop-appearance"))
                 .font_size(20.)
                 .font_weight(FontWeight::SEMI_BOLD),
             Border::new()
@@ -404,13 +408,15 @@ impl Preview {
                     self.snapshot
                         .as_ref()
                         .map(|snapshot| {
-                            format!(
-                                "Enlarged preview · Desktop {} of {}",
-                                snapshot.current + 1,
-                                snapshot.desktops.len()
+                            crate::i18n::format(
+                                "desktop-preview-summary",
+                                &[
+                                    ("number", (snapshot.current + 1).into()),
+                                    ("total", (snapshot.desktops.len()).into()),
+                                ],
                             )
                         })
-                        .unwrap_or_else(|| "Desktop preview".into()),
+                        .unwrap_or_else(|| crate::i18n::text("desktop-preview").into()),
                 )
                 .font_size(12.)
                 .opacity(0.7),

@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.9.0.schema.json
+PackageIdentifier: DanKrusi.WindowsVirtualDesktopHelper
+PackageVersion: {version}
+MinimumOSVersion: 10.0.22000.0
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+  - RelativeFilePath: WindowsVirtualDesktopHelper.exe
+    PortableCommandAlias: WindowsVirtualDesktopHelper
+UpgradeBehavior: uninstallPrevious
+Commands:
+  - WindowsVirtualDesktopHelper
+Dependencies:
+  PackageDependencies:
+    - PackageIdentifier: Microsoft.WindowsAppRuntime.2
+      MinimumVersion: 2.4.0
+Installers:
+  - Architecture: x64
+    InstallerUrl: {x64-url}
+    InstallerSha256: {x64-hash}
+  - Architecture: x86
+    InstallerUrl: {x86-url}
+    InstallerSha256: {x86-hash}
+  - Architecture: arm64
+    InstallerUrl: {arm64-url}
+    InstallerSha256: {arm64-hash}
+ManifestType: installer
+ManifestVersion: 1.9.0

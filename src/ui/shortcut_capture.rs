@@ -19,7 +19,7 @@ impl Capture {
             )
         };
         if hook.is_null() {
-            return Err("Couldn't start shortcut recording. Try again.".into());
+            return Err(crate::i18n::text("couldn-t-start-shortcut-recording-try-again").into());
         }
         CALLBACK.with(|slot| *slot.borrow_mut() = Some(Box::new(callback)));
         Ok(Self(hook))

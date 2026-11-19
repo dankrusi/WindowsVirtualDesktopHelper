@@ -1,4 +1,7 @@
+#[path = "scripts/localization_build.rs"]
+mod localization;
 fn main() {
+    localization::generate();
     println!("cargo:rerun-if-changed=assets/app.manifest");
     if std::env::var("CARGO_CFG_TARGET_ENV").as_deref() == Ok("msvc") {
         let manifest = std::path::Path::new(&std::env::var("CARGO_MANIFEST_DIR").unwrap())

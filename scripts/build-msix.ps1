@@ -5,7 +5,7 @@ Builds and validates an unsigned desktop MSIX package and a Store upload archive
 .EXAMPLE
 .\scripts\build-msix.ps1 --architecture x64
 .EXAMPLE
-.\scripts\build-msix.ps1 --store --architecture x64 --identity-file .\packaging\msix\StoreIdentity.json
+.\scripts\build-msix.ps1 --store --architecture x64 --identity-file .\installers\microsoftstore\StoreIdentity.json
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -16,7 +16,7 @@ $spec = @{ 'store' = 'switch' }; foreach ($name in $names) { $spec[$name] = 'str
 $options = Read-Arguments $args $spec @'
 Usage: build-msix.ps1 [--architecture x64|x86|arm64] [--store] [options]
   --architecture            Target architecture (default: x64).
-  --store                   Use the Partner Center identity (packaging\msix\StoreIdentity.json).
+  --store                   Use the Partner Center identity (installers\microsoftstore\StoreIdentity.json).
   --version                 Package version; must be the VERSION.md version plus .0.
   --output-directory        Output folder (default: dist).
   --identity-file           JSON file with Name, Publisher, PublisherDisplayName, DisplayName.
@@ -40,14 +40,14 @@ $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $appVersion = Get-AppVersion
 if (-not $Version) { $Version = "$appVersion.0" }
 if ($Version -ne "$appVersion.0") { throw 'MSIX version must match VERSION.md plus a fourth zero component.' }
-if ($Version -notmatch '^\d+\.\d+\.\d+\.\d+$') { throw 'MSIX version must contain four numbers, for example 3.0.0.0.' }
+if ($Version -notmatch '^\d+\.\d+\.\d+\.\d+$') { throw 'MSIX version must contain four numbers, for example 3.0.2.0.' }
 $packageVersion = [version]$Version
 if ($packageVersion.Major -lt 1 -or @($packageVersion.Major, $packageVersion.Minor, $packageVersion.Build, $packageVersion.Revision | Where-Object { $_ -gt 65535 }).Count -gt 0) {
     throw 'MSIX version components must be between 0 and 65535, with a nonzero major version.'
 }
 if ($Store -and $packageVersion.Revision -ne 0) { throw 'Microsoft Store packages must use zero for the fourth version component.' }
 
-if (-not $IdentityFile -and $Store) { $IdentityFile = Join-Path $repoRoot 'packaging\msix\StoreIdentity.json' }
+if (-not $IdentityFile -and $Store) { $IdentityFile = Join-Path $repoRoot 'installers\microsoftstore\StoreIdentity.json' }
 if ($IdentityFile -and (Test-Path -LiteralPath $IdentityFile)) {
     $identity = Get-Content -LiteralPath $IdentityFile -Raw | ConvertFrom-Json
     if (-not $IdentityName) { $IdentityName = $identity.Name }
@@ -56,7 +56,7 @@ if ($IdentityFile -and (Test-Path -LiteralPath $IdentityFile)) {
     if (-not $DisplayName -and $identity.PSObject.Properties['DisplayName']) { $DisplayName = $identity.DisplayName }
 }
 if ($Store -and (-not $IdentityName -or -not $Publisher -or -not $PublisherDisplayName -or -not $DisplayName)) {
-    throw 'Store builds require Name, Publisher, PublisherDisplayName, and the reserved app DisplayName from Partner Center. See packaging/msix/StoreIdentity.example.json.'
+    throw 'Store builds require Name, Publisher, PublisherDisplayName, and the reserved app DisplayName from Partner Center. See installers/microsoftstore/StoreIdentity.example.json.'
 }
 if (-not $IdentityName) { $IdentityName = 'WindowsVirtualDesktopHelper.Development' }
 if (-not $Publisher) { $Publisher = 'CN=WindowsVirtualDesktopHelper Development' }
@@ -120,7 +120,7 @@ try {
     }
 } finally { $sourceLogo.Dispose() }
 
-[xml]$manifest = Get-Content -LiteralPath (Join-Path $repoRoot 'packaging\msix\AppxManifest.xml') -Raw
+[xml]$manifest = Get-Content -LiteralPath (Join-Path $repoRoot 'installers\microsoftstore\AppxManifest.xml') -Raw
 $manifest.Package.Identity.SetAttribute('Name', $IdentityName)
 $manifest.Package.Identity.SetAttribute('Publisher', $Publisher)
 $manifest.Package.Identity.SetAttribute('Version', $Version)

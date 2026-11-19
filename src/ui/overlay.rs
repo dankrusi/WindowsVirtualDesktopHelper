@@ -113,6 +113,8 @@ pub fn preview_pixels(
             font: super::font(
                 &appearance.font,
                 (appearance.font_size * 96. / 72. * scale).round().max(1.) as i32,
+                label,
+                CLEARTYPE_QUALITY,
             ),
             alpha: appearance.opacity,
             target: appearance.opacity,
@@ -231,6 +233,8 @@ impl Overlays {
                     font: super::font(
                         &appearance.font,
                         (appearance.font_size * dpi as f64 / 72.) as i32,
+                        label,
+                        CLEARTYPE_QUALITY,
                     ),
                     border: appearance.border,
                     radius: scale(appearance.radius, dpi),
@@ -386,7 +390,7 @@ unsafe fn paint(dc: HDC, r: RECT, s: &State) {
         r,
         s.fg,
         s.font,
-        DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS,
+        DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX,
     );
 }
 

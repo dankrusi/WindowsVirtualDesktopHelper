@@ -50,9 +50,20 @@ impl Document {
             });
             if current.get(key) != base.get(key) && current.get(key).map(String::as_str) != desired
             {
-                return Err(format!(
-                    "{key} changed in Settings while this editor was open. Its current value is {}. Your draft has been kept; reopen the editor to start from the current settings.",
-                    current.get(key).map(String::as_str).unwrap_or("(removed)")
+                return Err(crate::i18n::format(
+                    "editor-conflict",
+                    &[
+                        ("key", (key).to_string().into()),
+                        (
+                            "value",
+                            (current
+                                .get(key)
+                                .map(String::as_str)
+                                .unwrap_or(crate::i18n::text("removed")))
+                            .to_string()
+                            .into(),
+                        ),
+                    ],
                 ));
             }
             match value {

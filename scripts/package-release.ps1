@@ -12,7 +12,7 @@ Produces, in OutputDirectory:
 Used by the GitHub Actions release job; it can also be run locally after building all three
 architectures with: .\scripts\build-msix.ps1 --store --architecture <arch>
 .EXAMPLE
-.\scripts\package-release.ps1 --version 3.0.1
+.\scripts\package-release.ps1 --version 3.0.2
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -34,7 +34,7 @@ $Architectures = if ($options['architectures']) { @($options['architectures']) }
 Assert-Choice 'architectures' $Architectures @('x64', 'x86', 'arm64')
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $Version = $Version.TrimStart('v')
-if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "Version must look like 3.0.1, got '$Version'." }
+if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "Version must look like 3.0.2, got '$Version'." }
 $appVersion = Get-AppVersion
 if ($appVersion -ne $Version) { throw "Tag version $Version does not match VERSION.md version $appVersion." }
 if (-not $InputDirectory) { $InputDirectory = Join-Path $repoRoot 'dist' }

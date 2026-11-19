@@ -4,6 +4,7 @@ pub const DEFAULTS: &[(&str, &str)] = &[
     ("debug.singleInstance", "true"),
     ("general.startupWithWindows", "false"),
     ("general.theme", "auto"),
+    ("general.language", "auto"),
     ("theme.icons.disabledOpacity", "0.5"),
     ("theme.icons.font", "Segoe UI"),
     ("theme.icons.emojiFont", "Segoe UI Symbol"),

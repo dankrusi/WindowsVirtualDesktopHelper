@@ -1,0 +1,7 @@
+# Locale identifier = native language name. Add the matching <locale>.ftl file.
+en-US = English
+zh-Hans = 简体中文
+zh-Hant = 繁體中文
+de = Deutsch
+es = Español
+fr = Français

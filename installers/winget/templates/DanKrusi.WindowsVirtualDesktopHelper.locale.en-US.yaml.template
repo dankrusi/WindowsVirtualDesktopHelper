@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
+PackageIdentifier: DanKrusi.WindowsVirtualDesktopHelper
+PackageVersion: {version}
+PackageLocale: en-US
+Publisher: Dan Krusi
+PublisherUrl: https://github.com/dankrusi
+PublisherSupportUrl: https://github.com/dankrusi/WindowsVirtualDesktopHelper/issues
+PackageName: Windows Virtual Desktop Helper
+PackageUrl: https://github.com/dankrusi/WindowsVirtualDesktopHelper
+License: GPL-3.0-or-later
+LicenseUrl: https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/v{version}/LICENSE.md
+ShortDescription: Tray icons, desktop name overlays, and keyboard shortcuts for Windows 11 virtual desktops.
+Moniker: windows-virtualdesktop-helper
+Tags:
+  - desktop
+  - virtual-desktop
+  - windows11
+ReleaseNotesUrl: https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/tag/v{version}
+ManifestType: defaultLocale
+ManifestVersion: 1.9.0

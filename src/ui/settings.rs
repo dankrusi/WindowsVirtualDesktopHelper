@@ -8,28 +8,28 @@ use windows_reactor::*;
 use windows_sys::Win32::Foundation::HWND;
 
 const PAGES: [(&str, &str, &str); 6] = [
-    ("general", "General", "\u{E713}"),
-    ("tray", "Tray icons", "\u{E9D9}"),
-    ("overlays", "Desktop overlays", "\u{E7F4}"),
-    ("hotkeys", "Keyboard shortcuts", "\u{E765}"),
-    ("advanced", "Advanced", "\u{E90F}"),
-    ("about", "About", "\u{E946}"),
+    ("general", "general", "\u{E713}"),
+    ("tray", "tray-icons", "\u{E9D9}"),
+    ("overlays", "desktop-overlays", "\u{E7F4}"),
+    ("hotkeys", "keyboard-shortcuts", "\u{E765}"),
+    ("advanced", "advanced", "\u{E90F}"),
+    ("about", "about", "\u{E946}"),
 ];
 const POS: [(&str, &str); 9] = [
-    ("topleft", "Top left"),
-    ("topcenter", "Top center"),
-    ("topright", "Top right"),
-    ("middleleft", "Center left"),
-    ("middlecenter", "Center"),
-    ("middleright", "Center right"),
-    ("bottomleft", "Bottom left"),
-    ("bottomcenter", "Bottom center"),
-    ("bottomright", "Bottom right"),
+    ("topleft", "top-left"),
+    ("topcenter", "top-center"),
+    ("topright", "top-right"),
+    ("middleleft", "center-left"),
+    ("middlecenter", "center"),
+    ("middleright", "center-right"),
+    ("bottomleft", "bottom-left"),
+    ("bottomcenter", "bottom-center"),
+    ("bottomright", "bottom-right"),
 ];
 const THEME: [(&str, &str); 3] = [
-    ("auto", "Use Windows setting"),
-    ("light", "Light"),
-    ("dark", "Dark"),
+    ("auto", "use-windows-setting"),
+    ("light", "light"),
+    ("dark", "dark"),
 ];
 
 enum Message {
@@ -222,7 +222,9 @@ impl Component for SettingsUi {
                 };
                 if !context.open_window(View::component::<super::config_editor::Editor>(input)) {
                     self.editor.closed();
-                    self.error = "Couldn't open the configuration editor. Try again.".into();
+                    self.error =
+                        crate::i18n::text("couldn-t-open-the-configuration-editor-try-again")
+                            .into();
                 }
             }
             Message::EditorSaved(settings) => self.accept(settings),
@@ -236,7 +238,7 @@ impl Component for SettingsUi {
                         super::open_url(std::ptr::null_mut(), &path.to_string_lossy());
                     }
                 } else {
-                    self.error = "No log has been created yet.".into();
+                    self.error = crate::i18n::text("no-log-has-been-created-yet").into();
                 }
             }
             Message::Folder => super::settings_process::open_folder(&self.settings),
@@ -279,7 +281,7 @@ impl Component for SettingsUi {
         }
     }
     fn view(&self, _: &Settings, context: &mut ViewContext<Self>) -> View {
-        context.window_title("Settings · Virtual Desktop Helper");
+        context.window_title(crate::i18n::text("settings-virtual-desktop-helper"));
         context.window_visuals(
             WindowVisuals::new()
                 .client_size(
@@ -326,7 +328,7 @@ impl Component for SettingsUi {
                     .slots([
                         SlotView::new(
                             NavigationViewItemSlot::Content,
-                            TextBlock::new().text(*title),
+                            TextBlock::new().text(crate::i18n::text(title)),
                         ),
                         SlotView::new(NavigationViewItemSlot::Icon, FontIcon::new().glyph(*icon)),
                     ]),
@@ -335,15 +337,15 @@ impl Component for SettingsUi {
         let title = PAGES
             .iter()
             .find(|p| p.0 == self.page)
-            .map(|p| p.1)
-            .unwrap_or("General");
+            .map(|p| crate::i18n::text(p.1))
+            .unwrap_or(crate::i18n::text("general"));
         let description = match self.page.as_str() {
-            "tray" => "Know where you are, without opening Task View.",
-            "overlays" => "Choose when and where desktop names appear.",
-            "hotkeys" => "Move between desktops without leaving the keyboard.",
-            "advanced" => "Fine-tune your setup and manage configuration.",
-            "about" => "A little more clarity for your Windows desktops.",
-            _ => "Make your virtual desktops feel like home.",
+            "tray" => crate::i18n::text("know-where-you-are-without-opening-task-view"),
+            "overlays" => crate::i18n::text("choose-when-and-where-desktop-names-appear"),
+            "hotkeys" => crate::i18n::text("move-between-desktops-without-leaving-the-keyboard"),
+            "advanced" => crate::i18n::text("fine-tune-your-setup-and-manage-configuration"),
+            "about" => crate::i18n::text("a-little-more-clarity-for-your-windows-desktops"),
+            _ => crate::i18n::text("make-your-virtual-desktops-feel-like-home"),
         };
         let body = match self.page.as_str() {
             "tray" => self.tray(context),
@@ -365,6 +367,7 @@ impl Component for SettingsUi {
                         StackPanel::new().spacing(8.).children((
                             TextBlock::new()
                                 .text(title)
+                                .text_wrapping(TextWrapping::Wrap)
                                 .font_size(28.)
                                 .font_weight(FontWeight::SEMI_BOLD),
                             description_text(description),
@@ -372,7 +375,7 @@ impl Component for SettingsUi {
                         InfoBar::new()
                             .is_open(!self.error.is_empty())
                             .severity(InfoBarSeverity::Error)
-                            .title("Change wasn't saved")
+                            .title(crate::i18n::text("change-wasn-t-saved"))
                             .message(&self.error)
                             .on_closed(context.callback(|()| Message::Dismiss)),
                         body,
@@ -398,9 +401,9 @@ impl Component for SettingsUi {
                     NavigationViewSlot::PaneFooter,
                     TextBlock::new()
                         .text(if self.pane_open {
-                            "Virtual Desktop Helper 3.0"
+                            concat!("Virtual Desktop Helper ", env!("CARGO_PKG_VERSION"))
                         } else {
-                            "3.0"
+                            env!("CARGO_PKG_VERSION")
                         })
                         .font_size(12.)
                         .opacity(0.6)
@@ -429,8 +432,10 @@ impl SettingsUi {
             self.sender
                 .send(Message::SchedulePreview(self.preview_generation));
         }
+        crate::i18n::configure(candidate.get("general.language"));
         self.settings = candidate;
-        self.tray_preview.render(&self.settings);
+        self.tray_preview
+            .refresh(&self.settings, super::tray_preview::Refresh::Change);
         super::settings_process::update_caption(&self.settings);
         self.editor.update(&self.settings);
         self.error.clear();
@@ -515,11 +520,11 @@ impl SettingsUi {
             Border::new().corner_radius(8.).background(ThemeBrush::CardBackground).content(
                 Grid::new().columns([GridLength::STAR, GridLength::Auto]).children((
                     InfoBar::new().grid_column(0).is_open(true).is_closable(false).severity(InfoBarSeverity::Informational)
-                        .title(if overridden { "Set by command-line options" } else { "Custom configuration" })
-                        .message(format!("{}\n{values}", if overridden { "Reset restores the default for this session. Launch options apply again after restarting." } else { "Edit this value in Advanced, or reset it to use the options here." })),
+                        .title(if overridden { crate::i18n::text("set-by-command-line-options") } else { crate::i18n::text("custom-configuration") })
+                        .message(format!("{}\n{values}", if overridden { crate::i18n::text("reset-restores-the-default-for-this-session-launch-options-apply-again-a") } else { crate::i18n::text("edit-this-value-in-advanced-or-reset-it-to-use-the-options-here") })),
                     Button::new().grid_column(1).margin(16.).vertical_alignment(VerticalAlignment::Center)
-                        .automation_name("Reset to default").on_click(self.sender.callback(move |()| Message::Reset(reset_keys.clone())))
-                        .content("Reset")
+                        .automation_name(crate::i18n::text("reset-to-default")).on_click(self.sender.callback(move |()| Message::Reset(reset_keys.clone())))
+                        .content(crate::i18n::text("reset"))
                 ))
             )
         ))
@@ -601,11 +606,20 @@ impl SettingsUi {
         icon: &str,
         title: &str,
         description: &str,
-        choices: &'static [(&'static str, &'static str)],
+        choices: &[(&str, &str)],
     ) -> View {
-        let selected = choices
+        let choices: Vec<(String, String)> = choices
             .iter()
-            .position(|(value, _)| *value == self.settings.get(key));
+            .map(|(id, label)| ((*id).into(), (*label).into()))
+            .collect();
+        let selected = choices.iter().position(|(value, _)| {
+            *value
+                == if key == "general.language" {
+                    crate::i18n::resolve(self.settings.get(key)).unwrap_or(self.settings.get(key))
+                } else {
+                    self.settings.get(key)
+                }
+        });
         self.managed(
             &[key],
             selected.is_some(),
@@ -615,16 +629,17 @@ impl SettingsUi {
                 description,
                 "",
                 ComboBox::new()
-                    .width(210.)
-                    .items_source(choices.iter().map(|(_, label)| *label))
+                    .min_width(210.)
+                    .max_width(320.)
+                    .items_source(choices.iter().map(|(_, label)| crate::i18n::text(label)))
                     .selected_index(selected)
-                    .placeholder_text("Custom")
+                    .placeholder_text(crate::i18n::text("custom"))
                     .is_enabled(self.enabled(key) && selected.is_some())
                     .automation_name(title)
                     .on_selection_changed(c.callback(move |index: Option<usize>| {
                         index
                             .and_then(|i| choices.get(i))
-                            .map(|(value, _)| Message::Set(key, (*value).into()))
+                            .map(|(value, _)| Message::Set(key, value.clone()))
                             .unwrap_or(Message::Page(None))
                     }))
                     .into(),
@@ -695,10 +710,15 @@ impl SettingsUi {
                 "",
                 "",
                 ComboBox::new()
-                    .width(210.)
-                    .items_source(["Small", "Medium", "Large"])
+                    .min_width(210.)
+                    .max_width(320.)
+                    .items_source([
+                        crate::i18n::text("small"),
+                        crate::i18n::text("medium"),
+                        crate::i18n::text("large"),
+                    ])
                     .selected_index(selected)
-                    .placeholder_text("Custom")
+                    .placeholder_text(crate::i18n::text("custom"))
                     .is_enabled(selected.is_some() && keys.iter().all(|key| self.enabled(key)))
                     .automation_name(title)
                     .on_selection_changed(c.callback(move |index: Option<usize>| {
@@ -733,10 +753,15 @@ impl SettingsUi {
             .collect::<Vec<_>>();
         let picker = ComboBox::new()
             .width(if selected == 3 { 140. } else { 210. })
-            .items_source(["Small", "Medium", "Large", "Custom"])
+            .items_source([
+                crate::i18n::text("small"),
+                crate::i18n::text("medium"),
+                crate::i18n::text("large"),
+                crate::i18n::text("custom"),
+            ])
             .selected_index(Some(selected))
             .is_enabled(keys.iter().all(|key| self.enabled(key)))
-            .automation_name("Size")
+            .automation_name(crate::i18n::text("size"))
             .on_selection_changed(c.callback(move |index: Option<usize>| {
                 let Some(index) = index.filter(|i| *i != selected && *i <= 3) else {
                     return Message::Page(None);
@@ -756,13 +781,13 @@ impl SettingsUi {
         if selected == 3 {
             controls.push(
                 Button::new()
-                    .width(62.)
+                    .min_width(62.)
                     .is_enabled(keys.iter().all(|key| self.enabled(key)))
-                    .automation_name("Reset size")
+                    .automation_name(crate::i18n::text("reset-size"))
                     .on_click(c.callback(move |()| {
                         Message::Reset(keys.iter().map(|key| (*key).into()).collect())
                     }))
-                    .content("Reset"),
+                    .content(crate::i18n::text("reset")),
             );
         }
         let mut rows = vec![self.managed(
@@ -770,7 +795,7 @@ impl SettingsUi {
             true,
             self.row(
                 "\u{E8A4}",
-                "Size",
+                crate::i18n::text("size"),
                 "",
                 "",
                 StackPanel::new()
@@ -781,8 +806,8 @@ impl SettingsUi {
         )];
         if selected == 3 {
             for (key, title, maximum) in [
-                (dimensions[0], "Width", 1920_f64),
-                (dimensions[1], "Height", 1080_f64),
+                (dimensions[0], crate::i18n::text("width"), 1920_f64),
+                (dimensions[1], crate::i18n::text("height"), 1080_f64),
             ] {
                 let value = self.settings.number(key);
                 let enabled = self.enabled(key) && self.enabled(custom_key);
@@ -794,7 +819,10 @@ impl SettingsUi {
                         key,
                         StackPanel::new().width(210.).spacing(4.).children((
                             TextBlock::new()
-                                .text(format!("{value:.0} px"))
+                                .text(crate::i18n::format(
+                                    "pixels",
+                                    &[("value", format!("{value:.0}").into())],
+                                ))
                                 .opacity(if enabled { 1. } else { 0.4 })
                                 .horizontal_alignment(HorizontalAlignment::Right),
                             Slider::new()
@@ -829,16 +857,19 @@ impl SettingsUi {
             supported,
             self.row(
                 "\u{E8A9}",
-                "Distance from screen edge",
+                crate::i18n::text("distance-from-screen-edge"),
                 if relevant {
                     ""
                 } else {
-                    "Not used with the Center position."
+                    crate::i18n::text("not-used-with-the-center-position")
                 },
                 "",
                 StackPanel::new().width(210.).spacing(4.).children((
                     TextBlock::new()
-                        .text(format!("{value:.0} px"))
+                        .text(crate::i18n::format(
+                            "pixels",
+                            &[("value", format!("{value:.0}").into())],
+                        ))
                         .opacity(if enabled { 1. } else { 0.4 })
                         .horizontal_alignment(HorizontalAlignment::Right),
                     Slider::new()
@@ -847,7 +878,7 @@ impl SettingsUi {
                         .step_frequency(1.)
                         .value(value.clamp(0., 200.))
                         .is_enabled(enabled)
-                        .automation_name("Distance from screen edge")
+                        .automation_name(crate::i18n::text("distance-from-screen-edge"))
                         .on_value_changed(
                             c.callback(move |value| Message::Set(key, format!("{value:.0}"))),
                         ),
@@ -861,15 +892,11 @@ impl SettingsUi {
             "feature.showPrevNextIcons.nextChar",
         ];
         const PAIRS: [(&str, &str, &str); 5] = [
-            ("\u{2039}", "\u{203a}", "\u{2039}  \u{203a}    Chevrons"),
-            ("\u{2190}", "\u{2192}", "\u{2190}  \u{2192}    Arrows"),
-            ("\u{25c0}", "\u{25b6}", "\u{25c0}  \u{25b6}    Triangles"),
-            (
-                "\u{00ab}",
-                "\u{00bb}",
-                "\u{00ab}  \u{00bb}    Double chevrons",
-            ),
-            ("<", ">", "<  >    Angles"),
+            ("\u{2039}", "\u{203a}", "chevrons"),
+            ("\u{2190}", "\u{2192}", "arrows"),
+            ("\u{25c0}", "\u{25b6}", "triangles"),
+            ("\u{00ab}", "\u{00bb}", "double-chevrons"),
+            ("<", ">", "angles"),
         ];
         let selected = PAIRS.iter().position(|(prev, next, _)| {
             self.settings.get(KEYS[0]) == *prev && self.settings.get(KEYS[1]) == *next
@@ -879,16 +906,17 @@ impl SettingsUi {
             selected.is_some(),
             self.row(
                 "\u{E8AB}",
-                "Previous/next symbol",
-                "Choose a matching pair of navigation symbols.",
+                crate::i18n::text("previous-next-symbol"),
+                crate::i18n::text("choose-a-matching-pair-of-navigation-symbols"),
                 "",
                 ComboBox::new()
-                    .width(210.)
-                    .items_source(PAIRS.iter().map(|p| p.2))
+                    .min_width(210.)
+                    .max_width(320.)
+                    .items_source(PAIRS.iter().map(|p| crate::i18n::text(p.2)))
                     .selected_index(selected)
-                    .placeholder_text("Custom")
+                    .placeholder_text(crate::i18n::text("custom"))
                     .is_enabled(selected.is_some() && KEYS.iter().all(|key| self.enabled(key)))
-                    .automation_name("Previous/next symbol")
+                    .automation_name(crate::i18n::text("previous-next-symbol"))
                     .on_selection_changed(c.callback(|index: Option<usize>| {
                         index
                             .and_then(|i| PAIRS.get(i))
@@ -905,51 +933,64 @@ impl SettingsUi {
         )
     }
     fn general(&self, c: &ViewContext<Self>) -> View {
+        let languages = crate::i18n::choices();
+        let languages: Vec<_> = languages
+            .iter()
+            .map(|(id, name)| (id.as_str(), name.as_str()))
+            .collect();
         let startup = if registry::packaged() {
             self.row(
                 "\u{E7E8}",
-                "Start with Windows",
-                "Manage this app in Windows Startup Apps.",
+                crate::i18n::text("start-with-windows"),
+                crate::i18n::text("manage-this-app-in-windows-startup-apps"),
                 "",
                 Button::new()
                     .on_click(c.callback(|()| Message::Startup))
-                    .content("Open Windows Settings"),
+                    .content(crate::i18n::text("open-windows-settings")),
             )
         } else {
             self.toggle(
                 c,
                 "general.startupWithWindows",
                 "\u{E7E8}",
-                "Start with Windows",
-                "Have your desktop tools ready when you sign in.",
+                crate::i18n::text("start-with-windows"),
+                crate::i18n::text("have-your-desktop-tools-ready-when-you-sign-in"),
             )
         };
         section(vec![
             card(self.tray_preview.desktop_view(&self.settings)),
-            group_title("Personalization"),
+            group_title(crate::i18n::text("personalization")),
             self.choice(
                 c,
                 "general.theme",
                 "\u{E790}",
-                "App theme",
-                "Choose a look, or follow Windows.",
+                crate::i18n::text("app-theme"),
+                crate::i18n::text("choose-a-look-or-follow-windows"),
                 &THEME,
             ),
-            group_title("Startup and behavior"),
+            self.choice(
+                c,
+                "general.language",
+                "\u{E774}",
+                crate::i18n::text("language"),
+                crate::i18n::text("language-description"),
+                &languages,
+            ),
+            group_title(crate::i18n::text("startup-and-behavior")),
             startup,
             self.toggle(
                 c,
                 "feature.showSplashScreen",
                 "\u{E734}",
-                "Welcome message",
-                "Show a brief overlay when the helper starts.",
+                crate::i18n::text("welcome-message"),
+                crate::i18n::text("show-a-brief-overlay-when-the-helper-starts"),
             ),
             self.toggle(
                 c,
                 "feature.restorePreviousWindowFocus",
                 "\u{E8A7}",
-                "Restore window focus",
-                "Return to the last active window when you switch desktops.",
+                crate::i18n::text("restore-window-focus"),
+                crate::i18n::text("return-to-the-last-active-window-when-you-switch-desktops"),
             ),
         ])
     }
@@ -961,51 +1002,51 @@ impl SettingsUi {
                     .spacing(12.)
                     .children((
                         TextBlock::new()
-                            .text("Arrange your tray icons")
+                            .text(crate::i18n::text("arrange-your-tray-icons"))
                             .font_size(20.)
                             .font_weight(FontWeight::SEMI_BOLD),
                         TextBlock::new()
-                            .text("Windows decides where new tray icons appear, so these icons may start out hidden or in an unexpected order. To move them, select the Show hidden icons arrow (^) next to the clock, then drag each icon onto the taskbar. Putting Previous on the left and Next on the right works well.")
+                            .text(crate::i18n::text("windows-decides-where-new-tray-icons-appear-so-these-icons-may-start-out"))
                             .text_wrapping(TextWrapping::Wrap),
                         self.tray_preview.animation(&self.settings),
                     )),
             ),
-            group_title("Indicators"),
+            group_title(crate::i18n::text("indicators")),
             self.toggle(
                 c,
                 "feature.showDesktopNumberInIconTray",
                 "\u{E8EF}",
-                "Desktop number",
-                "See the current desktop at a glance.",
+                crate::i18n::text("desktop-number"),
+                crate::i18n::text("see-the-current-desktop-at-a-glance"),
             ),
             self.toggle(
                 c,
                 "feature.showDesktopNameInIconTray",
                 "\u{E8D2}",
-                "Desktop initial",
-                "Use the first character of the desktop name.",
+                crate::i18n::text("desktop-initial"),
+                crate::i18n::text("use-the-first-character-of-the-desktop-name"),
             ),
             self.toggle(
                 c,
                 "feature.showDesktopNumberInIconTray.clickToOpenTaskView",
                 "\u{E7F4}",
-                "Click to open Task View",
-                "Click the desktop indicator to see all your desktops.",
+                crate::i18n::text("click-to-open-task-view"),
+                crate::i18n::text("click-the-desktop-indicator-to-see-all-your-desktops"),
             ),
-            group_title("Navigation"),
+            group_title(crate::i18n::text("navigation")),
             self.toggle(
                 c,
                 "feature.showPrevNextIcons",
                 "\u{E8AB}",
-                "Previous and next buttons",
-                "Switch desktops directly from the tray.",
+                crate::i18n::text("previous-and-next-buttons"),
+                crate::i18n::text("switch-desktops-directly-from-the-tray"),
             ),
             self.toggle(
                 c,
                 "feature.showPrevNextIcons.automaticallyHidePrevNextOnBounds",
                 "\u{E890}",
-                "Hide unavailable arrows",
-                "Hide Previous on the first desktop and Next on the last.",
+                crate::i18n::text("hide-unavailable-arrows"),
+                crate::i18n::text("hide-previous-on-the-first-desktop-and-next-on-the-last"),
             ),
             self.symbols(c),
         ])
@@ -1039,7 +1080,7 @@ impl SettingsUi {
                 _,
             ) = if status {
                 (
-                    "Always-visible desktop name",
+                    crate::i18n::text("always-visible-desktop-name"),
                     "feature.showDesktopStatusOverlay",
                     "feature.showDesktopStatusOverlay.position",
                     "feature.showDesktopStatusOverlay.showOnAllMonitors",
@@ -1053,7 +1094,7 @@ impl SettingsUi {
                 )
             } else {
                 (
-                    "When switching desktops",
+                    crate::i18n::text("when-switching-desktops"),
                     "feature.showDesktopSwitchOverlay",
                     "feature.showDesktopSwitchOverlay.position",
                     "feature.showDesktopSwitchOverlay.showOnAllMonitors",
@@ -1073,14 +1114,14 @@ impl SettingsUi {
                     feature,
                     "\u{E7F4}",
                     if status {
-                        "Show desktop name"
+                        crate::i18n::text("show-desktop-name")
                     } else {
-                        "Show desktop notification"
+                        crate::i18n::text("show-desktop-notification")
                     },
                     if status {
-                        "Keep the current desktop name visible."
+                        crate::i18n::text("keep-the-current-desktop-name-visible")
                     } else {
-                        "Briefly show the desktop name after switching."
+                        crate::i18n::text("briefly-show-the-desktop-name-after-switching")
                     },
                 ),
                 self.overlay_size(
@@ -1092,51 +1133,58 @@ impl SettingsUi {
                         "theme.overlay.customSize"
                     },
                 ),
-                self.presets(c, text, "Text size"),
-                self.choice(c, position, "\u{E8A9}", "Position", "", &POS),
+                self.presets(c, text, crate::i18n::text("text-size")),
+                self.choice(
+                    c,
+                    position,
+                    "\u{E8A9}",
+                    crate::i18n::text("position"),
+                    "",
+                    &POS,
+                ),
                 self.distance(c, offset, position),
                 self.toggle(
                     c,
                     border,
                     "\u{E739}",
-                    "Border",
-                    "Outline the desktop label.",
+                    crate::i18n::text("border"),
+                    crate::i18n::text("outline-the-desktop-label"),
                 ),
                 self.toggle(
                     c,
                     corners,
                     "\u{E7C1}",
-                    "Rounded corners",
-                    "Soften the edges of the label.",
+                    crate::i18n::text("rounded-corners"),
+                    crate::i18n::text("soften-the-edges-of-the-label"),
                 ),
                 self.toggle(
                     c,
                     translucent,
                     "\u{E790}",
-                    "Translucent",
-                    "Let the desktop show through.",
+                    crate::i18n::text("translucent"),
+                    crate::i18n::text("let-the-desktop-show-through"),
                 ),
                 self.toggle(
                     c,
                     animate,
                     "\u{E768}",
-                    "Animation",
-                    "Fade the label in smoothly.",
+                    crate::i18n::text("animation"),
+                    crate::i18n::text("fade-the-label-in-smoothly"),
                 ),
                 self.toggle(
                     c,
                     all_monitors,
                     "\u{E7F4}",
-                    "Show on every monitor",
-                    "Use the same appearance across your screens.",
+                    crate::i18n::text("show-on-every-monitor"),
+                    crate::i18n::text("use-the-same-appearance-across-your-screens"),
                 ),
             ]);
             if !status {
                 rows.push(self.number(
                     c,
                     "feature.showDesktopSwitchOverlay.duration",
-                    "Display time",
-                    "Milliseconds. Use 0 to keep visible until the next switch.",
+                    crate::i18n::text("display-time"),
+                    crate::i18n::text("milliseconds-use-0-to-keep-visible-until-the-next-switch"),
                     0.,
                     60000.,
                 ));
@@ -1144,13 +1192,13 @@ impl SettingsUi {
             rows.push(
                 self.row(
                     "\u{E768}",
-                    "Preview on desktop",
-                    "Try the current appearance and placement.",
+                    crate::i18n::text("preview-on-desktop"),
+                    crate::i18n::text("try-the-current-appearance-and-placement"),
                     "",
                     Button::new()
                         .is_enabled(self.settings.bool(feature))
                         .on_click(c.callback(move |()| Message::Preview(status)))
-                        .content("Preview"),
+                        .content(crate::i18n::text("preview")),
                 ),
             );
         }
@@ -1177,74 +1225,148 @@ impl SettingsUi {
                     } else {
                         ButtonStyle::Default
                     })
-                    .automation_name(format!("Change {title} shortcut"))
+                    .automation_name(crate::i18n::format(
+                        "change-shortcut",
+                        &[("title", (title).to_string().into())],
+                    ))
                     .on_click(c.callback(move |()| Message::Capture(key)))
                     .content(if recording {
-                        "Press shortcut…"
+                        crate::i18n::text("press-shortcut")
                     } else {
                         self.settings.get(key)
                     }),
                 switch()
                     .is_on(self.settings.bool(enabled))
                     .is_enabled(self.enabled(enabled))
-                    .automation_name(format!("Enable {title}"))
+                    .automation_name(crate::i18n::format(
+                        "enable-setting",
+                        &[("title", (title).to_string().into())],
+                    ))
                     .on_toggled(c.callback(move |v: bool| Message::Set(enabled, v.to_string()))),
             ));
         self.row("\u{E765}", title, description, key, content)
     }
     fn hotkeys(&self, c: &ViewContext<Self>) -> View {
         section(vec![
-        description_text("Click a shortcut to record a new key combination. Use Ctrl, Alt, Shift or Win with another key. Press Esc to cancel."),
-        InfoBar::new()
-            .is_open(true)
-            .is_closable(false)
-            .severity(InfoBarSeverity::Informational)
-            .title("Some shortcuts belong to Windows")
-            .message("Windows reserves some key combinations for itself, such as Win + L or Ctrl + Alt + Delete, and won't let other apps use them. Shortcuts that Windows or another app already uses may not work either. If a shortcut doesn't respond, try a different one.")
-            .margin(Thickness::new(0., 8., 0., 0.))
-            .into(),
-        group_title("Switch desktops"),self.shortcut(c,"feature.useHotKeyToJumpToPreviousDesktop","feature.useHotKeyToJumpToPreviousDesktop.hotkey","Most recent desktop","Toggle between the two desktops you used most recently."),self.shortcut(c,"feature.useHotKeyToSwitchDesktopForward","feature.useHotKeyToSwitchDesktopForward.hotkey","Next desktop","Move one desktop to the right."),self.shortcut(c,"feature.useHotKeyToSwitchDesktopBackward","feature.useHotKeyToSwitchDesktopBackward.hotkey","Previous desktop","Move one desktop to the left."),
-        group_title("Jump to a desktop number"),self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber","\u{E8EF}","Number shortcuts","Jump directly to desktops 1–9."),self.choice(c,"feature.useHotKeyToJumpToDesktopNumber.hotkey","\u{E765}","Modifier keys","Hold these keys while pressing a desktop number.",&[("Alt","Alt"),("Ctrl + Alt","Ctrl + Alt"),("Ctrl + Shift","Ctrl + Shift"),("Win + Alt","Win + Alt"),("Ctrl + Alt + Shift","Ctrl + Alt + Shift")]),
-        self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber.useDigits","\u{E765}","Number row","Use the 1–9 keys above the letters."),self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits","\u{E765}","Number pad","Use the 1–9 keys on the number pad."),self.toggle(c,"feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys","\u{E765}","Function keys","Use F1–F9 to select the corresponding desktop."),
-    ])
+            description_text(crate::i18n::text(
+                "click-a-shortcut-to-record-a-new-key-combination-use-ctrl-alt-shift-or-w",
+            )),
+            InfoBar::new()
+                .is_open(true)
+                .is_closable(false)
+                .severity(InfoBarSeverity::Informational)
+                .title(crate::i18n::text("some-shortcuts-belong-to-windows"))
+                .message(crate::i18n::text(
+                    "windows-reserves-some-key-combinations-for-itself-such-as-win-l-or-ctrl",
+                ))
+                .margin(Thickness::new(0., 8., 0., 0.))
+                .into(),
+            group_title(crate::i18n::text("switch-desktops")),
+            self.shortcut(
+                c,
+                "feature.useHotKeyToJumpToPreviousDesktop",
+                "feature.useHotKeyToJumpToPreviousDesktop.hotkey",
+                crate::i18n::text("most-recent-desktop"),
+                crate::i18n::text("toggle-between-the-two-desktops-you-used-most-recently"),
+            ),
+            self.shortcut(
+                c,
+                "feature.useHotKeyToSwitchDesktopForward",
+                "feature.useHotKeyToSwitchDesktopForward.hotkey",
+                crate::i18n::text("next-desktop"),
+                crate::i18n::text("move-one-desktop-to-the-right"),
+            ),
+            self.shortcut(
+                c,
+                "feature.useHotKeyToSwitchDesktopBackward",
+                "feature.useHotKeyToSwitchDesktopBackward.hotkey",
+                crate::i18n::text("previous-desktop"),
+                crate::i18n::text("move-one-desktop-to-the-left"),
+            ),
+            group_title(crate::i18n::text("jump-to-a-desktop-number")),
+            self.toggle(
+                c,
+                "feature.useHotKeyToJumpToDesktopNumber",
+                "\u{E8EF}",
+                crate::i18n::text("number-shortcuts"),
+                crate::i18n::text("jump-directly-to-desktops-1-9"),
+            ),
+            self.choice(
+                c,
+                "feature.useHotKeyToJumpToDesktopNumber.hotkey",
+                "\u{E765}",
+                crate::i18n::text("modifier-keys"),
+                crate::i18n::text("hold-these-keys-while-pressing-a-desktop-number"),
+                &[
+                    ("Alt", "Alt"),
+                    ("Ctrl + Alt", "Ctrl + Alt"),
+                    ("Ctrl + Shift", "Ctrl + Shift"),
+                    ("Win + Alt", "Win + Alt"),
+                    ("Ctrl + Alt + Shift", "Ctrl + Alt + Shift"),
+                ],
+            ),
+            self.toggle(
+                c,
+                "feature.useHotKeyToJumpToDesktopNumber.useDigits",
+                "\u{E765}",
+                crate::i18n::text("number-row"),
+                crate::i18n::text("use-the-1-9-keys-above-the-letters"),
+            ),
+            self.toggle(
+                c,
+                "feature.useHotKeyToJumpToDesktopNumber.useNumpadDigits",
+                "\u{E765}",
+                crate::i18n::text("number-pad"),
+                crate::i18n::text("use-the-1-9-keys-on-the-number-pad"),
+            ),
+            self.toggle(
+                c,
+                "feature.useHotKeyToJumpToDesktopNumber.useFunctionKeys",
+                "\u{E765}",
+                crate::i18n::text("function-keys"),
+                crate::i18n::text("use-f1-f9-to-select-the-corresponding-desktop"),
+            ),
+        ])
     }
     fn advanced(&self, c: &ViewContext<Self>) -> View {
         section(vec![
             self.row(
                 "\u{E8B7}",
-                "Configuration and logs",
-                "Open the folder containing your settings and app.log.",
+                crate::i18n::text("configuration-and-logs"),
+                crate::i18n::text("open-the-folder-containing-your-settings-and-app-log"),
                 "",
                 Button::new()
                     .on_click(c.callback(|()| Message::Folder))
-                    .content("Open folder"),
+                    .content(crate::i18n::text("open-folder")),
             ),
             self.text_setting(
                 c,
                 "theme.icons.font",
-                "Tray font",
-                "The font used for desktop numbers.",
+                crate::i18n::text("tray-font"),
+                crate::i18n::text("the-font-used-for-desktop-numbers"),
             ),
             self.text_setting(
                 c,
                 "theme.overlay.font",
-                "Notification font",
-                "The font used for switch notifications.",
+                crate::i18n::text("notification-font"),
+                crate::i18n::text("the-font-used-for-switch-notifications"),
             ),
             self.text_setting(
                 c,
                 "theme.status.font",
-                "Status font",
-                "The font used for the permanent label.",
+                crate::i18n::text("status-font"),
+                crate::i18n::text("the-font-used-for-the-permanent-label"),
             ),
             self.row(
                 "\u{E943}",
-                "Configuration editor",
-                "Edit all settings, colors and custom hotkeys in a separate window.",
+                crate::i18n::text("configuration-editor"),
+                crate::i18n::text(
+                    "edit-all-settings-colors-and-custom-hotkeys-in-a-separate-window",
+                ),
                 "",
                 Button::new()
                     .on_click(c.callback(|()| Message::OpenEditor))
-                    .content("Open editor"),
+                    .content(crate::i18n::text("open-editor")),
             ),
         ])
     }
@@ -1262,20 +1384,20 @@ impl SettingsUi {
                         Border::new().canvas_left(12.).canvas_top(12.).width(36.).height(28.).corner_radius(3.).background(ThemeBrush::Accent).border_brush(Color::rgb(255,255,255)).border_thickness(2.)
                     ))),
                 TextBlock::new().text("Windows Virtual Desktop Helper").font_size(24.).font_weight(FontWeight::SEMI_BOLD).text_wrapping(TextWrapping::Wrap),
-                description_text(&format!("Version {}  \u{00b7}  by Dan Krusi and contributors", env!("CARGO_PKG_VERSION"))),
-                TextBlock::new().text("Know which desktop you're on. Move between workspaces with tray icons, desktop labels and keyboard shortcuts.").text_wrapping(TextWrapping::Wrap),
-                StackPanel::new().orientation(Orientation::Horizontal).spacing(8.).children((link("View on GitHub", "https://github.com/dankrusi/WindowsVirtualDesktopHelper"), link("Donate", "https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6")))
+                description_text(&crate::i18n::format("version-credit", &[("version", (env!("CARGO_PKG_VERSION")).to_string().into())])),
+                TextBlock::new().text(crate::i18n::text("know-which-desktop-you-re-on-move-between-workspaces-with-tray-icons-des")).text_wrapping(TextWrapping::Wrap),
+                StackPanel::new().orientation(Orientation::Horizontal).spacing(8.).children((link(crate::i18n::text("view-on-github"), "https://github.com/dankrusi/WindowsVirtualDesktopHelper"), link(crate::i18n::text("donate"), "https://www.paypal.com/donate/?hosted_button_id=BG5FYMAHFG9V6")))
             ))),
-            group_title("Support and diagnostics"),
-            self.row("\u{E119}", "Contact", "dan@dankrusi.com", "", link("Email Dan", "mailto:dan@dankrusi.com")),
-            self.row("\u{E8A5}", "Report an issue", "Share a bug report or suggest an improvement.", "", link("GitHub issues", "https://github.com/dankrusi/WindowsVirtualDesktopHelper/issues")),
-            self.row("\u{E9D9}", "Application log", "View recent activity and connection errors.", "", Button::new().on_click(c.callback(|()| Message::Log)).content("Show log")),
-            self.row("\u{E713}", "Configuration", "Inspect settings, colors and custom shortcuts.", "", Button::new().on_click(c.callback(|()| Message::Page(Some("advanced".into())))).content("Show configuration")),
-            group_title("Open source"),
+            group_title(crate::i18n::text("support-and-diagnostics")),
+            self.row("\u{E119}", crate::i18n::text("contact"), "dan@dankrusi.com", "", link(crate::i18n::text("email-dan"), "mailto:dan@dankrusi.com")),
+            self.row("\u{E8A5}", crate::i18n::text("report-an-issue"), crate::i18n::text("share-a-bug-report-or-suggest-an-improvement"), "", link(crate::i18n::text("github-issues"), "https://github.com/dankrusi/WindowsVirtualDesktopHelper/issues")),
+            self.row("\u{E9D9}", crate::i18n::text("application-log"), crate::i18n::text("view-recent-activity-and-connection-errors"), "", Button::new().on_click(c.callback(|()| Message::Log)).content(crate::i18n::text("show-log"))),
+            self.row("\u{E713}", crate::i18n::text("configuration"), crate::i18n::text("inspect-settings-colors-and-custom-shortcuts"), "", Button::new().on_click(c.callback(|()| Message::Page(Some("advanced".into())))).content(crate::i18n::text("show-configuration"))),
+            group_title(crate::i18n::text("open-source")),
             card(StackPanel::new().spacing(8.).children((
-                TextBlock::new().text("Made with Rust and Microsoft WinUI 3").font_weight(FontWeight::SEMI_BOLD),
-                description_text("GPL-3.0. VirtualDesktopAPI: MIT. Windows bindings and windows-reactor: MIT / Apache-2.0. rustc-hash: Apache-2.0 / MIT. uuid: MIT. sha1_smol: BSD-3-Clause."),
-                link("License and source", "https://github.com/dankrusi/WindowsVirtualDesktopHelper")
+                TextBlock::new().text(crate::i18n::text("made-with-rust-and-microsoft-winui-3")).font_weight(FontWeight::SEMI_BOLD),
+                description_text("GPL-3.0. VirtualDesktopAPI: MIT. Windows bindings and windows-reactor: MIT / Apache-2.0. rustc-hash: Apache-2.0 / MIT. uuid: MIT. sha1_smol: BSD-3-Clause. Fluent, unic-langid, unicode-segmentation: MIT / Apache-2.0."),
+                link(crate::i18n::text("license-and-source"), "https://github.com/dankrusi/WindowsVirtualDesktopHelper")
             )))
         ])
     }
@@ -1336,7 +1458,8 @@ fn section(views: Vec<View>) -> View {
 }
 pub fn run() -> Result<(), String> {
     let settings = Settings::load()?;
-    App::run_component::<SettingsUi>(settings).map_err(|e|format!("WinUI Settings could not start: {e}. Install Microsoft Windows App Runtime 2.4 or later."))
+    App::run_component::<SettingsUi>(settings)
+        .map_err(|e| crate::i18n::format("winui-start-error", &[("error", (e).to_string().into())]))
 }
 
 #[cfg(test)]

@@ -26,7 +26,10 @@ pub(super) struct WindowHook {
 impl WindowHook {
     pub fn install(hwnd: HWND, sender: LocalSender<Message>) -> Result<Self, String> {
         if hwnd.is_null() {
-            return Err("Couldn't initialize the editor window. Close it and try again.".into());
+            return Err(crate::i18n::text(
+                "couldn-t-initialize-the-editor-window-close-it-and-try-again",
+            )
+            .into());
         }
         let state = Rc::new(State {
             hwnd: Cell::new(hwnd),
@@ -41,7 +44,10 @@ impl WindowHook {
                 Rc::as_ptr(&state) as usize,
             ) == 0
             {
-                return Err("Couldn't initialize unsaved-change protection. Close the editor and try again.".into());
+                return Err(crate::i18n::text(
+                    "couldn-t-initialize-unsaved-change-protection-close-the-editor-and-try-a",
+                )
+                .into());
             }
             let keyboard = SetWindowsHookExW(
                 WH_GETMESSAGE,
@@ -51,10 +57,10 @@ impl WindowHook {
             );
             if keyboard.is_null() {
                 RemoveWindowSubclass(hwnd, Some(window_proc), SUBCLASS_ID);
-                return Err(
-                    "Couldn't initialize the editor keyboard shortcuts. Close it and try again."
-                        .into(),
-                );
+                return Err(crate::i18n::text(
+                    "couldn-t-initialize-the-editor-keyboard-shortcuts-close-it-and-try-again",
+                )
+                .into());
             }
             EDITOR.with(|slot| *slot.borrow_mut() = Rc::downgrade(&state));
             Ok(Self { state, keyboard })

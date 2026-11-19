@@ -13,7 +13,7 @@ use std::{
 use windows_reactor::*;
 use windows_sys::Win32::{Foundation::HWND, UI::WindowsAndMessaging::*};
 
-const TITLE: &str = "Configuration \u{b7} Virtual Desktop Helper";
+const TITLE: &str = "configuration-virtual-desktop-helper";
 
 struct SessionState {
     latest: RefCell<Settings>,
@@ -97,7 +97,7 @@ impl Component for Editor {
     fn update(&mut self, message: Message, context: &ComponentContext<Self>) {
         match message {
             Message::Ready => {
-                let hwnd = super::settings_process::window_named(TITLE);
+                let hwnd = super::settings_process::window_for_role(2);
                 match native::WindowHook::install(hwnd, context.sender()) {
                     Ok(hook) => {
                         self.native = Some(hook);
@@ -142,7 +142,7 @@ impl Component for Editor {
     }
     fn view(&self, _: &Input, context: &mut ViewContext<Self>) -> View {
         let settings = self.input.session.0.latest.borrow();
-        context.window_title(TITLE);
+        context.window_title(crate::i18n::text(TITLE));
         context.window_visuals(
             WindowVisuals::new()
                 .client_size(960., 720.)
@@ -168,7 +168,7 @@ impl Component for Editor {
             .element_ref(&self.textbox)
             .horizontal_alignment(HorizontalAlignment::Stretch)
             .vertical_alignment(VerticalAlignment::Stretch)
-            .automation_name("Configuration text")
+            .automation_name(crate::i18n::text("configuration-text"))
             .grid_row(2);
         if self.ready {
             textbox = textbox.on_text_changed(context.callback(Message::Edit));
@@ -193,7 +193,8 @@ impl Component for Editor {
                                 .vertical_alignment(VerticalAlignment::Center),
                             StackPanel::new().grid_column(1).spacing(6.).children((
                                 TextBlock::new()
-                                    .text("Configuration editor")
+                                    .text(crate::i18n::text("configuration-editor"))
+                                    .text_wrapping(TextWrapping::Wrap)
                                     .font_size(24.)
                                     .font_weight(FontWeight::SEMI_BOLD),
                                 TextBlock::new()
@@ -208,7 +209,7 @@ impl Component for Editor {
                         .is_open(!self.error.is_empty())
                         .is_closable(false)
                         .severity(InfoBarSeverity::Error)
-                        .title("Configuration wasn't saved")
+                        .title(crate::i18n::text("configuration-wasn-t-saved"))
                         .message(&self.error),
                     textbox,
                     Grid::new()
@@ -219,10 +220,11 @@ impl Component for Editor {
                             TextBlock::new()
                                 .vertical_alignment(VerticalAlignment::Center)
                                 .opacity(0.7)
+                                .text_wrapping(TextWrapping::Wrap)
                                 .text(if self.document.dirty() {
-                                    "Unsaved changes"
+                                    crate::i18n::text("unsaved-changes")
                                 } else if self.just_saved {
-                                    "Saved"
+                                    crate::i18n::text("saved")
                                 } else {
                                     ""
                                 }),
@@ -233,27 +235,31 @@ impl Component for Editor {
                                 .children((
                                     Button::new()
                                         .on_click(context.callback(|()| Message::Close))
-                                        .content("Close"),
+                                        .content(crate::i18n::text("close")),
                                     Button::new()
                                         .style(ButtonStyle::Accent)
                                         .min_width(112.)
                                         .is_enabled(self.ready && self.document.dirty())
-                                        .automation_name("Save configuration, Control S")
+                                        .automation_name(crate::i18n::text(
+                                            "save-configuration-control-s",
+                                        ))
                                         .on_click(context.callback(|()| Message::Save))
-                                        .content("Save  (Ctrl+S)"),
+                                        .content(crate::i18n::text("save-ctrl-s")),
                                 )),
                         )),
                 )),
             ContentDialog::new()
                 .is_open(self.confirm_close)
-                .title("Save your changes?")
-                .primary_button_text("Save")
-                .secondary_button_text("Discard")
-                .close_button_text("Keep editing")
+                .title(crate::i18n::text("save-your-changes"))
+                .primary_button_text(crate::i18n::text("save"))
+                .secondary_button_text(crate::i18n::text("discard"))
+                .close_button_text(crate::i18n::text("keep-editing"))
                 .on_closed(context.callback(Message::Confirm))
                 .content(
                     TextBlock::new()
-                        .text("You have unsaved changes to the configuration.")
+                        .text(crate::i18n::text(
+                            "you-have-unsaved-changes-to-the-configuration",
+                        ))
                         .text_wrapping(TextWrapping::Wrap),
                 ),
         ))
@@ -278,7 +284,7 @@ impl Editor {
         self.error.clear();
     }
     fn caption(&self) {
-        super::settings_process::update_caption_for(TITLE, &self.input.session.0.latest.borrow());
+        super::settings_process::update_caption_for(2, &self.input.session.0.latest.borrow());
     }
     fn save(&mut self) -> bool {
         if !self.ready {

@@ -46,10 +46,10 @@ pub fn chord(modifiers: &[u16], key: u16) -> Result<(), String> {
                 cleanup.as_ptr(),
                 std::mem::size_of::<INPUT>() as i32,
             );
-            return Err(
-                "Windows blocked simulated input (possibly an elevated foreground application)."
-                    .into(),
-            );
+            return Err(crate::i18n::text(
+                "windows-blocked-simulated-input-possibly-an-elevated-foreground-applicat",
+            )
+            .into());
         }
         Ok(())
     }

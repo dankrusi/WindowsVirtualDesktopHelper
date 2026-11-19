@@ -19,7 +19,9 @@ impl Action {
                 .and_then(|s| s.parse::<usize>().ok())
                 .filter(|n| *n > 0)
                 .map(|n| Self::Desktop(n - 1))
-                .ok_or_else(|| format!("Unknown action: {s}")),
+                .ok_or_else(|| {
+                    crate::i18n::format("unknown-action", &[("action", (s).to_string().into())])
+                }),
         }
     }
 }
@@ -31,7 +33,9 @@ pub struct Binding {
     pub text: String,
 }
 pub fn parse(s: &str) -> Result<Binding, String> {
-    let (keys, action) = s.split_once('=').ok_or("Hotkey needs '= Action'")?;
+    let (keys, action) = s
+        .split_once('=')
+        .ok_or(crate::i18n::text("hotkey-needs-action"))?;
     let mut modifiers = 0;
     let mut key = None;
     for word in keys.split('+').map(str::trim) {
@@ -42,14 +46,22 @@ pub fn parse(s: &str) -> Result<Binding, String> {
             "win" | "windows" => modifiers |= MOD_WIN,
             _ => {
                 if key.is_some() {
-                    return Err(format!("Only one regular key is allowed: {s}"));
+                    return Err(crate::i18n::format(
+                        "one-regular-key",
+                        &[("shortcut", (s).to_string().into())],
+                    ));
                 }
-                key = Some(key_code(word).ok_or_else(|| format!("Unknown key: {word}"))?);
+                key = Some(key_code(word).ok_or_else(|| {
+                    crate::i18n::format("unknown-key", &[("key", (word).to_string().into())])
+                })?);
             }
         }
     }
     if modifiers == 0 || key.is_none() {
-        return Err(format!("A modifier and a regular key are required: {s}"));
+        return Err(crate::i18n::format(
+            "modifier-required",
+            &[("shortcut", (s).to_string().into())],
+        ));
     }
     Ok(Binding {
         modifiers,
@@ -97,7 +109,10 @@ pub fn bindings(s: &Settings) -> Result<Vec<Binding>, String> {
     for text in list {
         let b = parse(&text)?;
         if !seen.insert((b.modifiers, b.key)) {
-            return Err(format!("Duplicate shortcut: {text}"));
+            return Err(crate::i18n::format(
+                "duplicate-shortcut",
+                &[("shortcut", (text).to_string().into())],
+            ));
         }
         result.push(b);
     }

@@ -8,26 +8,28 @@ Creates a release: bumps the version, updates README/CHANGELOG, tags, pushes, an
    rewrites the README download links (between the release-* marker comments).
 3. Commits "Release v<version>", tags v<version> and pushes both.
 4. GitHub Actions then builds all architectures and publishes the GitHub Release.
-5. Waits for that run, then commits the Scoop manifest with the released ZIP's hash.
+5. Waits for that run, then commits the Scoop and WinGet manifests with verified release hashes.
    Scoop Extras picks up new GitHub releases automatically through its autoupdate block.
 6. Downloads the Microsoft Store upload file and opens Partner Center (get-store-upload.ps1).
 .EXAMPLE
 .\scripts\release.ps1                            # asks for the version
 .EXAMPLE
-.\scripts\release.ps1 --version 3.0.1 --no-push  # commit and tag locally only
+.\scripts\release.ps1 --version 3.0.2 --no-push  # commit and tag locally only
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'lib\arguments.ps1')
 . (Join-Path $PSScriptRoot 'lib\version.ps1')
-$options = Read-Arguments $args @{ 'version' = 'string'; 'no-push' = 'switch'; 'skip-checks' = 'switch'; 'no-wait' = 'switch' } @'
-Usage: release.ps1 [--version x.y.z] [--no-push] [--no-wait] [--skip-checks]
+$options = Read-Arguments $args @{ 'version' = 'string'; 'prepare-only' = 'switch'; 'no-push' = 'switch'; 'skip-checks' = 'switch'; 'no-wait' = 'switch' } @'
+Usage: release.ps1 [--version x.y.z] [--prepare-only] [--no-push] [--no-wait] [--skip-checks]
   --version      Version to release; asked for interactively when omitted.
+  --prepare-only Update local version files and CHANGELOG only; keep published download links.
   --no-push      Commit and tag locally only.
-  --no-wait      Push, but don't wait for CI, update the Scoop manifest or fetch the Store file.
+  --no-wait      Push, but don't wait for CI, update package-manager manifests or fetch the Store file.
   --skip-checks  Don't run scripts\check.ps1 first.
 '@
 $Version = $options['version']
+$PrepareOnly = $options['prepare-only']
 $NoPush = $options['no-push']
 $SkipChecks = $options['skip-checks']
 $NoWait = $options['no-wait']
@@ -57,9 +59,11 @@ function Set-Block([string]$Text, [string]$Name, [string]$Content) {
 Push-Location $repoRoot
 try {
     # 1. Preconditions
-    if ((git rev-parse --abbrev-ref HEAD) -ne 'main') { throw 'Releases are made from the main branch.' }
-    if (git status --porcelain --untracked-files=no) { throw 'Commit or stash your changes first (git status is not clean).' }
-    Invoke-Native git @('pull', '--ff-only', '--quiet')
+    if (-not $PrepareOnly) {
+        if ((git rev-parse --abbrev-ref HEAD) -ne 'main') { throw 'Releases are made from the main branch.' }
+        if (git status --porcelain --untracked-files=no) { throw 'Commit or stash your changes first (git status is not clean).' }
+        Invoke-Native git @('pull', '--ff-only', '--quiet')
+    }
     $current = Get-AppVersion
     if (-not $Version) {
         # Suggest the current version if it was never released, otherwise the next patch version.
@@ -73,11 +77,11 @@ try {
     }
     $Version = $Version.TrimStart('v')
     $tag = "v$Version"
-    if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "Version must look like 3.0.1, got '$Version'." }
+    if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "Version must look like 3.0.2, got '$Version'." }
     if ([version]$Version -lt [version]$current) { throw "Version $Version is older than the current version $current." }
     if (git tag --list $tag) { throw "Tag $tag already exists." }
-    if (git ls-remote --tags origin "refs/tags/$tag") { throw "Tag $tag already exists on GitHub." }
-    if (-not $NoPush) { Invoke-Native gh @('auth', 'status') | Out-Null }
+    if (-not $PrepareOnly -and (git ls-remote --tags origin "refs/tags/$tag")) { throw "Tag $tag already exists on GitHub." }
+    if (-not $PrepareOnly -and -not $NoPush) { Invoke-Native gh @('auth', 'status') | Out-Null }
     if (-not $SkipChecks) { & (Join-Path $PSScriptRoot 'check.ps1') }
 
     # 2. Version, CHANGELOG, README
@@ -103,6 +107,22 @@ try {
     }
     Write-Text 'CHANGELOG.md' $changelogText $changelog.Bom
 
+    # Keep the checked-in MSIX template and current documentation examples in sync.
+    $msix = Read-Text 'installers/microsoftstore/AppxManifest.xml'
+    $msixText = [regex]::Replace($msix.Text, '(?<= Version=")[0-9.]+(?=")', "$Version.0")
+    Write-Text 'installers/microsoftstore/AppxManifest.xml' $msixText $msix.Bom
+    if ($Version -ne $current) {
+        foreach ($path in @('docs/releasing.md', 'docs/msix.md', 'installers/winget/README.md', 'installers/scoop/README.md')) {
+            $document = Read-Text $path
+            Write-Text $path ($document.Text.Replace($current, $Version)) $document.Bom
+        }
+    }
+
+    if ($PrepareOnly) {
+        Write-Host "Prepared $tag locally. Published download links are unchanged; nothing was committed, tagged or pushed."
+        return
+    }
+
     $readme = Read-Text 'README.md'
     $nl = $readme.NewLine
     $download = "$repoUrl/releases/download/$tag"
@@ -119,7 +139,7 @@ try {
     Write-Text 'README.md' $text $readme.Bom
 
     # 3. Commit, tag, push
-    Invoke-Native git @('add', 'VERSION.md', 'Cargo.toml', 'Cargo.lock', 'CHANGELOG.md', 'README.md')
+    Invoke-Native git @('add', 'VERSION.md', 'Cargo.toml', 'Cargo.lock', 'CHANGELOG.md', 'README.md', 'installers/microsoftstore/AppxManifest.xml', 'docs/releasing.md', 'docs/msix.md', 'installers/winget/README.md', 'installers/scoop/README.md')
     Invoke-Native git @('commit', '--quiet', '-m', "Release $tag")
     Invoke-Native git @('tag', '-a', $tag, '-m', "Release $tag")
     Write-Host "Committed and tagged $tag."
@@ -141,21 +161,18 @@ try {
     & gh run watch $runId --exit-status --interval 30
     if ($LASTEXITCODE -ne 0) { throw "The release build failed. See $repoUrl/actions/runs/$runId" }
 
-    # 5. Scoop manifest with the released hash
-    $hash = ((gh release download $tag --pattern "$zip.zip.sha256" --output -) -join '').Trim()
-    if ($hash -notmatch '^[0-9a-f]{64}$') { throw "Could not read the released ZIP checksum (got '$hash')." }
-    $template = Read-Text 'installers\scoop\windows-virtualdesktop-helper.json.template'
-    $manifest = $template.Text.Replace('{version}', $Version).Replace('{zip-url}', "$download/$zip.zip").Replace('{zip-hash}', $hash)
-    Write-Text 'installers\scoop\windows-virtualdesktop-helper.json' $manifest $template.Bom
-    Invoke-Native git @('add', 'installers/scoop/windows-virtualdesktop-helper.json')
-    Invoke-Native git @('commit', '--quiet', '-m', "Update Scoop manifest for $tag")
+    # 5. Package-manager manifests from the actual released archives.
+    & (Join-Path $PSScriptRoot 'update-installers.ps1') --version $Version
+    Invoke-Native git @('add', 'installers/scoop/windows-virtualdesktop-helper.json', 'installers/winget/manifests')
+    Invoke-Native git @('commit', '--quiet', '-m', "Update package-manager manifests for $tag")
     Invoke-Native git @('push', '--quiet', 'origin', 'main')
 
     Write-Host ''
     Write-Host "Released $tag"
     Write-Host "  GitHub:  $repoUrl/releases/tag/$tag"
     Write-Host '  Scoop:   Extras updates automatically within a few hours.'
-    Write-Host '  winget:  served from the Store (winget install 9N4HNXPRTSDC).'
+    Write-Host '  WinGet:  portable manifests ready in installers/winget; submit them to winget-pkgs.'
+    Write-Host '           Store installation: winget install --id 9N4HNXPRTSDC --source msstore'
     Write-Host '  Store:   upload the file below in Partner Center.'
 } finally { Pop-Location }
 

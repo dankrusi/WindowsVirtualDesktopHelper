@@ -14,8 +14,10 @@ pub struct Settings {
 }
 impl Settings {
     pub fn load() -> Result<Self, String> {
-        let dir = PathBuf::from(std::env::var_os("APPDATA").ok_or("APPDATA is unavailable")?)
-            .join("WindowsVirtualDesktopHelper");
+        let dir = PathBuf::from(
+            std::env::var_os("APPDATA").ok_or(crate::i18n::text("appdata-is-unavailable"))?,
+        )
+        .join("WindowsVirtualDesktopHelper");
         let mut result = Self {
             config: BTreeMap::new(),
             arguments: BTreeMap::new(),
@@ -39,6 +41,7 @@ impl Settings {
             }
         }
         result.arguments = arguments(std::env::args().skip(1))?;
+        crate::i18n::configure(result.get("general.language"));
         result.validate()?;
         Ok(result)
     }
@@ -70,7 +73,9 @@ impl Settings {
                     .iter()
                     .find(|(name, _)| *name == key)
                     .copied()
-                    .ok_or_else(|| format!("Unknown setting: {key}"))
+                    .ok_or_else(|| {
+                        crate::i18n::format("unknown-setting", &[("key", (key).to_string().into())])
+                    })
             })
             .collect::<Result<Vec<_>, _>>()?;
         for (key, value) in defaults {
@@ -107,15 +112,27 @@ impl Settings {
                 !v.contains('\0')
             };
             if !valid {
-                return Err(format!("Invalid value for {key}: {v}"));
+                return Err(crate::i18n::format(
+                    "invalid-value",
+                    &[
+                        ("key", (key).to_string().into()),
+                        ("value", (v).to_string().into()),
+                    ],
+                ));
             }
             if (key.ends_with(".width") || key.ends_with(".height") || key.ends_with(".fontSize"))
                 && !(1.0..=16384.0).contains(&self.number(key))
             {
-                return Err(format!("{key} must be between 1 and 16384"));
+                return Err(crate::i18n::format(
+                    "dimension-range",
+                    &[("key", (key).to_string().into())],
+                ));
             }
             if key.ends_with(".duration") && !(0..=i32::MAX).contains(&self.int(key)) {
-                return Err(format!("{key} must be a nonnegative integer"));
+                return Err(crate::i18n::format(
+                    "nonnegative-integer",
+                    &[("key", (key).to_string().into())],
+                ));
             }
             if key.ends_with(".position")
                 && ![
@@ -131,16 +148,25 @@ impl Settings {
                 ]
                 .contains(&v)
             {
-                return Err(format!("Invalid overlay position: {v}"));
+                return Err(crate::i18n::format(
+                    "invalid-position",
+                    &[("value", (v).to_string().into())],
+                ));
             }
         }
         if !["auto", "light", "dark"].contains(&self.get("general.theme")) {
-            return Err("Theme must be auto, light or dark".into());
+            return Err(crate::i18n::text("theme-must-be-auto-light-or-dark").into());
+        }
+        if !crate::i18n::valid_language(self.get("general.language")) {
+            return Err(crate::i18n::text("invalid-language").into());
         }
         Ok(())
     }
     pub fn save(&self) -> Result<(), String> {
-        let dir = self.path.parent().ok_or("Invalid settings path")?;
+        let dir = self
+            .path
+            .parent()
+            .ok_or(crate::i18n::text("invalid-settings-path"))?;
         fs::create_dir_all(dir).map_err(|e| e.to_string())?;
         // Write all file settings (including custom/unknown keys), never CLI overrides.
         let text = self
@@ -260,9 +286,12 @@ pub fn parse(text: &str) -> Result<BTreeMap<String, String>, String> {
         }
         let (k, v) = line
             .split_once([':', '='])
-            .ok_or_else(|| format!("Settings line {} needs a colon", i + 1))?;
+            .ok_or_else(|| crate::i18n::format("line-colon", &[("line", (i + 1).into())]))?;
         if k.trim().is_empty() {
-            return Err(format!("Settings line {} has an empty key", i + 1));
+            return Err(crate::i18n::format(
+                "line-empty-key",
+                &[("line", (i + 1).into())],
+            ));
         }
         map.insert(k.trim().into(), unquote(v.trim()));
     }
@@ -272,9 +301,12 @@ fn arguments(args: impl Iterator<Item = String>) -> Result<BTreeMap<String, Stri
     let mut args = args.peekable();
     let mut map = BTreeMap::new();
     while let Some(arg) = args.next() {
-        let key = arg
-            .strip_prefix("--")
-            .ok_or_else(|| format!("Expected --setting, found {arg}"))?;
+        let key = arg.strip_prefix("--").ok_or_else(|| {
+            crate::i18n::format(
+                "expected-setting",
+                &[("argument", (arg).to_string().into())],
+            )
+        })?;
         let val = if args.peek().is_some_and(|a| !a.starts_with("--")) {
             args.next().unwrap()
         } else {
@@ -313,6 +345,43 @@ mod tests {
         assert_eq!(m["theme.status.offset"], "-5");
     }
     #[test]
+    fn language_uses_the_same_file_cli_and_reset_contract() {
+        let mut settings = Settings {
+            config: parse("general.language: zh-Hant\ncustom.note: 工作").unwrap(),
+            arguments: arguments(
+                ["--general.language", "de-CH"]
+                    .into_iter()
+                    .map(str::to_string),
+            )
+            .unwrap(),
+            path: Default::default(),
+        };
+        assert_eq!(settings.get("general.language"), "de-CH");
+        assert!(settings.validate().is_ok());
+        settings.arguments.clear();
+        assert_eq!(settings.get("general.language"), "zh-Hant");
+        for locale in [
+            "auto", "en-US", "zh-Hans", "zh-Hant", "de", "es", "fr", "fr-CA", "zh-TW",
+        ] {
+            settings.set("general.language", locale);
+            assert!(settings.validate().is_ok(), "{locale}");
+        }
+        // A removed custom file must not prevent the app from starting.
+        settings.set("general.language", "eo");
+        assert!(settings.validate().is_ok());
+        for locale in ["", "not-a-language", "und", "zh--Hant"] {
+            settings.set("general.language", locale);
+            assert!(settings.validate().is_err(), "{locale}");
+        }
+        settings
+            .arguments
+            .insert("general.language".into(), "es".into());
+        settings.reset(["general.language"]).unwrap();
+        assert_eq!(settings.get("general.language"), "auto");
+        assert!(!settings.arguments.contains_key("general.language"));
+        assert_eq!(settings.get("custom.note"), "工作");
+    }
+    #[test]
     fn precedence() {
         let mut s = Settings {
             config: BTreeMap::new(),
@@ -324,7 +393,7 @@ mod tests {
         assert_eq!(s.get("general.theme"), "dark");
         assert!(s.bool("feature.showDesktopNumberInIconTray"));
         assert!(s.validate().is_ok());
-        assert_eq!(DEFAULTS.len(), 69);
+        assert_eq!(DEFAULTS.len(), 70);
     }
     #[test]
     fn saving_preserves_unknown_keys_and_never_cli_overrides() {

@@ -58,6 +58,9 @@ jobs:
           merge-multiple: true
       - run: ./scripts/package-release.ps1 --version '${{ github.ref_name }}' --input-directory dist --output-directory dist/release
         shell: powershell
+      - name: Generate verified Scoop and WinGet manifests
+        run: ./scripts/update-installers.ps1 --version '${{ github.ref_name }}' --asset-directory dist/release/github --output-directory dist/release/installers
+        shell: powershell
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: WindowsVirtualDesktopHelper-release

@@ -1,4 +1,5 @@
 use crate::{platform::desktop::Snapshot, platform::wide, settings::Settings};
+use unicode_segmentation::UnicodeSegmentation;
 use windows_sys::core::GUID;
 use windows_sys::Win32::{
     Foundation::*,
@@ -65,9 +66,9 @@ impl Tray {
                 data.szTip = if connected {
                     tooltip(id, snap)
                 } else {
-                    shell_text(&format!(
-                        "{} \u{b7} Virtual Desktop Helper\nReconnecting to Windows...",
-                        icon_name(id)
+                    shell_text(&crate::i18n::format(
+                        "tray-reconnecting",
+                        &[("role", (icon_name(id)).to_string().into())],
                     ))
                 };
                 let old = previous
@@ -135,34 +136,37 @@ fn identity(hwnd: HWND, scope: &str, id: u32) -> NOTIFYICONDATAW {
 }
 fn icon_name(id: u32) -> &'static str {
     match id {
-        1 => "Desktop number",
-        2 => "Desktop initial",
-        3 => "Previous desktop",
-        4 => "Next desktop",
-        _ => "Desktop controls",
+        1 => crate::i18n::text("desktop-number"),
+        2 => crate::i18n::text("desktop-initial"),
+        3 => crate::i18n::text("previous-desktop"),
+        4 => crate::i18n::text("next-desktop"),
+        _ => crate::i18n::text("desktop-controls"),
     }
 }
 fn tooltip(id: u32, snap: &Snapshot) -> [u16; 128] {
-    shell_text(&format!(
-        "{} · Virtual Desktop Helper\n{} · {} of {}",
-        icon_name(id),
-        snap.active().name,
-        snap.current + 1,
-        snap.desktops.len()
+    shell_text(&crate::i18n::format(
+        "tray-tooltip",
+        &[
+            ("role", (icon_name(id)).to_string().into()),
+            ("name", (snap.active().name).to_string().into()),
+            ("number", (snap.current + 1).into()),
+            ("total", (snap.desktops.len()).into()),
+        ],
     ))
 }
-/// NUL-terminate Shell strings without cutting a UTF-16 surrogate pair.
+/// NUL-terminate Shell strings without cutting a visible Unicode character.
 fn shell_text<const N: usize>(text: &str) -> [u16; N] {
     let mut buffer = [0; N];
     let mut offset = 0;
-    for ch in text.chars().take_while(|ch| *ch != '\0') {
-        let mut units = [0; 2];
-        let units = ch.encode_utf16(&mut units);
-        if offset + units.len() >= N {
+    for cluster in text.split('\0').next().unwrap_or("").graphemes(true) {
+        let length = cluster.encode_utf16().count();
+        if offset + length >= N {
             break;
         }
-        buffer[offset..offset + units.len()].copy_from_slice(units);
-        offset += units.len();
+        for unit in cluster.encode_utf16() {
+            buffer[offset] = unit;
+            offset += 1;
+        }
     }
     buffer
 }
@@ -180,7 +184,13 @@ pub fn icon_specs(s: &Settings, snap: &Snapshot) -> Vec<(u32, String, bool)> {
         icons.push((1, (index + 1).to_string(), true));
     }
     if s.bool("feature.showDesktopNameInIconTray") {
-        let name = snap.active().name.chars().next().unwrap_or('?').to_string();
+        let name = snap
+            .active()
+            .name
+            .graphemes(true)
+            .next()
+            .unwrap_or("?")
+            .to_string();
         icons.push((2, name, true));
     }
     if s.bool("feature.showPrevNextIcons") {
@@ -256,13 +266,15 @@ pub fn pixels(
             0,
         ))
     };
-    let font = s.get(if label.chars().any(|c| c as u32 > 0xffff) {
-        "theme.icons.emojiFont"
-    } else if symbol {
-        "theme.icons.symbolsFont"
-    } else {
-        "theme.icons.font"
-    });
+    let font = s.get(
+        if label.chars().any(|c| matches!(c as u32, 0x1f000..=0x1faff)) {
+            "theme.icons.emojiFont"
+        } else if symbol {
+            "theme.icons.symbolsFont"
+        } else {
+            "theme.icons.font"
+        },
+    );
     let opacity = if enabled {
         1.
     } else {
@@ -357,36 +369,28 @@ fn rasterize(
         }
         let old = SelectObject(dc, bitmap);
         std::ptr::write_bytes(bits, 0, (high * high * 4) as usize);
-        let name = font_name.split(',').next().unwrap_or("Segoe UI");
+        let text = label;
         let mut height = (high as f64 * 0.94) as i32;
         let label = wide(label);
         let mut font;
         loop {
-            font = CreateFontW(
-                -height,
-                0,
-                0,
-                0,
-                if font_name.to_lowercase().contains("bold") {
-                    700
-                } else {
-                    400
-                },
-                u32::from(font_name.to_lowercase().contains("italic")),
-                0,
-                0,
-                DEFAULT_CHARSET as u32,
-                OUT_DEFAULT_PRECIS as u32,
-                CLIP_DEFAULT_PRECIS as u32,
-                ANTIALIASED_QUALITY as u32,
-                DEFAULT_PITCH as u32,
-                wide(name).as_ptr(),
-            );
+            font = super::font(font_name, height, text, ANTIALIASED_QUALITY);
             let previous = SelectObject(dc, font);
-            let mut extent = SIZE { cx: 0, cy: 0 };
-            GetTextExtentPoint32W(dc, label.as_ptr(), (label.len() - 1) as i32, &mut extent);
+            let mut extent = RECT {
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
+            };
+            DrawTextW(
+                dc,
+                label.as_ptr(),
+                (label.len() - 1) as i32,
+                &mut extent,
+                DT_CALCRECT | DT_SINGLELINE | DT_NOPREFIX,
+            );
             SelectObject(dc, previous);
-            if extent.cx <= high - 8 || height <= 8 {
+            if extent.right <= high - 8 || height <= 8 {
                 break;
             }
             DeleteObject(font);
@@ -478,6 +482,56 @@ fn rasterize(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn shell_truncation_preserves_whole_graphemes() {
+        assert_eq!(shell_text::<3>("e\u{301}x"), [0x65, 0x301, 0]);
+        assert_eq!(shell_text::<2>("e\u{301}x"), [0, 0]);
+        assert_eq!(shell_text::<5>("A👩‍💻B"), [0x41, 0, 0, 0, 0]);
+        assert_eq!(shell_text::<4>("工\0学"), [0x5de5, 0, 0, 0]);
+    }
+    #[test]
+    fn initials_keep_combining_marks_cjk_and_emoji_sequences() {
+        let mut settings = Settings {
+            config: Default::default(),
+            arguments: Default::default(),
+            path: Default::default(),
+        };
+        settings.set("feature.showDesktopNameInIconTray", "true");
+        for (name, expected) in [
+            ("工作", "工"),
+            ("e\u{301}quipe", "e\u{301}"),
+            ("👩‍💻 Work", "👩‍💻"),
+            ("𠀀桌面", "𠀀"),
+        ] {
+            let snapshot = Snapshot {
+                current: 0,
+                desktops: vec![crate::platform::desktop::Desktop {
+                    id: 1,
+                    name: name.into(),
+                }],
+            };
+            let initial = icon_specs(&settings, &snapshot)
+                .into_iter()
+                .find(|(id, _, _)| *id == 2)
+                .unwrap()
+                .1;
+            assert_eq!(initial, expected);
+        }
+    }
+    #[test]
+    fn cjk_rasterization_has_distinct_glyphs_at_taskbar_dpis() {
+        for size in [16, 24, 32, 48] {
+            let work = rasterize("工", size, "Segoe UI", 0xffffff, None, 1.);
+            let study = rasterize("学", size, "Segoe UI", 0xffffff, None, 1.);
+            let traditional = rasterize("學", size, "Segoe UI", 0xffffff, None, 1.);
+            assert!(work.iter().any(|p| p >> 24 != 0));
+            assert_ne!(
+                work, study,
+                "different characters must not produce the same missing-glyph box at {size}"
+            );
+            assert_ne!(study, traditional);
+        }
+    }
     #[test]
     fn tray_restores_partial_failures_and_shell_restarts_without_a_desktop_connection() {
         use std::collections::HashSet;

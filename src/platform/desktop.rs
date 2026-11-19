@@ -18,7 +18,7 @@ struct Com(Ptr, PhantomData<Rc<()>>);
 impl Com {
     fn new(p: Ptr) -> Result<Self, String> {
         if p.is_null() {
-            Err("COM returned a null interface".into())
+            Err(crate::i18n::text("com-returned-a-null-interface").into())
         } else {
             Ok(Self(p, PhantomData))
         }
@@ -124,7 +124,10 @@ impl DesktopManager {
                     }
                 }
             }
-            Err("This Windows build exposes no supported virtual desktop interface. See app.log and report your Windows build on GitHub.".into())
+            Err(crate::i18n::text(
+                "this-windows-build-exposes-no-supported-virtual-desktop-interface-see-ap",
+            )
+            .into())
         }
     }
     /// Published IVirtualDesktopManager API: attribute a foreground event to the
@@ -136,7 +139,7 @@ impl DesktopManager {
         let public = self
             .public
             .as_ref()
-            .ok_or("Window desktop API unavailable")?;
+            .ok_or(crate::i18n::text("window-desktop-api-unavailable"))?;
         unsafe {
             let mut id = GUID::from_u128(0);
             let f: unsafe extern "system" fn(
@@ -192,7 +195,7 @@ impl DesktopManager {
             let mut n = 0;
             check(count(array.0, &mut n))?;
             if n == 0 || n > 4096 {
-                return Err("Invalid virtual desktop count".into());
+                return Err(crate::i18n::text("invalid-virtual-desktop-count").into());
             }
             let mut result = Vec::with_capacity(n as usize);
             for i in 0..n {
@@ -232,20 +235,24 @@ impl DesktopManager {
             );
             let name = registry::string(HKEY_CURRENT_USER, &key, "Name")
                 .filter(|s| !s.is_empty())
-                .unwrap_or_else(|| format!("Desktop {}", i + 1));
+                .unwrap_or_else(|| {
+                    crate::i18n::format("desktop-number-label", &[("number", (i + 1).into())])
+                });
             desktops.push(Desktop { id, name });
         }
         let current = desktops
             .iter()
             .position(|d| d.id == id)
-            .ok_or("Current desktop changed during enumeration")?;
+            .ok_or(crate::i18n::text(
+                "current-desktop-changed-during-enumeration",
+            ))?;
         Ok(Snapshot { desktops, current })
     }
     pub fn switch(&self, index: usize) -> Result<(), String> {
         let desktops = self.desktops()?;
         let d = desktops
             .get(index)
-            .ok_or("Desktop number is out of range")?;
+            .ok_or(crate::i18n::text("desktop-number-is-out-of-range"))?;
         unsafe {
             let slot = 9 + usize::from(self.profile.extra_current);
             let hr = if self.profile.monitor {

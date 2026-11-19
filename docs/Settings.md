@@ -38,6 +38,30 @@ The previous/next symbol picker updates both existing `prevChar` and `nextChar` 
 
 Settings controls save automatically. Changes to the switching-desktop overlay automatically preview on the desktop after 500 ms without further changes. The preview follows the configured display time; a display time of zero uses a temporary 2.2-second preview. Disabling the feature cancels pending previews and clears the current one. The Preview button is also available for both overlays. Command-line overrides are never written into the configuration file.
 
+### Language
+
+General → Language selects English, Simplified Chinese, Traditional Chinese, German, Spanish or French. The default, `auto`, follows the Windows display-language preference list and falls back to English. Changes apply to the tray, Settings and open configuration editor without a restart; unsaved editor text is preserved.
+
+Save a preference in the configuration file:
+
+```text
+general.language: de
+```
+
+Or override it for one launch:
+
+```powershell
+.\WindowsVirtualDesktopHelper.exe --general.language zh-Hans
+```
+
+Supported values are `auto`, `en-US`, `zh-Hans`, `zh-Hant`, `de`, `es`, and `fr`. Regional values such as `de-CH`, `es-MX`, `fr-CA`, `zh-CN` and `zh-TW` resolve to the corresponding translation. An explicit Chinese script takes precedence over the region. Malformed locale identifiers are rejected with an error. Valid locales without an installed catalog fall back to English, so removing a custom file does not prevent startup.
+
+Precedence is **command line → configuration files → auto**. Launch overrides are never saved. The language picker displays an overridden preference as managed; Reset restores `auto` for the current session, and the launch option applies again on the next launch. Configuration keys, shortcut tokens, custom desktop names and user-entered text are not translated.
+
+The six standard translations are embedded in the executable. To add a custom language, place a UTF-8 Fluent file such as `eo.ftl` beside the configuration file (`%APPDATA%\WindowsVirtualDesktopHelper\`) or the executable. Restart the app to discover it in the language picker. An optional `language-name = Esperanto` message supplies the display name. The configuration-folder file takes priority over a matching file beside the executable. Missing or invalid messages fall back to bundled translations and then English; malformed files are skipped and logged.
+
+The same `general.language` setting and launch override select custom locales, for example `general.language: eo` or `--general.language eo`. See [Translating](translating.md) and the [Esperanto example](../examples/translations/eo.ftl).
+
 ### Configuration editor
 
 Advanced → Configuration editor → Open editor opens a separate, resizable WinUI window. Its multiline draft is independent of the live settings. Use **Save** or **Ctrl+S** to validate and apply the complete edit. Errors leave the draft and previous settings intact; closing an unsaved document offers Save, Discard or Keep editing. Repeatedly choosing Open editor activates the existing window.

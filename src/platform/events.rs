@@ -49,7 +49,10 @@ impl Watcher {
                 )
             };
             if code != 0 {
-                return Err(format!("Desktop notifications unavailable: {code}"));
+                return Err(crate::i18n::format(
+                    "notifications-unavailable",
+                    &[("code", (code).to_string().into())],
+                ));
             }
             events.push(event);
         }

@@ -13,7 +13,10 @@ pub fn open(root: HKEY, path: &str, access: u32) -> Result<Key, String> {
     let mut key = std::ptr::null_mut();
     let code = unsafe { RegOpenKeyExW(root, wide(path).as_ptr(), 0, access, &mut key) };
     if code != 0 {
-        return Err(format!("Registry {path}: {code}"));
+        return Err(crate::i18n::format(
+            "registry-error",
+            &[("path", path.into()), ("code", code.to_string().into())],
+        ));
     }
     Ok(Key(key))
 }
@@ -103,7 +106,10 @@ pub fn startup(enabled: bool) -> Result<(), String> {
         }
     };
     if code != 0 && code != 2 {
-        return Err(format!("Cannot update startup: {code}"));
+        return Err(crate::i18n::format(
+            "startup-error",
+            &[("code", (code).to_string().into())],
+        ));
     }
     Ok(())
 }

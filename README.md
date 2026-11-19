@@ -81,6 +81,16 @@ You can just run the executable file WindowsVirtualDesktopHelper.exe to use Wind
 Also available for [ARM64](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.1/WindowsVirtualDesktopHelper.Executable.v3.0.1.arm64.zip) and [x86](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.1/WindowsVirtualDesktopHelper.Executable.v3.0.1.x86.zip).
 <!-- release-executable:end -->
 
+### WinGet
+
+Install the Microsoft Store edition:
+
+```powershell
+winget install --id 9N4HNXPRTSDC --exact --source msstore
+```
+
+Portable WinGet manifests for x64, x86 and ARM64 are generated with each release. See [WinGet packaging](installers/winget/README.md) for local installation and the community repository submission process; the portable package is not yet listed in that repository.
+
 ### Scoop
 
 A command-line installer for Windows
@@ -90,6 +100,8 @@ A command-line installer for Windows
 ```scoop bucket add extras```
 
 ```scoop install windows-virtualdesktop-helper```
+
+Settings needs Windows App Runtime 2.4 or later, as described under Compatibility. See [Scoop maintenance](installers/scoop/README.md) for the local manifest and validation workflow.
 
 
 
@@ -117,6 +129,23 @@ The following versions are not supported:
 * Windows Server
   
 If you know of a working version or non-working version, please report it.
+
+### Languages
+
+The following languages are included in the executable:
+
+| Language | Language code |
+| --- | --- |
+| English | `en-US` |
+| Simplified Chinese (简体中文) | `zh-Hans` |
+| Traditional Chinese (繁體中文) | `zh-Hant` |
+| German (Deutsch) | `de` |
+| Spanish (Español) | `es` |
+| French (Français) | `fr` |
+
+Choose **General → Language**, set `general.language: de` in configuration, or launch with `--general.language de`. The default `auto` follows Windows.
+
+Custom UTF-8 language files such as `eo.ftl` are discovered beside the configuration file or executable and appear in the language picker after restarting the app. See [Contributing translations](#contributing-translations) and [language settings](docs/Settings.md#language).
 
 
 
@@ -245,6 +274,18 @@ Run the automated checks before submitting changes:
 ```
 
 For MSIX packages, portable ZIP archives, and Microsoft Store upload archives, see [MSIX packaging and signing](docs/msix.md). The included GitHub Actions workflow runs the checks and builds packages for x64, x86, and ARM64. To publish a release, see [Releasing](docs/releasing.md). Distributable artifacts are written to ``dist/``.
+
+### Contributing translations
+
+Edit a file in `locales/` and submit a pull request, or try a custom translation without rebuilding:
+
+1. Name the file after its locale, for example `eo.ftl`, and optionally add `language-name = Esperanto` for its native name in the picker.
+2. Copy it into `%APPDATA%\WindowsVirtualDesktopHelper\` beside the configuration file, or beside `WindowsVirtualDesktopHelper.exe`.
+3. Restart the app and select the language under **General → Language**. You can also use `general.language: eo` or `--general.language eo`.
+
+The configuration-folder file takes precedence over a same-language executable-folder file. Missing messages use the embedded language, then English; malformed files are skipped and reported in `app.log`. These files work in release builds too.
+
+Try the partial [Esperanto example](examples/translations/eo.ftl), which demonstrates discovery, accented characters and fallback to English. See the [translation guide](docs/translating.md) for syntax, validation and adding a bundled language.
 
 ### Dependencies
 

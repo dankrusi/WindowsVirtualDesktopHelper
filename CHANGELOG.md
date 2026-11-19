@@ -1,3 +1,28 @@
+# v3.0.2
+
+## Features
+* Use the app in English, Simplified Chinese, Traditional Chinese, German, Spanish or French, with a language picker and automatic Windows language detection.
+* Translate the app by editing readable language files; all translations are included in the executable.
+* Add custom languages by placing a translation file beside the configuration or executable, then choosing it in Settings after restarting.
+* Display Chinese desktop names and complete accented or emoji initials more reliably in tray icons and overlays.
+
+## Changes
+* Organize distribution files under `installers/microsoftstore`, `installers/scoop`, and `installers/winget`; update packaging scripts and declare all six embedded languages in the Store manifest.
+* Generate x64, x86 and ARM64 Scoop and WinGet manifests from verified release ZIPs. Check SHA-256, executable architecture and required files before writing manifests; run offline regression checks in CI. Declare the Windows App Runtime dependency for WinGet and document it for Scoop.
+* Include package-manager manifests in CI release artifacts and update current version examples and the MSIX template during releases. Document the separate upstream submission steps for Scoop metadata and portable WinGet packages.
+* Add `general.language: auto` and the `--general.language` launch override, with regional locale matching and English fallback. Language changes refresh Settings, the configuration editor and tray without restarting.
+* Extract 231 messages into UTF-8 Fluent catalogs. Build-time checks validate syntax, duplicate IDs and placeholder names; tests require complete shipped catalogs. Generate the language selector from `locales/languages.txt`.
+* Discover external UTF-8 Fluent files in both debug and release builds. Configuration-folder files take precedence over executable-folder files; partial catalogs fall back to embedded translations. Include a partial Esperanto example and contributor instructions.
+* Add translator documentation and an expanded pseudo-localization generator for manual layout checks.
+* Add `release.ps1 --prepare-only` to prepare version metadata locally without committing, tagging, pushing or changing published download links. Show the full build version in the Settings sidebar.
+* Identify native Settings/editor windows by stable role properties and IPC shortcut conflicts by typed errors, independently of translated text.
+* Include third-party license notices for the new localization dependencies.
+* Add Fluent, language identifier and Unicode grapheme dependencies; check GDI font coverage and try Windows script fonts when necessary.
+
+## Fixes
+* Preserve combining marks and joined emoji in desktop initials, and stop treating all supplementary Unicode characters as emoji.
+* Render ampersands literally in desktop overlays and allow more room for translated controls and headings.
+
 # v3.0.1
 
 ## Features

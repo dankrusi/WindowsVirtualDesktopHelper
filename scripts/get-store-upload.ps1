@@ -10,7 +10,7 @@ in Partner Center.
 .EXAMPLE
 .\scripts\get-store-upload.ps1                   # version from VERSION.md
 .EXAMPLE
-.\scripts\get-store-upload.ps1 --version 3.0.1
+.\scripts\get-store-upload.ps1 --version 3.0.2
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'

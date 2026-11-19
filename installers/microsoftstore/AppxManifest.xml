@@ -5,7 +5,7 @@
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap desktop rescap">
-  <Identity Name="WindowsVirtualDesktopHelper.Development" Publisher="CN=WindowsVirtualDesktopHelper Development" Version="3.0.0.0" ProcessorArchitecture="x64" />
+  <Identity Name="WindowsVirtualDesktopHelper.Development" Publisher="CN=WindowsVirtualDesktopHelper Development" Version="3.0.2.0" ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>Windows Virtual Desktop Helper</DisplayName>
     <PublisherDisplayName>Dan Krusi</PublisherDisplayName>
@@ -13,7 +13,12 @@
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Resources>
-    <Resource Language="en-us" />
+    <Resource Language="en-US" />
+    <Resource Language="zh-Hans" />
+    <Resource Language="zh-Hant" />
+    <Resource Language="de" />
+    <Resource Language="es" />
+    <Resource Language="fr" />
   </Resources>
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />

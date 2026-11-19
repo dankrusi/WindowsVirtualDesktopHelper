@@ -13,3 +13,10 @@
   - `## Changes`: technical and detailed changes (architecture, dependencies, packaging, build, configuration keys, behavior details).
   - `## Fixes`: bug fixes.
 - Use `*` bullets, one change per bullet. The topmost section becomes the GitHub release notes.
+
+# Releasing and Store builds
+
+- To release a version or produce a Microsoft Store upload, commit the changes on `main` and run `.\scripts\release.ps1 --version X.Y.Z` (see `docs/releasing.md`). Don't bump the version by hand first: the script sets `VERSION.md`, `Cargo.toml`/`Cargo.lock`, the CHANGELOG heading and the README links itself.
+- The script tags and pushes, and GitHub Actions builds x64, x86 and ARM64; it then downloads the single `.msixupload` with all three to `dist\store\`. Use that file for Partner Center.
+- Don't build Store uploads locally with `build-msix.ps1 --store`: this machine has no Visual Studio ARM64 build tools, so a local upload would miss ARM64.
+- The script waits for CI (often more than 10 minutes), so run it in the background and send a notification when it finishes.

@@ -77,17 +77,9 @@ impl Drop for SettingsProcess {
     }
 }
 unsafe fn window_for_process(pid: u32) -> HWND {
-    let windows = windows_for_process(pid);
-    windows
-        .iter()
-        .copied()
-        .find(|hwnd| {
-            let mut title = [0u16; 128];
-            let len = GetWindowTextW(*hwnd, title.as_mut_ptr(), title.len() as i32);
-            String::from_utf16_lossy(&title[..len as usize])
-                == "Settings \u{b7} Virtual Desktop Helper"
-        })
-        .or_else(|| windows.first().copied())
+    windows_for_process(pid)
+        .into_iter()
+        .find(|hwnd| GetPropW(*hwnd, wide("WVDH.WindowRole").as_ptr()) as usize == 1)
         .unwrap_or(std::ptr::null_mut())
 }
 unsafe fn windows_for_process(pid: u32) -> Vec<HWND> {
@@ -96,7 +88,7 @@ unsafe fn windows_for_process(pid: u32) -> Vec<HWND> {
         let mut owner = 0;
         GetWindowThreadProcessId(hwnd, &mut owner);
         if owner == *pid
-            && IsWindowVisible(hwnd) != 0
+            && (GetWindowLongPtrW(hwnd, GWL_STYLE) as u32) & WS_CAPTION == WS_CAPTION
             && GetWindow(hwnd, GW_OWNER).is_null()
             // GetWindowLongPtrW returns isize on 64-bit and i32 on 32-bit Windows.
             && (GetWindowLongPtrW(hwnd, GWL_EXSTYLE) as u32) & WS_EX_TOOLWINDOW == 0
@@ -149,9 +141,22 @@ fn send(parent: HWND, message: usize, text: &str) -> Result<(), String> {
         )
     };
     if sent == 0 {
-        return Err("The desktop helper isn't responding. Your change was not saved. Reopen Settings and try again.".into());
+        return Err(crate::i18n::text(
+            "the-desktop-helper-isn-t-responding-your-change-was-not-saved-reopen-set",
+        )
+        .into());
     }
-    match reply {1=>Ok(()),2=>Err("That shortcut is already in use. Choose a different combination; your previous settings are still active.".into()),_=>Err("Couldn't save this change. Your previous settings are still active. Check app.log in the configuration folder.".into())}
+    match reply {
+        1 => Ok(()),
+        2 => Err(crate::i18n::text(
+            "that-shortcut-is-already-in-use-choose-a-different-combination-your-prev",
+        )
+        .into()),
+        _ => Err(crate::i18n::text(
+            "couldn-t-save-this-change-your-previous-settings-are-still-active-check",
+        )
+        .into()),
+    }
 }
 pub fn open_folder(settings: &Settings) {
     if let Some(path) = settings.path.parent() {
@@ -177,35 +182,92 @@ pub fn startup_settings() {
 // Apply the native caption theme as well as WinUI's content theme.
 // AppWindow PreferredTheme alone does not update classic caption colors on all builds.
 pub fn update_caption(settings: &Settings) {
-    update_caption_for("Settings \u{b7} Virtual Desktop Helper", settings);
+    update_caption_for(1, settings);
 }
-pub(super) fn window_named(title: &str) -> HWND {
+/// Claim a native window once; translated titles are never used as identity.
+/// Settings mounts before the editor, so only the newly mounted window is unclaimed.
+pub(super) fn window_for_role(role: usize) -> HWND {
     unsafe {
-        let title = wide(title);
-        let mut hwnd = std::ptr::null_mut();
-        loop {
-            hwnd = FindWindowExW(std::ptr::null_mut(), hwnd, std::ptr::null(), title.as_ptr());
-            if hwnd.is_null() {
-                return hwnd;
-            }
-            let mut pid = 0;
-            GetWindowThreadProcessId(hwnd, &mut pid);
-            if pid == windows_sys::Win32::System::Threading::GetCurrentProcessId() {
-                return hwnd;
+        let property = wide("WVDH.WindowRole");
+        let windows =
+            windows_for_process(windows_sys::Win32::System::Threading::GetCurrentProcessId());
+        if let Some(hwnd) = windows
+            .iter()
+            .find(|h| GetPropW(**h, property.as_ptr()) as usize == role)
+        {
+            return *hwnd;
+        }
+        if let Some(hwnd) = windows.iter().find(|h| {
+            GetPropW(**h, property.as_ptr()).is_null()
+                && GetWindowThreadProcessId(**h, std::ptr::null_mut())
+                    == windows_sys::Win32::System::Threading::GetCurrentThreadId()
+        }) {
+            if SetPropW(*hwnd, property.as_ptr(), role as HANDLE) != 0 {
+                return *hwnd;
             }
         }
+        std::ptr::null_mut()
     }
 }
-pub(super) fn update_caption_for(title: &str, settings: &Settings) {
+pub(super) fn update_caption_for(role: usize, settings: &Settings) {
     unsafe {
-        let hwnd = window_named(title);
+        let hwnd = window_for_role(role);
         if !hwnd.is_null() {
             let dark = match settings.get("general.theme") {
                 "dark" => true,
                 "light" => false,
                 _ => crate::platform::registry::apps_dark(),
             };
+            let title = crate::i18n::text(if role == 1 {
+                "settings-virtual-desktop-helper"
+            } else {
+                "configuration-virtual-desktop-helper"
+            });
+            SetWindowTextW(hwnd, wide(title).as_ptr());
             super::theme(hwnd, dark);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn native_window_roles_survive_identical_translated_captions() {
+        // Hidden native windows exercise discovery; no desktop UI is shown.
+        unsafe {
+            let create = || {
+                CreateWindowExW(
+                    0,
+                    wide("STATIC").as_ptr(),
+                    wide("Settings").as_ptr(),
+                    WS_OVERLAPPEDWINDOW,
+                    0,
+                    0,
+                    100,
+                    100,
+                    std::ptr::null_mut(),
+                    std::ptr::null_mut(),
+                    std::ptr::null_mut(),
+                    std::ptr::null(),
+                )
+            };
+            let settings = create();
+            assert!(!settings.is_null());
+            assert_eq!(window_for_role(1), settings);
+            let editor = create();
+            assert!(!editor.is_null());
+            assert_eq!(window_for_role(2), editor);
+            SetWindowTextW(settings, wide("设置").as_ptr());
+            SetWindowTextW(editor, wide("设置").as_ptr());
+            assert_eq!(window_for_role(1), settings);
+            assert_eq!(window_for_role(2), editor);
+            assert_eq!(
+                window_for_process(windows_sys::Win32::System::Threading::GetCurrentProcessId()),
+                settings
+            );
+            DestroyWindow(editor);
+            DestroyWindow(settings);
         }
     }
 }
