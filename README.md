@@ -81,16 +81,6 @@ You can just run the executable file WindowsVirtualDesktopHelper.exe to use Wind
 Also available for [ARM64](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.2/WindowsVirtualDesktopHelper.Executable.v3.0.2.arm64.zip) and [x86](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.2/WindowsVirtualDesktopHelper.Executable.v3.0.2.x86.zip).
 <!-- release-executable:end -->
 
-### WinGet
-
-Install the Microsoft Store edition (recommended; uses Store installation and updates):
-
-```powershell
-winget install --id 9N4HNXPRTSDC --exact --source msstore
-```
-
-Portable WinGet manifests for x64, x86 and ARM64 are generated with each release. After the community submission is accepted, install with `winget install windows-virtualdesktop-helper --source winget`. See [WinGet packaging](installers/winget/README.md) for local installation and the community repository submission process; the portable package is not yet listed in that repository.
-
 ### Scoop
 
 A command-line installer for Windows
@@ -102,6 +92,15 @@ A command-line installer for Windows
 ```scoop install windows-virtualdesktop-helper```
 
 Settings needs Windows App Runtime 2.4 or later, as described under Compatibility. See [Scoop maintenance](installers/scoop/README.md) for the local manifest and validation workflow.
+
+### WinGet
+
+Install the Microsoft Store version using WinGet. Installation and updates are handled by the Microsoft Store:
+
+```powershell
+winget install --id 9N4HNXPRTSDC --exact --source msstore
+```
+
 
 
 

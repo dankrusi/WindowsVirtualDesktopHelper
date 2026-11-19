@@ -1,3 +1,12 @@
+# Unreleased
+
+## Features
+
+## Changes
+* Document WinGet installation through the Microsoft Store below Scoop in the README, and mark the custom WinGet community package submission as abandoned in favor of the Store channel.
+
+## Fixes
+
 # v3.0.2
 
 ## Features

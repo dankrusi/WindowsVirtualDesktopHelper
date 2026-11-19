@@ -54,7 +54,7 @@ The listing, screenshots and pricing carry over from the previous submission.
 | GitHub Releases | Created by the workflow. |
 | Microsoft Store | Upload the `.msixupload` in Partner Center (above). |
 | WinGet (Store) | `winget install --id 9N4HNXPRTSDC --exact --source msstore`. |
-| WinGet (portable) | Generated under [installers/winget](../installers/winget/README.md). Each version needs a pull request to `microsoft/winget-pkgs`; generation alone does not publish it. |
+| WinGet (portable) | Community submission was abandoned in favor of the Store channel. Generated manifests remain under [installers/winget](../installers/winget/README.md) for reference and are not submitted upstream. |
 | Scoop | The [Extras manifest](https://github.com/ScoopInstaller/Extras/blob/master/bucket/windows-virtualdesktop-helper.json) autoupdates from new GitHub releases. It expects `WindowsVirtualDesktopHelper.Executable.v<version>.zip`, so keep that asset name. See [Scoop maintenance](../installers/scoop/README.md) for local testing and upstream metadata updates. |
 
 ## Optional: automatic Store submission
