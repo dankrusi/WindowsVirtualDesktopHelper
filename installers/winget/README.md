@@ -6,6 +6,10 @@ The Microsoft Store channel is already available:
 winget install --id 9N4HNXPRTSDC --exact --source msstore
 ```
 
+This is the recommended WinGet command when you want Microsoft Store installation and updates. It always selects the Store-approved release, so a newly built version becomes available after Partner Center submission and certification. No community manifest or per-release WinGet submission is needed for this channel.
+
+The community manifest schema does not support an `msstore` installer or a Store product-ID forwarding field. The friendly `windows-virtualdesktop-helper` moniker below belongs to the separate portable package; it cannot redirect to the Store product. See Microsoft's [installer schema](https://github.com/microsoft/winget-cli/blob/master/schemas/JSON/manifests/latest/manifest.installer.latest.json).
+
 This folder also maintains portable-package manifests for `DanKrusi.WindowsVirtualDesktopHelper`. They use the same GitHub release ZIPs as Scoop, include x64, x86 and ARM64, require Windows 11, and declare the Windows App Runtime 2.4+ dependency.
 
 ## Generate and validate

@@ -83,7 +83,7 @@ Also available for [ARM64](https://github.com/dankrusi/WindowsVirtualDesktopHelp
 
 ### WinGet
 
-Install the Microsoft Store edition:
+Install the Microsoft Store edition (recommended; uses Store installation and updates):
 
 ```powershell
 winget install --id 9N4HNXPRTSDC --exact --source msstore
