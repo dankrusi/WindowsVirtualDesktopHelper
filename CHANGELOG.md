@@ -3,6 +3,9 @@
 ## Features
 
 ## Changes
+* Export English, Simplified Chinese, and Traditional Chinese dark overview illustrations, Store box art, and poster art from Figma as locale-named PNGs in the screenshot gallery.
+* Add Simplified and Traditional Chinese Settings screenshots in light and dark themes, label screenshot filenames by locale, and support language selection in the screenshot script and gallery.
+* Add editable Microsoft Store listing text for all six supported languages and document CSV imports that reuse existing screenshots and artwork.
 * Document WinGet installation through the Microsoft Store below Scoop in the README, and mark the custom WinGet community package submission as abandoned in favor of the Store channel.
 
 ## Fixes

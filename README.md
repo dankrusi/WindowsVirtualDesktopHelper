@@ -4,7 +4,7 @@ Simple and lightweight app to help with Virtual Desktops for Windows 11.
 
 Built with Rust, with a lightweight native Windows tray app and a modern Settings interface.
 
-![Screenshot](screenshots/WindowsVirtualDesktopHelper-overview-dark.png)
+![Screenshot](screenshots/WindowsVirtualDesktopHelper-overview-en-US-dark.png)
 
 <!-- release-links:start -->
 [Get it from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc?cid=github) |
@@ -36,15 +36,15 @@ Keywords: Virtual Desktop indicator, Virtual Desktop name, Virtual Desktop numbe
 * Free
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-02-tray-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-02-tray-light.png">
-  <img alt="Settings: Tray icons" src="screenshots/WindowsVirtualDesktopHelper-Screenshot-02-tray-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-02-tray-en-US-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-02-tray-en-US-light.png">
+  <img alt="Settings: Tray icons" src="screenshots/WindowsVirtualDesktopHelper-Screenshot-02-tray-en-US-light.png">
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-03-overlays-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-03-overlays-light.png">
-  <img alt="Settings: Desktop overlays" src="screenshots/WindowsVirtualDesktopHelper-Screenshot-03-overlays-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-03-overlays-en-US-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/WindowsVirtualDesktopHelper-Screenshot-03-overlays-en-US-light.png">
+  <img alt="Settings: Desktop overlays" src="screenshots/WindowsVirtualDesktopHelper-Screenshot-03-overlays-en-US-light.png">
 </picture>
 
 [See all screenshots](screenshots/screenshots.md)

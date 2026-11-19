@@ -1,0 +1,20 @@
+{
+  "Title": "Virtual Desktop Helper",
+  "ShortDescription": "Keep track of your Windows 11 virtual desktops with tray indicators, desktop name overlays, and customizable keyboard shortcuts. Free, lightweight, and open source, with a modern Settings interface and six built-in languages.",
+  "Description": "Know which virtual desktop you are on and switch between desktops with ease. Virtual Desktop Helper is a free, lightweight, open-source app that adds useful indicators and controls to Windows 11 virtual desktops.\n\nShow the current desktop number or the initial of its name in the notification area. Display the desktop name when switching, or keep it visible in a permanent status overlay. Click tray icons to move to the previous or next desktop, jump directly to a numbered desktop with custom keyboard shortcuts, or toggle between your two most recently used desktops.\n\nMake the app your own with modern Settings, light and dark themes, shortcut recording, and live overlay previews. Adjust overlay appearance, position, timing, and monitor selection. Advanced options are available through the configuration editor and command-line settings. Enable startup with Windows through Windows Startup Apps. The app automatically recovers after Windows Explorer restarts.\n\nChoose English, German, Spanish, French, Simplified Chinese, or Traditional Chinese, or follow your Windows language automatically. You can also add your own translation file beside the configuration file or executable and select it after restarting the app.\n\nVersion 3 and later require Windows 11. Windows 10 users can use version 2.1 or earlier; the features described here apply to version 3. Settings requires Windows App Runtime 2.4 or later, which the Microsoft Store installs automatically. Compatibility with unreleased Windows Insider builds is not guaranteed.\n\nProject information, documentation, and source code: https://github.com/dankrusi/WindowsVirtualDesktopHelper",
+  "Features": [
+    "Show the current desktop number or name initial in the notification area",
+    "Show desktop names when switching, or keep a permanent status overlay visible",
+    "Switch to the previous or next desktop by clicking tray icons",
+    "Jump to numbered desktops with keyboard digits, numpad digits, or function-key shortcuts",
+    "Toggle between your two most recently used desktops with a configurable hotkey",
+    "Customize overlay appearance, position, timing, and monitor selection with live previews",
+    "Modern Settings with light and dark themes, shortcut recording, and a configuration editor",
+    "English, German, Spanish, French, Simplified Chinese, Traditional Chinese, and custom translations",
+    "Automatically recover after Windows Explorer restarts; optional startup with Windows",
+    "Free, lightweight, configurable, and open source"
+  ],
+  "Keywords": ["virtual desktop", "desktop indicator", "desktop name", "desktop number", "tray icon", "keyboard shortcuts", "Windows 11"],
+  "ReleaseNotes": "New in 3.0.2:\n• Choose from six built-in languages: English, German, Spanish, French, Simplified Chinese, and Traditional Chinese.\n• Follow your Windows language automatically or choose a language in Settings, configuration, or launch options.\n• Add custom translations by placing a language file beside the configuration file or executable, then restarting the app.\n• Improved display of Chinese desktop names, accented initials, and emoji in tray icons and overlays.\n• More room for translated controls and headings, and corrected ampersand display in overlays.",
+  "LicenseTerms": "Licensed under the GNU General Public License, version 3 or (at your option) any later version. License and source code: https://github.com/dankrusi/WindowsVirtualDesktopHelper/blob/main/LICENSE.md"
+}
