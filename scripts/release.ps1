@@ -128,7 +128,7 @@ try {
     $download = "$repoUrl/releases/download/$tag"
     $zip = "WindowsVirtualDesktopHelper.Executable.$tag"
     $text = Set-Block $readme.Text 'links' (
-        "[Get it from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc) |$nl" +
+        "[Get it from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc?cid=github) |$nl" +
         "[Download $tag Executable (.zip)]($download/$zip.zip) |$nl" +
         "[GitHub Releases]($repoUrl/releases)$nl")
     # Version 3 ships no MSI; the Setup section stays empty until an installer is published again.

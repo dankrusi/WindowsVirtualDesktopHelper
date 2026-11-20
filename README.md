@@ -7,7 +7,7 @@ Built with Rust, with a lightweight native Windows tray app and a modern Setting
 ![Screenshot](screenshots/WindowsVirtualDesktopHelper-overview-dark.png)
 
 <!-- release-links:start -->
-[Get it from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc) |
+[Get it from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc?cid=github) |
 [Download v3.0.2 Executable (.zip)](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases/download/v3.0.2/WindowsVirtualDesktopHelper.Executable.v3.0.2.zip) |
 [GitHub Releases](https://github.com/dankrusi/WindowsVirtualDesktopHelper/releases)
 <!-- release-links:end -->
@@ -66,7 +66,7 @@ Settings requires Microsoft Windows App Runtime 2.4 or later. The Microsoft Stor
 
 You can install Windows Virtual Desktop Helper from the Microsoft Store.
 
-[Get Windows Virtual Desktop Helper from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc)
+[Get Windows Virtual Desktop Helper from Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc?cid=github)
 
 <!-- release-setup:start -->
 <!-- release-setup:end -->
@@ -183,7 +183,7 @@ Locally built executables and MSIX packages are unsigned by default. Windows may
 
 ### Why is this app being reported by Windows Defender as malware?
 
-Unsigned applications can trigger antivirus detections. Download the app from the [Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc) or this project's GitHub Releases, and verify published SHA-256 checksums when available. If you believe a detection is a false positive, report it to your antivirus vendor.
+Unsigned applications can trigger antivirus detections. Download the app from the [Microsoft Store](https://apps.microsoft.com/detail/9n4hnxprtsdc?cid=github) or this project's GitHub Releases, and verify published SHA-256 checksums when available. If you believe a detection is a false positive, report it to your antivirus vendor.
 
 ### How do I open Settings?
 
