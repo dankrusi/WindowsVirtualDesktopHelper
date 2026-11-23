@@ -235,10 +235,12 @@ pub struct Metrics {
 pub fn metrics() -> Metrics {
     unsafe {
         let taskbar = FindWindowW(wide("Shell_TrayWnd").as_ptr(), std::ptr::null());
-        let dpi = if taskbar.is_null() {
-            96
+        let taskbar_dpi = GetDpiForWindow(taskbar);
+        // Explorer's taskbar may be temporarily absent during a display change.
+        let dpi = if taskbar_dpi == 0 {
+            GetDpiForSystem().max(USER_DEFAULT_SCREEN_DPI)
         } else {
-            GetDpiForWindow(taskbar).max(96)
+            taskbar_dpi
         };
         Metrics {
             dpi,
@@ -425,40 +427,27 @@ fn rasterize(
                 }
             }
         }
-        let target = size * 4;
-        let padding = ((size as f64 * 0.08).round() as i32).max(1) * 4;
-        let available = target - 2 * padding;
-        let ink_width = (right - left).max(1);
-        let ink_height = (bottom - top).max(1);
-        let scale = available as f64 / ink_width.max(ink_height) as f64;
-        let width = ((ink_width as f64 * scale).round() as i32).max(1);
-        let height = ((ink_height as f64 * scale).round() as i32).max(1);
-        let dx = (target - width) / 2;
-        let dy = (target - height) / 2;
+        // Map each physical icon pixel directly to the high-resolution mask.
+        // Preserve the aspect ratio and snap the outer ink origin to the pixel grid.
+        let padding = (f64::from(size) * 0.08).round().max(1.);
+        let ink_width = f64::from((right - left).max(0));
+        let ink_height = f64::from((bottom - top).max(0));
+        let source_step = ink_width.max(ink_height).max(1.) / (f64::from(size) - 2. * padding);
+        let dx = ((f64::from(size) - ink_width / source_step) / 2.).round();
+        let dy = ((f64::from(size) - ink_height / source_step) / 2.).round();
+        let source_area = source_step * source_step;
         let mut result = vec![0; (size * size) as usize];
         for y in 0..size {
             for x in 0..size {
-                let mut sum = 0;
-                for sy in 0..4 {
-                    for sx in 0..4 {
-                        let xx = x * 4 + sx - dx;
-                        let yy = y * 4 + sy - dy;
-                        if left < right
-                            && top < bottom
-                            && xx >= 0
-                            && xx < width
-                            && yy >= 0
-                            && yy < height
-                        {
-                            let source_x =
-                                left + ((xx as f64 + 0.5) * ink_width as f64 / width as f64) as i32;
-                            let source_y = top
-                                + ((yy as f64 + 0.5) * ink_height as f64 / height as f64) as i32;
-                            sum += source[(source_y * high + source_x) as usize] & 255;
-                        }
-                    }
-                }
-                let coverage = ((sum as f64 / 16.) * opacity).round() as u32;
+                let source_x = f64::from(left) + (f64::from(x) - dx) * source_step;
+                let source_y = f64::from(top) + (f64::from(y) - dy) * source_step;
+                let covered = covered_area(
+                    source,
+                    high,
+                    source_x.max(f64::from(left))..(source_x + source_step).min(f64::from(right)),
+                    source_y.max(f64::from(top))..(source_y + source_step).min(f64::from(bottom)),
+                );
+                let coverage = (covered / source_area * opacity).round() as u32;
                 let alpha = if bg.is_some() { 255 } else { coverage };
                 let mut pixel = alpha << 24;
                 for (shift, source_shift) in [(0, 16), (8, 8), (16, 0)] {
@@ -479,6 +468,28 @@ fn rasterize(
         result
     }
 }
+
+/// Integrate grayscale coverage, weighting each source pixel by its overlap.
+fn covered_area(
+    source: &[u32],
+    stride: i32,
+    x: std::ops::Range<f64>,
+    y: std::ops::Range<f64>,
+) -> f64 {
+    if x.is_empty() || y.is_empty() {
+        return 0.;
+    }
+    let mut area = 0.;
+    for row in y.start.floor() as i32..y.end.ceil() as i32 {
+        let height = y.end.min(f64::from(row + 1)) - y.start.max(f64::from(row));
+        for col in x.start.floor() as i32..x.end.ceil() as i32 {
+            let width = x.end.min(f64::from(col + 1)) - x.start.max(f64::from(col));
+            area += f64::from(source[(row * stride + col) as usize] & 255) * width * height;
+        }
+    }
+    area
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -773,6 +784,13 @@ mod tests {
                 }
             }
         }
+    }
+    #[test]
+    fn coverage_preserves_subpixel_diagonal_edges() {
+        let diagonal = [255, 0, 0, 255];
+        assert_eq!(covered_area(&diagonal, 2, 0.25..1.25, 0.25..1.25), 159.375);
+        assert_eq!(covered_area(&diagonal, 2, 0.75..1.75, 0.75..1.75), 159.375);
+        assert_eq!(covered_area(&diagonal, 2, 0.5..1.5, 0.5..1.5), 127.5);
     }
     #[test]
     fn disabled_opacity_changes_alpha() {

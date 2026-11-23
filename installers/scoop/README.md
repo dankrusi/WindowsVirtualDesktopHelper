@@ -12,7 +12,7 @@ scoop install windows-virtualdesktop-helper
 To regenerate independently:
 
 ```powershell
-.\scripts\update-installers.ps1 --version 3.0.2
+.\scripts\update-installers.ps1 --version 3.0.3
 ```
 
 To test our manifest on a disposable Windows machine with Scoop installed:

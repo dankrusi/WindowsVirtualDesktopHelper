@@ -24,7 +24,7 @@ Each build stages files in a fresh `dist/.work/<id>/` directory; the script neve
 For local distribution, use a certificate already trusted by the target machine. Its subject must exactly match the manifest Publisher. Sign explicitly:
 
 ```powershell
-.\scripts\sign-msix.ps1 --package-path dist\WindowsVirtualDesktopHelper_3.0.2.0_x64_development.msix --certificate-thumbprint YOUR_CERTIFICATE_THUMBPRINT
+.\scripts\sign-msix.ps1 --package-path dist\WindowsVirtualDesktopHelper_3.0.3.0_x64_development.msix --certificate-thumbprint YOUR_CERTIFICATE_THUMBPRINT
 ```
 
 Signing verifies the signature and regenerates the MSIX checksum. Rebuild the upload archive separately if you need a signed archive; the generated Store upload intentionally contains the unsigned package. No certificate is created, imported or trusted by these scripts. The Microsoft Store signs packages distributed through the Store.

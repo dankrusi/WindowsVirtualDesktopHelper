@@ -1,4 +1,4 @@
-# Unreleased
+# v3.0.3
 
 ## Features
 
@@ -9,6 +9,7 @@
 * Document WinGet installation through the Microsoft Store below Scoop in the README, and mark the custom WinGet community package submission as abandoned in favor of the Store channel.
 
 ## Fixes
+* Smooth uneven edges on tray numbers, initials, and arrows at Windows display scaling levels.
 
 # v3.0.2
 
