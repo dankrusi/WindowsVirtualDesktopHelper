@@ -92,6 +92,8 @@ desktop-number = Número de escritorio
 see-the-current-desktop-at-a-glance = Identifica el escritorio actual de un vistazo.
 desktop-initial = Inicial del escritorio
 use-the-first-character-of-the-desktop-name = Usa el primer carácter del nombre del escritorio.
+uppercase-desktop-initial = Inicial del escritorio en mayúscula
+display-the-desktop-initial-in-uppercase = Muestra la inicial del escritorio en mayúscula.
 click-to-open-task-view = Abrir Vista de tareas al hacer clic
 click-the-desktop-indicator-to-see-all-your-desktops = Haz clic en el indicador para ver todos tus escritorios.
 navigation = Navegación
@@ -222,10 +224,10 @@ change-shortcut = Cambiar atajo de { $title }
 enable-setting = Activar { $title }
 version-credit = Versión { $version } · por Dan Krusi y colaboradores
 winui-start-error = No se pudo iniciar la configuración WinUI: { $error }. Instala Microsoft Windows App Runtime 2.4 o posterior.
-tray-reconnecting = { $role } · Virtual Desktop Helper
-    Reconectando con Windows…
-tray-tooltip = { $role } · Virtual Desktop Helper
-    { $name } · { $number } de { $total }
+tray-reconnecting = Reconectando con Windows…
+    { $role }
+tray-tooltip = { $name } · { $number } de { $total }
+    { $role }
 tray-preview-summary = Escritorio { $number } de { $total } · { $name }
 desktop-preview-summary = Vista previa ampliada · Escritorio { $number } de { $total }
 editor-conflict = { $key } cambió en Configuración mientras este editor estaba abierto. Su valor actual es { $value }. Se ha conservado tu borrador; vuelve a abrir el editor para partir de la configuración actual.

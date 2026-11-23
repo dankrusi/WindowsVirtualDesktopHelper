@@ -92,6 +92,8 @@ desktop-number = Numéro du bureau
 see-the-current-desktop-at-a-glance = Identifiez le bureau actif d’un coup d’œil.
 desktop-initial = Initiale du bureau
 use-the-first-character-of-the-desktop-name = Utilisez le premier caractère du nom du bureau.
+uppercase-desktop-initial = Initiale du bureau en majuscule
+display-the-desktop-initial-in-uppercase = Affichez l’initiale du bureau en majuscule.
 click-to-open-task-view = Ouvrir l’Affichage des tâches d’un clic
 click-the-desktop-indicator-to-see-all-your-desktops = Cliquez sur l’indicateur pour voir tous vos bureaux.
 navigation = Navigation
@@ -222,10 +224,10 @@ change-shortcut = Modifier le raccourci de { $title }
 enable-setting = Activer { $title }
 version-credit = Version { $version } · par Dan Krusi et les contributeurs
 winui-start-error = Impossible de démarrer les paramètres WinUI : { $error }. Installez Microsoft Windows App Runtime 2.4 ou une version ultérieure.
-tray-reconnecting = { $role } · Virtual Desktop Helper
-    Reconnexion à Windows…
-tray-tooltip = { $role } · Virtual Desktop Helper
-    { $name } · { $number } sur { $total }
+tray-reconnecting = Reconnexion à Windows…
+    { $role }
+tray-tooltip = { $name } · { $number } sur { $total }
+    { $role }
 tray-preview-summary = Bureau { $number } sur { $total } · { $name }
 desktop-preview-summary = Aperçu agrandi · Bureau { $number } sur { $total }
 editor-conflict = { $key } a été modifié dans les paramètres pendant que cet éditeur était ouvert. Sa valeur actuelle est { $value }. Votre brouillon a été conservé ; rouvrez l’éditeur pour repartir des paramètres actuels.

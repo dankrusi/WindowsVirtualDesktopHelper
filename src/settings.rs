@@ -393,7 +393,7 @@ mod tests {
         assert_eq!(s.get("general.theme"), "dark");
         assert!(s.bool("feature.showDesktopNumberInIconTray"));
         assert!(s.validate().is_ok());
-        assert_eq!(DEFAULTS.len(), 70);
+        assert_eq!(DEFAULTS.len(), 71);
     }
     #[test]
     fn saving_preserves_unknown_keys_and_never_cli_overrides() {

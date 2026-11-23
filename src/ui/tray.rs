@@ -7,6 +7,7 @@ use windows_sys::Win32::{
     UI::{HiDpi::*, Shell::*, WindowsAndMessaging::*},
 };
 pub const MESSAGE: u32 = 0x8003;
+const TOOLTIP_CAPACITY: usize = 128;
 pub struct Tray {
     hwnd: HWND,
     icons: Vec<(u32, HICON)>,
@@ -143,36 +144,64 @@ fn icon_name(id: u32) -> &'static str {
         _ => crate::i18n::text("desktop-controls"),
     }
 }
-fn tooltip(id: u32, snap: &Snapshot) -> [u16; 128] {
-    shell_text(&crate::i18n::format(
-        "tray-tooltip",
-        &[
-            ("role", (icon_name(id)).to_string().into()),
-            ("name", (snap.active().name).to_string().into()),
-            ("number", (snap.current + 1).into()),
-            ("total", (snap.desktops.len()).into()),
-        ],
-    ))
+fn tooltip(id: u32, snap: &Snapshot) -> [u16; TOOLTIP_CAPACITY] {
+    let format_tip = |name: &str| {
+        crate::i18n::format(
+            "tray-tooltip",
+            &[
+                ("role", icon_name(id).into()),
+                ("name", name.into()),
+                ("number", (snap.current + 1).into()),
+                ("total", snap.desktops.len().into()),
+            ],
+        )
+    };
+    let name = snap.active().name.split('\0').next().unwrap_or("");
+    let full = format_tip(name);
+    if full.encode_utf16().count() < TOOLTIP_CAPACITY {
+        return shell_text(&full);
+    }
+    // Keep the desktop number and the role visible if the name fills the buffer.
+    let fixed_units = format_tip("").encode_utf16().count();
+    let name_budget = (TOOLTIP_CAPACITY - 2).saturating_sub(fixed_units);
+    shell_text(&format_tip(&format!(
+        "{}…",
+        shell_prefix(name, name_budget)
+    )))
 }
 /// NUL-terminate Shell strings without cutting a visible Unicode character.
 fn shell_text<const N: usize>(text: &str) -> [u16; N] {
     let mut buffer = [0; N];
-    let mut offset = 0;
-    for cluster in text.split('\0').next().unwrap_or("").graphemes(true) {
-        let length = cluster.encode_utf16().count();
-        if offset + length >= N {
-            break;
-        }
-        for unit in cluster.encode_utf16() {
-            buffer[offset] = unit;
-            offset += 1;
-        }
+    for (slot, unit) in buffer
+        .iter_mut()
+        .zip(shell_prefix(text, N.saturating_sub(1)).encode_utf16())
+    {
+        *slot = unit;
     }
     buffer
+}
+fn shell_prefix(text: &str, max_units: usize) -> &str {
+    let (mut units, mut bytes) = (0, 0);
+    for cluster in text.split('\0').next().unwrap_or("").graphemes(true) {
+        units += cluster.encode_utf16().count();
+        if units > max_units {
+            break;
+        }
+        bytes += cluster.len();
+    }
+    &text[..bytes]
 }
 impl Drop for Tray {
     fn drop(&mut self) {
         self.clear();
+    }
+}
+pub(super) fn desktop_initial(s: &Settings, name: &str) -> String {
+    let initial = name.graphemes(true).next().unwrap_or("?");
+    if s.bool("feature.showDesktopNameInIconTray.uppercase") {
+        initial.to_uppercase()
+    } else {
+        initial.to_owned()
     }
 }
 /// Shared icon selection for the actual notification area and Settings preview.
@@ -184,14 +213,7 @@ pub fn icon_specs(s: &Settings, snap: &Snapshot) -> Vec<(u32, String, bool)> {
         icons.push((1, (index + 1).to_string(), true));
     }
     if s.bool("feature.showDesktopNameInIconTray") {
-        let name = snap
-            .active()
-            .name
-            .graphemes(true)
-            .next()
-            .unwrap_or("?")
-            .to_string();
-        icons.push((2, name, true));
+        icons.push((2, desktop_initial(s, &snap.active().name), true));
     }
     if s.bool("feature.showPrevNextIcons") {
         if !hide || index > 0 {
@@ -508,11 +530,15 @@ mod tests {
             path: Default::default(),
         };
         settings.set("feature.showDesktopNameInIconTray", "true");
-        for (name, expected) in [
-            ("工作", "工"),
-            ("e\u{301}quipe", "e\u{301}"),
-            ("👩‍💻 Work", "👩‍💻"),
-            ("𠀀桌面", "𠀀"),
+        assert!(!settings.bool("feature.showDesktopNameInIconTray.uppercase"));
+        for (name, original, uppercase) in [
+            ("工作", "工", "工"),
+            ("e\u{301}quipe", "e\u{301}", "E\u{301}"),
+            ("👩‍💻 Work", "👩‍💻", "👩‍💻"),
+            ("𠀀桌面", "𠀀", "𠀀"),
+            ("", "?", "?"),
+            ("planung", "p", "P"),
+            ("ßammlung", "ß", "SS"),
         ] {
             let snapshot = Snapshot {
                 current: 0,
@@ -521,12 +547,15 @@ mod tests {
                     name: name.into(),
                 }],
             };
-            let initial = icon_specs(&settings, &snapshot)
-                .into_iter()
-                .find(|(id, _, _)| *id == 2)
-                .unwrap()
-                .1;
-            assert_eq!(initial, expected);
+            for (enabled, expected) in [("false", original), ("true", uppercase)] {
+                settings.set("feature.showDesktopNameInIconTray.uppercase", enabled);
+                let initial = icon_specs(&settings, &snapshot)
+                    .into_iter()
+                    .find(|(id, _, _)| *id == 2)
+                    .unwrap()
+                    .1;
+                assert_eq!(initial, expected);
+            }
         }
     }
     #[test]
@@ -611,7 +640,8 @@ mod tests {
         assert_eq!(registered.len(), 4);
         assert!(restored_tips
             .iter()
-            .all(|tip| tip.contains("Reconnecting to Windows")));
+            .zip(1..=4)
+            .all(|(tip, id)| tip == &format!("Reconnecting to Windows…\n{}", icon_name(id))));
         assert_eq!(restored_tips.iter().collect::<HashSet<_>>().len(), 4);
         let offline = recovery_icon_specs(&settings, &snap, false);
         assert_eq!(offline[0], (1, "?".into(), false));
@@ -621,6 +651,11 @@ mod tests {
         assert!(tray.update_with(&settings, &snap, true, |operation, data| {
             assert_eq!(operation, NIM_MODIFY);
             let id = data.uID;
+            let tip = data.szTip;
+            assert_eq!(
+                tip,
+                shell_text(&format!("Work · 1 of 1\n{}", icon_name(id)))
+            );
             registered.contains(&id)
         }));
         assert_eq!(
@@ -671,7 +706,7 @@ mod tests {
         }
     }
     #[test]
-    fn tooltip_names_stay_unique_with_long_unicode_desktop_names() {
+    fn tooltip_puts_desktop_details_first_and_preserves_roles_with_long_names() {
         let snap = Snapshot {
             current: 0,
             desktops: vec![crate::platform::desktop::Desktop {
@@ -684,7 +719,9 @@ mod tests {
             let end = tip.iter().position(|ch| *ch == 0).unwrap();
             assert!(end <= 127);
             let text = String::from_utf16(&tip[..end]).expect("no split surrogate pair");
-            assert!(text.starts_with(icon_name(index as u32 + 1)));
+            assert!(text.starts_with("\u{1f4bb}"));
+            assert!(text.contains("… · 1 of 1\n"));
+            assert!(text.ends_with(icon_name(index as u32 + 1)));
             assert_eq!(tips.iter().filter(|other| *other == tip).count(), 1);
         }
         assert_eq!(shell_text::<4>("ab\u{1f4bb}"), [97, 98, 0, 0]);

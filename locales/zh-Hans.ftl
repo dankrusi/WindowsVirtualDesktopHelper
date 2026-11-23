@@ -92,6 +92,8 @@ desktop-number = 桌面编号
 see-the-current-desktop-at-a-glance = 一眼识别当前桌面。
 desktop-initial = 桌面首字符
 use-the-first-character-of-the-desktop-name = 使用桌面名称的第一个字符。
+uppercase-desktop-initial = 桌面首字母大写
+display-the-desktop-initial-in-uppercase = 以大写形式显示桌面名称的首字母。
 click-to-open-task-view = 点击打开任务视图
 click-the-desktop-indicator-to-see-all-your-desktops = 点击桌面指示器查看所有桌面。
 navigation = 导航
@@ -222,10 +224,10 @@ change-shortcut = 更改“{ $title }”快捷键
 enable-setting = 启用“{ $title }”
 version-credit = 版本 { $version } · 由 Dan Krusi 和贡献者开发
 winui-start-error = 无法启动 WinUI 设置：{ $error }。请安装 Microsoft Windows App Runtime 2.4 或更高版本。
-tray-reconnecting = { $role } · Virtual Desktop Helper
-    正在重新连接 Windows…
-tray-tooltip = { $role } · Virtual Desktop Helper
-    { $name } · 第 { $number } 个，共 { $total } 个
+tray-reconnecting = 正在重新连接 Windows…
+    { $role }
+tray-tooltip = { $name } · 第 { $number } 个，共 { $total } 个
+    { $role }
 tray-preview-summary = 桌面 { $number }，共 { $total } 个 · { $name }
 desktop-preview-summary = 放大预览 · 桌面 { $number }，共 { $total } 个
 editor-conflict = 此编辑器打开期间，{ $key } 在设置中发生了更改。当前值为 { $value }。草稿已保留；请重新打开编辑器，以当前设置为基础进行编辑。

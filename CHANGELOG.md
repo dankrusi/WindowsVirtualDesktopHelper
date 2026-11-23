@@ -1,6 +1,8 @@
 # v3.0.3
 
 ## Features
+* Optionally show the desktop initial in uppercase in the tray.
+* Tray tooltips show the desktop name and number first, followed by the icon’s role, without repeating the app name.
 
 ## Changes
 * Export English, Simplified Chinese, and Traditional Chinese dark overview illustrations, Store box art, and poster art from Figma as locale-named PNGs in the screenshot gallery.

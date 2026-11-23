@@ -90,5 +90,6 @@ pub const DEFAULTS: &[(&str, &str)] = &[
         "true",
     ),
     ("feature.showDesktopNameInIconTray", "false"),
+    ("feature.showDesktopNameInIconTray.uppercase", "false"),
     ("feature.restorePreviousWindowFocus", "false"),
 ];

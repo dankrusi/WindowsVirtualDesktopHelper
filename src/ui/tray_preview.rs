@@ -189,7 +189,7 @@ impl Preview {
             .map(|s| {
                 (
                     (s.current + 1).to_string(),
-                    s.active().name.chars().next().unwrap_or('W').to_string(),
+                    tray::desktop_initial(settings, &s.active().name),
                 )
             })
             .unwrap_or(("2".into(), "W".into()));

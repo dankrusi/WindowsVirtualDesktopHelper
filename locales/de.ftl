@@ -92,6 +92,8 @@ desktop-number = Desktopnummer
 see-the-current-desktop-at-a-glance = Erkenne den aktuellen Desktop auf einen Blick.
 desktop-initial = Desktop-Anfangszeichen
 use-the-first-character-of-the-desktop-name = Verwende das erste Zeichen des Desktopnamens.
+uppercase-desktop-initial = Desktop-Anfangszeichen großschreiben
+display-the-desktop-initial-in-uppercase = Zeige den Anfangsbuchstaben des Desktopnamens als Großbuchstaben.
 click-to-open-task-view = Taskansicht per Klick öffnen
 click-the-desktop-indicator-to-see-all-your-desktops = Klicke auf die Desktopanzeige, um alle Desktops zu sehen.
 navigation = Navigation
@@ -222,10 +224,10 @@ change-shortcut = Tastenkombination für { $title } ändern
 enable-setting = { $title } aktivieren
 version-credit = Version { $version } · von Dan Krusi und Mitwirkenden
 winui-start-error = Die WinUI-Einstellungen konnten nicht gestartet werden: { $error }. Installiere Microsoft Windows App Runtime 2.4 oder neuer.
-tray-reconnecting = { $role } · Virtual Desktop Helper
-    Verbindung mit Windows wird wiederhergestellt…
-tray-tooltip = { $role } · Virtual Desktop Helper
-    { $name } · { $number } von { $total }
+tray-reconnecting = Verbindung mit Windows wird wiederhergestellt…
+    { $role }
+tray-tooltip = { $name } · { $number } von { $total }
+    { $role }
 tray-preview-summary = Desktop { $number } von { $total } · { $name }
 desktop-preview-summary = Vergrößerte Vorschau · Desktop { $number } von { $total }
 editor-conflict = { $key } wurde in den Einstellungen geändert, während dieser Editor geöffnet war. Der aktuelle Wert ist { $value }. Dein Entwurf bleibt erhalten. Öffne den Editor erneut, um die aktuellen Einstellungen zu laden.

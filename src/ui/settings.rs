@@ -487,6 +487,7 @@ impl SettingsUi {
         } else {
             [
                 "feature.showPrevNextIcons",
+                "feature.showDesktopNameInIconTray",
                 "feature.showDesktopSwitchOverlay",
                 "feature.showDesktopStatusOverlay",
                 "feature.useHotKeyToJumpToDesktopNumber",
@@ -1025,6 +1026,13 @@ impl SettingsUi {
                 "\u{E8D2}",
                 crate::i18n::text("desktop-initial"),
                 crate::i18n::text("use-the-first-character-of-the-desktop-name"),
+            ),
+            self.toggle(
+                c,
+                "feature.showDesktopNameInIconTray.uppercase",
+                "\u{E8D2}",
+                crate::i18n::text("uppercase-desktop-initial"),
+                crate::i18n::text("display-the-desktop-initial-in-uppercase"),
             ),
             self.toggle(
                 c,

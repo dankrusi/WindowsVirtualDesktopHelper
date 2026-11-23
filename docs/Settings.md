@@ -136,6 +136,7 @@ If Explorer restarts or its desktop service is temporarily unavailable, the help
 | feature.showDesktopNumberInIconTray | ``true`` |  |
 | feature.showDesktopNumberInIconTray.clickToOpenTaskView | ``true`` |  |
 | feature.showDesktopNameInIconTray | ``false`` |  |
+| feature.showDesktopNameInIconTray.uppercase | ``false`` | Display the desktop initial in uppercase in the tray. |
 
 ### Config File
 

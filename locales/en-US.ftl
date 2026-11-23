@@ -91,6 +91,8 @@ desktop-number = Desktop number
 see-the-current-desktop-at-a-glance = See the current desktop at a glance.
 desktop-initial = Desktop initial
 use-the-first-character-of-the-desktop-name = Use the first character of the desktop name.
+uppercase-desktop-initial = Uppercase desktop initial
+display-the-desktop-initial-in-uppercase = Display the desktop initial in uppercase.
 click-to-open-task-view = Click to open Task View
 click-the-desktop-indicator-to-see-all-your-desktops = Click the desktop indicator to see all your desktops.
 navigation = Navigation
@@ -221,10 +223,10 @@ change-shortcut = Change { $title } shortcut
 enable-setting = Enable { $title }
 version-credit = Version { $version } · by Dan Krusi and contributors
 winui-start-error = WinUI Settings could not start: { $error }. Install Microsoft Windows App Runtime 2.4 or later.
-tray-reconnecting = { $role } · Virtual Desktop Helper
-    Reconnecting to Windows…
-tray-tooltip = { $role } · Virtual Desktop Helper
-    { $name } · { $number } of { $total }
+tray-reconnecting = Reconnecting to Windows…
+    { $role }
+tray-tooltip = { $name } · { $number } of { $total }
+    { $role }
 tray-preview-summary = Desktop { $number } of { $total } · { $name }
 desktop-preview-summary = Enlarged preview · Desktop { $number } of { $total }
 editor-conflict = { $key } changed in Settings while this editor was open. Its current value is { $value }. Your draft has been kept; reopen the editor to start from the current settings.
