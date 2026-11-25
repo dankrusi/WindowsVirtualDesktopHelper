@@ -102,7 +102,7 @@ Copy-Item -LiteralPath (Join-Path $repoRoot 'LICENSE.md'), (Join-Path $repoRoot 
 $assetsDirectory = Join-Path $stageDirectory 'Assets'
 New-Item -ItemType Directory -Path $assetsDirectory -Force | Out-Null
 Add-Type -AssemblyName System.Drawing
-$sourceLogo = [System.Drawing.Image]::FromFile((Join-Path $repoRoot 'assets\images\WindowsVirtualDeskopHelper Logo.png'))
+$sourceLogo = [System.Drawing.Image]::FromFile((Join-Path $repoRoot 'assets\app.png'))
 try {
     foreach ($asset in @(@('StoreLogo.png', 50), @('Square44x44Logo.png', 44), @('Square150x150Logo.png', 150))) {
         $size = [int]$asset[1]
@@ -110,7 +110,7 @@ try {
         try {
             $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
             try {
-                $graphics.Clear([System.Drawing.Color]::White)
+                $graphics.Clear([System.Drawing.Color]::Transparent)
                 $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
                 $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
                 $graphics.DrawImage($sourceLogo, 0, 0, $size, $size)

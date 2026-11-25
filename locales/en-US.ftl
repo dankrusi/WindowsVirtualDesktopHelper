@@ -92,7 +92,6 @@ see-the-current-desktop-at-a-glance = See the current desktop at a glance.
 desktop-initial = Desktop initial
 use-the-first-character-of-the-desktop-name = Use the first character of the desktop name.
 uppercase-desktop-initial = Uppercase desktop initial
-display-the-desktop-initial-in-uppercase = Display the desktop initial in uppercase.
 click-to-open-task-view = Click to open Task View
 click-the-desktop-indicator-to-see-all-your-desktops = Click the desktop indicator to see all your desktops.
 navigation = Navigation

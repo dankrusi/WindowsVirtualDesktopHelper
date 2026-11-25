@@ -93,7 +93,6 @@ see-the-current-desktop-at-a-glance = 一眼辨識目前桌面。
 desktop-initial = 桌面首字元
 use-the-first-character-of-the-desktop-name = 使用桌面名稱的第一個字元。
 uppercase-desktop-initial = 桌面首字母大寫
-display-the-desktop-initial-in-uppercase = 以大寫形式顯示桌面名稱的首字母。
 click-to-open-task-view = 按一下開啟工作檢視
 click-the-desktop-indicator-to-see-all-your-desktops = 按一下桌面指示器以查看所有桌面。
 navigation = 導覽

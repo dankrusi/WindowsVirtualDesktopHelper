@@ -30,4 +30,5 @@ panic = "abort"
 windows-reactor = { version = "=0.100.0", features = ["test"] }
 
 [build-dependencies]
+embed-resource = "3.0"
 fluent-syntax = "0.12.0"

@@ -93,7 +93,6 @@ see-the-current-desktop-at-a-glance = Identifiez le bureau actif d’un coup d�
 desktop-initial = Initiale du bureau
 use-the-first-character-of-the-desktop-name = Utilisez le premier caractère du nom du bureau.
 uppercase-desktop-initial = Initiale du bureau en majuscule
-display-the-desktop-initial-in-uppercase = Affichez l’initiale du bureau en majuscule.
 click-to-open-task-view = Ouvrir l’Affichage des tâches d’un clic
 click-the-desktop-indicator-to-see-all-your-desktops = Cliquez sur l’indicateur pour voir tous vos bureaux.
 navigation = Navigation

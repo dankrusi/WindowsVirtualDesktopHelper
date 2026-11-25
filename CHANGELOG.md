@@ -1,6 +1,8 @@
 # v3.0.3
 
 ## Features
+* Related options appear as compact, indented rows inside their parent setting’s card and use muted labels when disabled.
+* The Settings and Configuration Editor windows show the new blue Segoe UI chevron icon.
 * Optionally show the desktop initial in uppercase in the tray.
 * Tray tooltips show the desktop name and number first, followed by the icon’s role, without repeating the app name.
 

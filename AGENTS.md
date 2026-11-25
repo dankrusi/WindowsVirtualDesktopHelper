@@ -5,6 +5,12 @@
 - Run automated checks yourself, then ask the user to perform interactive computer/UI testing. Relaunch the updated build and provide a short test checklist instead of automating the UI.
 - If notifyme is installed and in the AGENTS instructions, send a a notification after successful completion and relaunch.
 
+# Settings UI
+
+- Place dependent settings inside their parent toggle’s card using the shared `toggle_group` and `SettingRow::Child` layout. Use compact, indented rows with the group’s divider and aligned controls.
+- Keep child settings visible when unavailable. Disable the controls and mute their labels and descriptions using the same effective enabled state. Keep wrapped text and native control sizes so the rows work at narrow widths and high DPI.
+- Apply the embedded app icon to every titled app window through the shared caption helper.
+
 # Changelog
 
 - Record every user-visible change in `CHANGELOG.md` under the topmost version heading (`# vX.Y.Z`). If that version is already released (it has a `vX.Y.Z` git tag), add a new `# Unreleased` heading above it; `scripts\release.ps1` renames it to the released version.

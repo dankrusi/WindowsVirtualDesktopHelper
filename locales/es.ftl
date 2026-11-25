@@ -93,7 +93,6 @@ see-the-current-desktop-at-a-glance = Identifica el escritorio actual de un vist
 desktop-initial = Inicial del escritorio
 use-the-first-character-of-the-desktop-name = Usa el primer carácter del nombre del escritorio.
 uppercase-desktop-initial = Inicial del escritorio en mayúscula
-display-the-desktop-initial-in-uppercase = Muestra la inicial del escritorio en mayúscula.
 click-to-open-task-view = Abrir Vista de tareas al hacer clic
 click-the-desktop-indicator-to-see-all-your-desktops = Haz clic en el indicador para ver todos tus escritorios.
 navigation = Navegación

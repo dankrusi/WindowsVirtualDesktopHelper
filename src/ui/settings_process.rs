@@ -1,12 +1,39 @@
 //! WinUI lives in an on-demand child process. The tray's COM apartment and idle
 //! footprint do not depend on a XAML window or a second permanent message loop.
 use crate::{platform::wide, settings::Settings};
-use std::process::{Child, Command};
+use std::{
+    cell::RefCell,
+    collections::BTreeMap,
+    process::{Child, Command},
+};
 use windows_sys::Win32::System::DataExchange::COPYDATASTRUCT;
-use windows_sys::Win32::{Foundation::*, UI::WindowsAndMessaging::*};
+use windows_sys::Win32::{
+    Foundation::*,
+    System::LibraryLoader::GetModuleHandleW,
+    UI::{
+        HiDpi::{GetDpiForWindow, GetSystemMetricsForDpi},
+        WindowsAndMessaging::*,
+    },
+};
 pub const SETTINGS_MESSAGE: usize = 0x57564448;
 pub const RESET_MESSAGE: usize = 0x57564449;
 pub const SHOW_ABOUT: u32 = WM_APP + 37;
+// The application icon group in assets/app.rc.
+const APP_ICON_ID: u16 = 101;
+thread_local! {
+    // Keep shared HICONs alive until the UI thread and its windows shut down.
+    static CAPTION_ICONS: RefCell<BTreeMap<(i32, i32), CaptionIcon>> = const {
+        RefCell::new(BTreeMap::new())
+    };
+}
+struct CaptionIcon(HICON);
+impl Drop for CaptionIcon {
+    fn drop(&mut self) {
+        if !self.0.is_null() {
+            unsafe { DestroyIcon(self.0) };
+        }
+    }
+}
 pub struct SettingsProcess(Child);
 impl SettingsProcess {
     pub fn open(parent: HWND, settings: &Settings, about: bool) -> Result<Self, String> {
@@ -224,7 +251,42 @@ pub(super) fn update_caption_for(role: usize, settings: &Settings) {
                 "configuration-virtual-desktop-helper"
             });
             SetWindowTextW(hwnd, wide(title).as_ptr());
+            set_caption_icons(hwnd);
             super::theme(hwnd, dark);
+        }
+    }
+}
+
+unsafe fn set_caption_icons(hwnd: HWND) {
+    let dpi = GetDpiForWindow(hwnd);
+    if dpi == 0 {
+        return;
+    }
+    for (kind, width, height) in [
+        (ICON_SMALL, SM_CXSMICON, SM_CYSMICON),
+        (ICON_BIG, SM_CXICON, SM_CYICON),
+    ] {
+        let width = GetSystemMetricsForDpi(width, dpi);
+        let height = GetSystemMetricsForDpi(height, dpi);
+        let icon = CAPTION_ICONS.with(|icons| {
+            icons
+                .borrow_mut()
+                .entry((width, height))
+                .or_insert_with(|| {
+                    CaptionIcon(LoadImageW(
+                        GetModuleHandleW(std::ptr::null()),
+                        APP_ICON_ID as usize as *const u16,
+                        IMAGE_ICON,
+                        width,
+                        height,
+                        0,
+                    ))
+                })
+                .0
+        });
+        let kind = kind as usize;
+        if !icon.is_null() && SendMessageW(hwnd, WM_GETICON, kind, dpi as isize) != icon as isize {
+            SendMessageW(hwnd, WM_SETICON, kind, icon as isize);
         }
     }
 }
@@ -233,8 +295,8 @@ pub(super) fn update_caption_for(role: usize, settings: &Settings) {
 mod tests {
     use super::*;
     #[test]
-    fn native_window_roles_survive_identical_translated_captions() {
-        // Hidden native windows exercise discovery; no desktop UI is shown.
+    fn native_window_captions_keep_distinct_roles_and_share_the_application_icon() {
+        // Hidden native windows exercise caption setup without opening desktop UI.
         unsafe {
             let create = || {
                 CreateWindowExW(
@@ -266,6 +328,21 @@ mod tests {
                 window_for_process(windows_sys::Win32::System::Threading::GetCurrentProcessId()),
                 settings
             );
+            let config = Settings {
+                config: Default::default(),
+                arguments: Default::default(),
+                path: Default::default(),
+            };
+            update_caption(&config);
+            update_caption_for(2, &config);
+            for kind in [ICON_SMALL, ICON_BIG] {
+                let settings_icon = SendMessageW(settings, WM_GETICON, kind as usize, 0);
+                assert_ne!(settings_icon, 0, "missing icon for window caption");
+                assert_eq!(
+                    SendMessageW(editor, WM_GETICON, kind as usize, 0),
+                    settings_icon
+                );
+            }
             DestroyWindow(editor);
             DestroyWindow(settings);
         }

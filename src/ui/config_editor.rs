@@ -159,6 +159,7 @@ impl Component for Editor {
                 }),
         );
         context.on_color_scheme(context.callback(|_: ColorScheme| Message::Appearance));
+        context.on_window_size(context.callback(|_: WindowSize| Message::Appearance));
         let sender = context.sender();
         context.use_effect("mount-editor", (), move || {
             sender.send(Message::Ready);
